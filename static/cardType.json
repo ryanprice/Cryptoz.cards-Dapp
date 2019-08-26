@@ -1,0 +1,35 @@
+
+
+array (
+  'name' => 'Robot Emperor Zombie',
+  'image' => 'https://cryptoz.cards/card-gen/assets/robot_bug.svg',
+  'description' => 'If you see one. There are a 1000 more',
+  'external_url' => 'https://cryptoz.cards/view/19',
+  'attributes' =>
+  array (
+    'id' => '19',
+    'card_set' => 'Misfits 1',
+    'zombie_type' => 'Thing',
+    'in_store' => 'Booster',  //Store,Booster
+    'rarity' => 'Uncommon',
+    'edition_total' => 0,     // 0= unlimited, #total amount allowed
+    'card_level' => 4,
+    'cost' => '0',            // 0- can't buy, >0 - can buy
+    'buy_czxp' => '10',
+    'transfer_czxp' => '5',
+    'sacrifice_czxp' => '6',
+    'unlock_czxp' => '18',
+  ),
+)
+
+
+  bg: 'card-bg card-bg-6'
+  
+          {id:0, name: 'Jim Zombie',graphic: 'jim.svg', cost: 300, cset: 'We like to party set', edition_total: '#1 of 100',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-6'},
+        {id:1, name: 'Dorothy',graphic: 'dorothy.svg', cost: 300, cset: 'We like to party set', edition_total: '#7 of 100',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-1'},
+        {id:2, name: 'Green Dragon',graphic: 'dragon_green.svg', cost: 300, cset: 'We like to party set', edition_total: '#9 of 100',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-2'},
+        {id:3, name: 'Jim Zombie',graphic: 'black_crow.svg', cost: 300, cset: 'We like to party set', edition_total: '#120',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-3'},
+        {id:4, name: 'Dorothy',graphic: 'bloody_flame_wraith.svg', cost: 300, cset: 'We like to party set', edition_total: '#8 of 120',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-4'},
+        {id:5, name: 'Green Dragon',graphic: 'ash.svg', cost: 300, cset: 'We like to party set', edition_total: '#8',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-5'},
+        {id:6, name: 'Green Dragon',graphic: 'baby_cthulhu.svg', cost: 300, cset: 'We like to party set', edition_total: '#630',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-6'},
+        {id:7, name: 'Green Dragon',graphic: 'angry_tree_red.svg', cost: 300, cset: 'We like to party set', edition_total: '#8 of 100',unlock_czxp : '1,300,300',card_level: 80, buy_czxp: '1,800',transfer_czxp: '100', sacrifice_czxp: '2,300',bg: 'card-bg card-bg-6'},
