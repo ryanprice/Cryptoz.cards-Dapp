@@ -52,7 +52,7 @@
             <br>
             
             <div class="row">
-              <div class="col text-left"  v-if="ownsCards == 1">
+              <div class="col text-left"  v-if="ownsCards">
                 <b-dropdown id="dropdown" text="Sort By">
                     <b-dropdown-item @click="sortByName('name')">Name</b-dropdown-item>
                     <b-dropdown-item @click="sortByAttr('rarity')">Rarity</b-dropdown-item>
@@ -68,9 +68,9 @@
               </div>
             </div>
             <br>
-            <div class="row" v-if="ownsCards == 1">
+            <div class="row" v-if="ownsCards">
               <OwnedCardContent v-on:card-updated="handleCardUpdated"
-                v-for="card in allCards" :key="card.id"
+                v-for="card in orderedCards" :key="card.id"
                 :id="card.id"
                 :type_id="card.attributes.type_id"
                 :name="card.name"
@@ -133,7 +133,7 @@ export default {
 
       // new wallet.. reset their boosters and czxp balance
       if (newValue !== oldValue) {
-        this.setSubscriptions();
+        this.getAllCards();
       }
     },
     cryptContent(newValue, oldValue) {
@@ -141,7 +141,7 @@ export default {
       
       // stale crypt contents, refresh now
       if (newValue !== oldValue) {
-        this.setSubscriptions();
+        this.getAllCards();
       }
     },
     currentEvent(newValue,oldValue) {
@@ -151,7 +151,7 @@ export default {
         this.showSpinner = 0;
         this.transactionStatus = 'Confirmed ! balance updated';
         if(this.subscriptionState == 0){
-          this.setSubscriptions();
+          this.getAllCards();
         }
       }
     }
@@ -159,7 +159,7 @@ export default {
   mounted () {
     if(this.coinbase !== null){
       console.log('Crypt is mounted..')
-      this.setSubscriptions();
+      this.getAllCards();
     }
   },
   data () {
@@ -172,19 +172,20 @@ export default {
       el : 0,
       confirmOpenBtnDisabled : 0,
       wagerAmount : 0,
-      allCards: []
+      allCards: {}, // key-value structure to ensure uniqueness of cards
+      orderedCards: []
     }
   },
   methods : {
     handleCardUpdated : function() {
       console.log('CryptContent got child event..re-render the view');
-      this.setSubscriptions();
+      this.getAllCards();
     },
-    setSubscriptions : function() {
+    getAllCards : function() {
       this.subscriptionState = 1;
       var self = this;
       
-      Cryptoz.deployed().then(function(instance) {
+      Cryptoz.deployed().then((instance) => {
         return instance.tokensOfOwner(self.coinbase)
       }).then(this.handleGetAllCards)
       
@@ -198,75 +199,90 @@ export default {
       }).then(this.handleBuyBooster) //update boosters owned and total types
       
     },
-    handleGetAllCards : function(res) {
+    handleGetAllCards : async function(res) {
       console.log('Handling tokensOfOwner...');
-      //console.log(res);
-      
-      //reset the view to empty
-      this.allCards = []
       
       if(res.length > 0){
         console.log('Got cards.. start render');
         var self= this;
         //first we update the view
-        this.ownsCards = 1;
-        
+        this.ownsCards = true;
         
         //Place to track our token array data
-        var tokenIdList = [];
+        var tokenIdList = {};
 
         //Define a function to do all our handling and chain the data before passing back to our view
         var getCard = function(tokenId){
-
-          Cryptoz.deployed().then(function(instance) {
-            return instance.getOwnedCard.call(tokenId)
-          }).then(function(elementReturned) {
-            //console.log('A card !' + tokenId);
-            //console.log(elementReturned);
-            tokenIdList[tokenId] = elementReturned
-            return axios.get('https://cryptoz.cards/services/getCardData.php?card_id=' + elementReturned[0].c[0])
-          }).then(function(res){
-            //console.log('token id:' + tokenId);
-            //console.log('edition:' + tokenIdList[tokenId][1].c[0])
-            //console.log(res)
-            
-            //card token id
-            res.data.id = tokenId;
-            
-            var newAttr = [];
-            //format the attributes to match our JS objects
-            res.data.attributes.forEach(function(element){
-              newAttr[element.trait_type] = element.value;
+          //console.log('token id:' + tokenId);
+          return new Promise((resolve, reject) => {
+            Cryptoz.deployed().then(function(instance) {
+              return instance.getOwnedCard.call(tokenId)
+            }).then(function(elementReturned) {
+              //console.log('A card !' + tokenId);
+              //console.log(elementReturned);
+              tokenIdList[tokenId] = elementReturned
+              return axios.get('https://cryptoz.cards/services/getCardData.php?card_id=' + elementReturned[0].c[0])
+            }).then(function(res){
+              //console.log('edition:' + tokenIdList[tokenId][1].c[0])
+              res.data.id = tokenId;
+              var newAttr = [];
+              //format the attributes to match our JS objects
+              res.data.attributes.forEach(function(element){
+                newAttr[element.trait_type] = element.value;
+              })
+              
+              //Overwrite our JSON reponse with vue friendly card binding data
+              res.data.attributes = newAttr;
+              
+              //Edition total
+              // #4  , #4 of 300
+              if(res.data.attributes.edition_total == 0) //unlimited
+              {
+                res.data.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0];
+              }else{
+                res.data.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0] +' of '+res.data.attributes.edition_total;
+              }
+              
+              switch(res.data.attributes.rarity){
+                case "Common":
+                  res.data.attributes.rarity = 'card-bg card-bg-6';
+                  break;
+                case "Uncommon":
+                  res.data.attributes.rarity = 'card-bg card-bg-5';
+                  break;
+                case "Rare":
+                  res.data.attributes.rarity = 'card-bg card-bg-4';
+                  break;
+                case "Epic":
+                  res.data.attributes.rarity = 'card-bg card-bg-3';
+                  break;
+                case "Diamond":
+                  res.data.attributes.rarity = 'card-bg card-bg-2';
+                  break;
+                case "Platinum":
+                  res.data.attributes.rarity = 'card-bg card-bg-1';
+                  break;
+              }
+              
+              resolve(res.data)
             })
-            
-            //Overwrite our JSON reponse with vue friendly card binding data
-            res.data.attributes = newAttr;
-            
-            //Edition total
-            // #4  , #4 of 300
-            if(res.data.attributes.edition_total == 0) //unlimited
-            {
-              res.data.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0];
-            }else{
-              res.data.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0] +' of '+res.data.attributes.edition_total;
-            }
-            
-            //pass the card data array to our view update handler
-            self.handleGotCardData(res);
+            .catch((err) => {
+              reject(err)
+            })
           })
         }
         
-        //Iterate through all our cards
-        res.forEach(function(element){
-          //console.log(element.c[0]);
-          //tokenIdList.push(element.c[0]);
-          getCard(element.c[0])
+        //asynchronously get all our cards
+        this.orderedCards = await Promise.all(
+          res.map(element => getCard(element.c[0]))
+        )
+        this.orderedCards.forEach(card => {
+          this.allCards[card.id] = card
         })
-        
         
       }else{
         console.log('no cards returned from handleGetAllCards()');
-        this.ownsCards = 0; //set the message to buy or get Cryptoz
+        this.ownsCards = false; //set the message to buy or get Cryptoz
       }
       //we are done, clear the state
       this.subscriptionState = 0;
@@ -274,32 +290,12 @@ export default {
     handleGotCardData : function(res) {
       //console.log(res.data);
       //Append the bg
-      switch(res.data.attributes.rarity){
-        case "Common":
-          res.data.attributes.rarity = 'card-bg card-bg-6';
-          break;
-        case "Uncommon":
-          res.data.attributes.rarity = 'card-bg card-bg-5';
-          break;
-        case "Rare":
-          res.data.attributes.rarity = 'card-bg card-bg-4';
-          break;
-        case "Epic":
-          res.data.attributes.rarity = 'card-bg card-bg-3';
-          break;
-        case "Diamond":
-          res.data.attributes.rarity = 'card-bg card-bg-2';
-          break;
-        case "Platinum":
-          res.data.attributes.rarity = 'card-bg card-bg-1';
-          break;
-      }
-      
-      this.allCards.push(res.data);
+      // console.log(res)
+      this.allCards[res.data.id] = res.data;
     },
     handleBuyBooster : function(result) {
       console.log('Handling buy booster...');
-      //console.log(result);
+      // console.log(result);
       this.$bvModal.hide('open-booster-modal')
       
       //change from pending to ready
@@ -336,35 +332,37 @@ export default {
         }
       })
     },
-    handleBoosterOpened : function(error, result) {
-      if(!error){
-        if(result !== undefined){
-          console.log('handleBoosterOpened:' ,result.tx);
-          //change from pending to ready
-          this.transactionStatus = 'Broadcast to chain...';
-          resolve(result);
+    handleBoosterOpened : function(result, error) {
+      return new Promise((resolve, reject) => {
+        if(!error){
+          if(result !== undefined){
+            console.log('handleBoosterOpened:' ,result.tx);
+            //change from pending to ready
+            this.transactionStatus = 'Broadcast to chain...';
+            resolve(result);
+          }else{
+            console.log('USER CANCELLED in handleBoosterOpened');
+            return reject(error);
+          }
         }else{
-          console.log('USER CANCELLED in handleBoosterOpened');
+          console.log('Error in handleBoosterOpened:', error);
           return reject(error);
         }
-      }else{
-        console.log('Error in handleBoosterOpened:', error);
-        return reject(error);
-      }
+      })
     },
     sortByName : function(param) {
-      this.allCards.sort(dynamicSort(param))
+      this.orderedCards.sort(dynamicSort(param))
     },
     sortByAttr : function(param) {
-      this.allCards.sort(sortAttributes(param))
+      this.orderedCards.sort(sortAttributes(param))
     }
   }
 }
 
 /*
   Ok we need to track the state of the Crypt
-  LoggedIn 1 or 0
-  ownsCards 1 or 0
+  LoggedIn true or false
+  ownsCards true or false
   Sorted By
     Name
     Date Type loaded

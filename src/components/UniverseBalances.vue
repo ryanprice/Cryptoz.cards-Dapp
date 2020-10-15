@@ -69,13 +69,25 @@
         
       },
       handleTotalTypes: function(_total){
+        console.log(
+          `%c handleTotalTypes: ${_total}`,
+          "color:green;"
+        );
         this.$store.dispatch('updateTypesTotal', parseInt(_total).toLocaleString())
       },
       // DONT DELETE !! THESE ARE SUPPLY TOTALS
       handleSetCZXPSupply :  function(_totalSupply) {
+        console.log(
+          `%c handleSetCZXPSupply: ${_totalSupply}`,
+          "color:green;"
+        );
         this.$store.dispatch('updateCZXPTotal', parseInt(_totalSupply).toLocaleString())
       },
       handleSetCryptozSupply :  function(_totalSupply) {
+        console.log(
+          `%c handleSetCryptozSupply: ${_totalSupply}`,
+          "color:green;"
+        );
         this.$store.dispatch('updateCryptozTotal', parseInt(_totalSupply).toLocaleString())
       },
     }

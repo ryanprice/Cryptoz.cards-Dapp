@@ -39,8 +39,8 @@ let watchEvents = function (state) {
            event.args.player == store.state.web3.coinbase){
           store.dispatch('updateOwnerBalances', event);
         }
-          //Otherwise a czxp event ALWAYS updates the universe balance
-          store.dispatch('updateUniverseBalances', event);
+        //Otherwise a czxp event ALWAYS updates the universe balance
+        store.dispatch('updateUniverseBalances', event);
       }else{
         console.log("ERROR in watchEvents.js : ", error);
       }

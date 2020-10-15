@@ -116,41 +116,37 @@ export default {
   methods : {
     buyCard : function(){
       console.log("Buying card:" + this.type_id);
-      var self = this;
       
-      Cryptoz.deployed().then(function(instance) {
-        return instance.buyCard(self.type_id, {from: self.coinbase, value:(self.cost*1000000000000000000)});
-      }).then(function(res) {
+      Cryptoz.deployed().then((instance) => {
+        return instance.buyCard(this.type_id, {from: this.coinbase, value:(this.cost*1000000000000000000)});
+      }).then((res) => {
         console.log(res);
-        self.showTransaction =1
-        self.$store.dispatch('updateOwnerBalances')
+        this.showTransaction =1
+        this.$store.dispatch('updateOwnerBalances')
       })
     },
     getCard : function(){
       console.log("Claiming card:" + this.type_id);
-      var self = this;
       
-      Cryptoz.deployed().then(function(instance) {
-        return instance.getFreeCard(self.type_id, {from: self.coinbase});
-      }).then(function(res) {
+      Cryptoz.deployed().then((instance) => {
+        return instance.getFreeCard(this.type_id, {from: this.coinbase});
+      }).then((res) => {
         console.log(res)
-        self.showTransaction =1
-        self.$store.dispatch('updateOwnerBalances')
+        this.showTransaction =1
+        this.$store.dispatch('updateOwnerBalances')
       })
     },
     sacrificeCard : function() {
       console.log("Sacrificing card:" + this.id);
-      var self = this;
       
-      Cryptoz.deployed().then(function(instance) {
-        self.isSacrificingCard = true;
+      Cryptoz.deployed().then((instance) => {
+        this.isSacrificingCard = true;
         return instance.sacrifice(self.id, {from:self.coinbase});
-      }).then(function(res){
-        console.log("sacrifice result:");
-        console.log(res);
-        self.$store.dispatch('updateOwnerBalances')
+      }).then((res) => {
+        console.log("sacrifice result: ", res);
+        this.$store.dispatch('updateOwnerBalances')
         //Send a mutation for the state change to the crypt
-        self.$store.dispatch('updateCrypt')
+        this.$store.dispatch('updateCrypt')
       }).catch((err) => {
         console.log(err.message);
         if (err.code === 4001) {
@@ -174,28 +170,42 @@ export default {
       //Disable the button so they dont mash it up
       this.confirmTransferBtnDisabled = 1;
       
+      
       //var toWallet = document.getElementById('toWallet').value
       
       console.log('to ' + this.newWallet)
       console.log('from ' + this.coinbase)
+      var contract
       
-      var self = this
-      
-      Cryptoz.deployed().then(function(instance) {
-        console.log(self.coinbase+' '+self.newWallet+' '+self.id)
-        return instance.transferFrom(self.coinbase, self.newWallet, self.id, {from:self.coinbase});
-      }).then(function(res){
-        //console.log("tranfer result:");
-        //console.log(res);
-        var modalName = 'transfer-modal-' + self.id;
-        console.log('closing modal' + modalName);
-        
-        self.$bvModal.hide('transfer-modal-' + self.id)
-        self.confirmTransferBtnDisabled = 0;
-        
+      Cryptoz.deployed().then((instance) => {
+        contract = instance
+        console.log(this.coinbase+' '+this.newWallet+' '+this.id)
+        var modalName = 'transfer-modal-' + this.id;
+        this.$bvModal.hide(modalName)
+        this.$bvToast.toast(
+          'Transaction pending in blockchain.',
+          {
+            title: 'Pending',
+            autoHideDelay: 5000,
+            solid: true
+          }
+        )
+        return contract.transferFrom(this.coinbase, this.newWallet, this.id, {from:this.coinbase});
+      }).then((res) => {
+        console.log("tranfer result: ", res);
+        this.confirmTransferBtnDisabled = 0;
+        this.$bvToast.toast(
+          'Gifting was successful.',
+          {
+            title: 'Success',
+            autoHideDelay: 5000,
+            solid: true
+          }
+        )
+        return contract.tokensOfOwner(self.coinbase)
+      }).then(this.handleGetAllCards)
         //Send a mutation for the state change to the crypt
-        self.$store.dispatch('updateCrypt')
-      })
+        // this.$store.dispatch('updateCrypt')
     }
   }
 }

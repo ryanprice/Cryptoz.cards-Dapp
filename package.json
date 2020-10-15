@@ -9,7 +9,6 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@truffle/contract": "^4.0.35",
     "axios": "^0.18.1",
     "bootstrap": "4.5.2",
     "bootstrap-vue": "^2.0.0-rc.27",
