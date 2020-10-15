@@ -62,8 +62,8 @@
         }).then(this.setCzxpBalance)
         
         Cryptoz.deployed().then(function(instance) {
-          console.log("get cryptoz cards tokens balance...");
-          return instance.tokensOfOwner.call(self.coinbase);
+          // console.log("get cryptoz cards tokens balance...");
+          return instance.tokensOfOwner(self.coinbase);
         }).then(this.setCryptozBalance)
         
         Cryptoz.deployed().then(function(instance) {
@@ -73,10 +73,10 @@
       setCzxpBalance :  function(bal){
         this.$store.dispatch('updateCZXPBalance', bal)
       },
-      setCryptozBalance : function(bal) {
+      setCryptozBalance : function(tokens) {
         //console.log('setCryptozBalance:',bal);
         //this.cards_owned = parseInt(bal).toLocaleString();
-        this.$store.dispatch('updateCardsOwned', parseInt(bal).toLocaleString())
+        this.$store.dispatch('updateCardsOwned', tokens.length)
       },
       setBoostersOwned : function(_total){
         //console.log('setBoostersOwned:',_total);

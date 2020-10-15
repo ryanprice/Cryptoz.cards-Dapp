@@ -172,7 +172,6 @@ export default {
       el : 0,
       confirmOpenBtnDisabled : 0,
       wagerAmount : 0,
-      allCards: {}, // key-value structure to ensure uniqueness of cards
       orderedCards: []
     }
   },
@@ -276,9 +275,7 @@ export default {
         this.orderedCards = await Promise.all(
           res.map(element => getCard(element.c[0]))
         )
-        this.orderedCards.forEach(card => {
-          this.allCards[card.id] = card
-        })
+        this.$store.dispatch('updateCardsOwned', this.orderedCards.length)
         
       }else{
         console.log('no cards returned from handleGetAllCards()');
@@ -286,12 +283,6 @@ export default {
       }
       //we are done, clear the state
       this.subscriptionState = 0;
-    },
-    handleGotCardData : function(res) {
-      //console.log(res.data);
-      //Append the bg
-      // console.log(res)
-      this.allCards[res.data.id] = res.data;
     },
     handleBuyBooster : function(result) {
       console.log('Handling buy booster...');
