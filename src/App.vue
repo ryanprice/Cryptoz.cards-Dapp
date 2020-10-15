@@ -218,4 +218,13 @@ export default {
     /* .component-fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }
+
+  .toast-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .toast-message {
+    margin-left: 10px;
+  }
 </style>

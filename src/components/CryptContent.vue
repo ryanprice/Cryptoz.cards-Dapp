@@ -23,7 +23,6 @@
   </b-modal>
     
     <div class="jumbotron">
-      
       <UniverseBalances></UniverseBalances>
       
           <h1>Your Cryptoz Wallet</h1>
@@ -34,13 +33,8 @@
               <div class="col">
                 <b-button class="btn btn-danger" v-bind:disabled="boostersOwned < 1" v-b-modal.open-booster-modal>Open Booster Card
                 </b-button>
-                <transition name="fade">
-                  <span v-if="showSpinner==1">
-                    <img src="@/assets/spinner.gif" class="spinner" /> <strong>{{transactionStatus}}</strong>
-                  </span>
-                </transition>
               </div>
-              <div class="col">
+              <div class="col buy-and-open-booster">
                 <button class="btn btn-danger" v-bind:disabled="balance < 2000000000000000" v-on:click="buyAndOpenBooster">Buy and Open Booster 0.002E
                 </button>
               </div>
@@ -96,6 +90,7 @@ import axios from 'axios'
 import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
+import {showPendingToast, showSuccessToast, showRejectedToast} from '../util/showToast';
 
 export default {
   name: 'CryptContent',
@@ -148,8 +143,7 @@ export default {
       console.log('CRYPT currentEvent:',newValue)
       if(newValue !== oldValue && typeof newValue !== "undefined"){
         console.log('CRYPT old:',oldValue ,' new:',newValue);
-        this.showSpinner = 0;
-        this.transactionStatus = 'Confirmed ! balance updated';
+        showSuccessToast(this, 'Confirmed ! balance updated')
         if(this.subscriptionState == 0){
           this.getAllCards();
         }
@@ -165,7 +159,6 @@ export default {
   data () {
     return {
       subscriptionState:0, // 0=idle,1=active
-      showSpinner:0,
       transactionStatus: 'Pending confirmation...',
       czxp_balance : 'Log in Metamask',
       ownsCards : 0,
@@ -191,12 +184,22 @@ export default {
     },
     buyAndOpenBooster : function() {
       console.log('Buy and Open Booster card...');
+      showPendingToast(this);
       var self = this;
       Cryptoz.deployed().then(function(instance) {
         return instance.buyBoosterCardAndOpen({from: self.coinbase, value:2000000000000000});
-      //}).then(this.handleBuyBooster)
-      }).then(this.handleBuyBooster) //update boosters owned and total types
-      
+      })
+      //update boosters owned and total types
+      .then(() => {
+        showSuccessToast(self);
+        this.handleBuyBooster();
+      })
+      .catch((err) => {
+        console.log(err.message);
+        if (err.code === 4001) {
+         showRejectedToast(self);
+        }
+      })
     },
     handleGetAllCards : async function(res) {
       console.log('Handling tokensOfOwner...');
@@ -297,29 +300,21 @@ export default {
       console.log('Wagering..' + this.wagerAmount);
       
       //Change buy button to pending.. or show some pending state
-      this.showSpinner = 1;
-      this.transactionStatus = 'Pending confirmation...';
-      
+      showPendingToast(this);
       var self = this;
       
       this.$bvModal.hide('open-booster-modal')
       
       Cryptoz.deployed().then(function(instance) {
         return instance.openBoosterCard(self.wagerAmount, {from: self.coinbase});
-      }).then(this.handleBoosterOpened)
+      }).then(() => {
+        showSuccessToast(self);
+        this.handleBoosterOpened();
+      })
       .catch(err => {
         console.log(err);
-        this.showSpinner = 0;
         if (err.code === 4001) {
-          this.$bvToast.toast(
-            'You have rejected the transaction.',
-            {
-              title: 'Transaction Rejected',
-              autoHideDelay: 5000,
-              solid: true,
-              variant: 'warning'
-            }
-          )
+          showRejectedToast(self);
         }
       })
     },
@@ -370,5 +365,14 @@ export default {
   }
   .spinner {
     width: 2em;
+  }
+
+  .spinner-wrapper {
+    display: flex;
+    margin: 0px 8px;
+  }
+
+  .buy-and-open-booster {
+    display: flex;
   }
 </style>
