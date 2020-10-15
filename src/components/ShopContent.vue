@@ -148,7 +148,7 @@ export default {
       if(newValue !== oldValue && typeof newValue !== "undefined"){
         if (this.pendingTransaction == newValue.blockHash) {
           this.showSpinner = 0;
-          this.transactionStatus = 'Confirmed ! balance updated';
+          this.transactionStatus = 'Confirmed! Balance updated';
         }
       }
     }

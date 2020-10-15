@@ -139,13 +139,15 @@ export default {
         this.getAllCards();
       }
     },
-    currentEvent(newValue,oldValue) {
+    currentEvent(newValue, oldValue) {
       console.log('CRYPT currentEvent:',newValue)
-      if(newValue !== oldValue && typeof newValue !== "undefined"){
-        console.log('CRYPT old:',oldValue ,' new:',newValue);
-        showSuccessToast(this, 'Confirmed ! balance updated')
+      if (newValue) {
         if(this.subscriptionState == 0){
           this.getAllCards();
+        }
+        if(oldValue && newValue.transactionHash !== oldValue.transactionHash){
+          console.log('CRYPT old:',oldValue ,' new:',newValue);
+          showSuccessToast(this, 'Confirmed! Balance updated')
         }
       }
     }
@@ -159,9 +161,8 @@ export default {
   data () {
     return {
       subscriptionState:0, // 0=idle,1=active
-      transactionStatus: 'Pending confirmation...',
       czxp_balance : 'Log in Metamask',
-      ownsCards : 0,
+      ownsCards : false,
       el : 0,
       confirmOpenBtnDisabled : 0,
       wagerAmount : 0,
@@ -191,8 +192,8 @@ export default {
       })
       //update boosters owned and total types
       .then(() => {
-        showSuccessToast(self);
-        this.handleBuyBooster();
+        this.$bvModal.hide('open-booster-modal')
+        this.getAllCards()
       })
       .catch((err) => {
         console.log(err.message);
@@ -290,10 +291,8 @@ export default {
     handleBuyBooster : function(result) {
       console.log('Handling buy booster...');
       // console.log(result);
-      this.$bvModal.hide('open-booster-modal')
       
       //change from pending to ready
-      this.transactionStatus = 'Broadcast to chain...';
     },
     openBooster : function () {
       
@@ -308,7 +307,6 @@ export default {
       Cryptoz.deployed().then(function(instance) {
         return instance.openBoosterCard(self.wagerAmount, {from: self.coinbase});
       }).then(() => {
-        showSuccessToast(self);
         this.handleBoosterOpened();
       })
       .catch(err => {
@@ -323,8 +321,6 @@ export default {
         if(!error){
           if(result !== undefined){
             console.log('handleBoosterOpened:' ,result.tx);
-            //change from pending to ready
-            this.transactionStatus = 'Broadcast to chain...';
             resolve(result);
           }else{
             console.log('USER CANCELLED in handleBoosterOpened');

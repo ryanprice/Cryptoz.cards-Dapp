@@ -226,5 +226,6 @@ export default {
 
   .toast-message {
     margin-left: 10px;
+    font-size: 20px;
   }
 </style>

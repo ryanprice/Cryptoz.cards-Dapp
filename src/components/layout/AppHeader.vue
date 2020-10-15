@@ -1,69 +1,73 @@
 <template>
   <div id="app-header" class="headerComponent" >
     <b-navbar toggleable="lg" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <img class="logo-nav" src="./../assets/cryptokeeper_logo.svg" />
-        
-        <router-link class="navbar-brand" to="/">Cryptoz</router-link>
-        
-        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-        
-        <b-collapse id="nav-collapse" is-nav>
-          <b-navbar-nav>
-            <b-nav-item>
-              <router-link to="/shop">Shop</router-link>
-            </b-nav-item>
-            <b-nav-item>
-              <router-link to="/crypt">Your Crypt</router-link>
-            </b-nav-item>
-            <b-nav-item>
-              <router-link to="/market">Markets</router-link>
-            </b-nav-item>
-            <b-nav-item>
-              <router-link to="/view/1">View</router-link>
-            </b-nav-item>
-          </b-navbar-nav>
-      
-          <div class="bonusClass" v-if="coinbase != null && bonusReady == 1  && showSpinner == false" v-on:click="GetBonus">
-            Claim 2 FREE Boosters !
-          </div>
-          <div v-else-if="showSpinner == true">
-              <img src="@/assets/spinner.gif" class="spinner" />
-              <transition>
-                <span class="spinner-text-style">{{transactionMessage}}</span>
-              </transition>
-          </div>
-          <div class="bonusClassNo" v-else-if="coinbase != null && bonusReady == 0 && showSpinner == false">
-            Your Next Bonus:<br><strong> {{timeToBonus}}</strong>
-          </div>
-
-          <transition name="fade" mode="out-in">
-
-            <p class="mm-header ml-auto" v-if="web3.isInjected == false">
-              Metamask is <strong>required</strong> to connect Cryptoz on Ethereum
-              <a href="https://metamask.io/" target="_blank">
-                <img src="@/assets/metamask_logo.png" width="40%" />
-              </a>
-            </p>
-            
-            <span class="wallet-nav ml-auto" v-else>
-              <img src="@/assets/metamask-face.png" width="8%" />
-              {{coinbase.substr(0,6) + '...' + coinbase.substr(38)}}
-              <span class="wallet-balance"><img src="@/assets/ethereum-symbol.png" width="10%" />  {{wallet.toFixed(4)}} </span>
-            </span>
-          
+    <router-link id="cryptoz-logo" class="navbar-brand" to="/">
+      <img class="logo-nav" src="./../assets/cryptokeeper_logo.svg" />
+      Cryptoz
+    </router-link>
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav>
+        <b-nav-item>
+          <router-link to="/shop">Shop</router-link>
+        </b-nav-item>
+        <b-nav-item>
+          <router-link to="/crypt">Your Crypt</router-link>
+        </b-nav-item>
+        <b-nav-item>
+          <router-link to="/market">Markets</router-link>
+        </b-nav-item>
+        <b-nav-item>
+          <router-link to="/view/1">View</router-link>
+        </b-nav-item>
+      </b-navbar-nav>
+  
+      <div class="bonusClass" v-if="coinbase != null && bonusReady == 1  && showSpinner == false" v-on:click="GetBonus">
+        Claim 2 FREE Boosters !
+      </div>
+      <div v-else-if="showSpinner == true">
+          <img src="@/assets/spinner.gif" class="spinner" />
+          <transition>
+            <span class="spinner-text-style">{{transactionMessage}}</span>
           </transition>
+      </div>
+      <div class="bonusClassNo" v-else-if="coinbase != null && bonusReady == 0 && showSpinner == false">
+        Your Next Bonus:<br><strong> {{timeToBonus}}</strong>
+      </div>
 
-          <b-nav  class="ml-auto">
-            <router-link to="/help">Help</router-link>
-          </b-nav>
+      <transition name="fade" mode="out-in">
+
+        <p class="mm-header ml-auto" v-if="web3.isInjected == false">
+          Metamask is <strong>required</strong> to connect Cryptoz on Ethereum
+          <a href="https://metamask.io/" target="_blank">
+            <img src="@/assets/metamask_logo.png" width="40%" />
+          </a>
+        </p>
         
-          <b-nav-item v-if="web3.isInjected == false">
-            <b-button variant="primary" v-on:click="requestPermission()">
-              Connect
-            </b-button>
-          </b-nav-item>
-          
-        </b-collapse>
+        <span class="wallet-nav ml-auto flex-row" v-else>
+          <div v-b-tooltip.hover :title="coinbase">
+            <img src="@/assets/metamask-face.png" />
+            {{coinbase.substr(0,6) + '...' + coinbase.substr(38)}}
+          </div>
+          <span v-b-tooltip.hover :title="wallet" class="wallet-balance">
+            <img src="@/assets/ethereum-symbol.png" />
+            {{wallet.toFixed(4)}}
+          </span>
+        </span>
+      
+      </transition>
+
+      <b-nav  class="ml-auto">
+        <router-link to="/help">Help</router-link>
+      </b-nav>
+    
+      <b-nav-item v-if="web3.isInjected == false">
+        <b-button variant="primary" v-on:click="requestPermission()">
+          Connect
+        </b-button>
+      </b-nav-item>
+      
+    </b-collapse>
       
     </b-navbar>
       <p></p>
@@ -127,7 +131,7 @@ export default {
       if(newValue !== oldValue && typeof newValue !== "undefined"){
         if (this.pendingTransaction == newValue.blockHash) {
           this.showSpinner = false;
-          this.transactionMessage = 'Confirmed ! balance updated';
+          this.transactionMessage = 'Confirmed! Balance updated';
           this.setSubscriptions();
         }
       }
@@ -224,6 +228,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  #cryptoz-logo {
+    margin-right: 3rem;
+  }
+
   .router-link-active {
     color:#ffffff;
   }
@@ -236,7 +244,7 @@ export default {
   }
 
   .logo-nav{
-    margin-right: 1.6em;
+    margin-right: 0.5em;
     width:2em;
   }
 
@@ -244,6 +252,10 @@ export default {
     color: #d48b15;
     width:22em;
     margin-left: 2em;
+  }
+
+  .wallet-nav img {
+    width: 30px;
   }
   
   li{
@@ -257,8 +269,7 @@ export default {
   a:hover{
     color:#FFF;
     text-decoration: none;
-    border: 1px solid #fff;
-    padding:1px;
+    transform: scale(1.1);
   }
 
   .fade-enter-active, .fade-leave-active {
@@ -300,6 +311,11 @@ export default {
     cursor: pointer;
     padding:1px;
     border: 1px solid transparent;
+  }
+
+  .flex-row {
+    display: flex;
+    flex-direction: row;
   }
 
   @keyframes shake {

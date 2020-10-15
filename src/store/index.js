@@ -44,7 +44,9 @@ export const store = new Vuex.Store({
   updateUniverseBalances(state, payload) {
     console.log('mutate updateUniverseBalances');
     state.universeBalances += 1;
-    state.lastChainEvent = payload;
+    if (payload) {
+      state.lastChainEvent = payload;
+    }
   },
   updateCZXPBalance (state, payload) {
     console.log("updateCZXPBalance state.." ,payload);

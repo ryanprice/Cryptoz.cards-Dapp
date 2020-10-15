@@ -125,8 +125,7 @@
         
         Cryptoz.deployed().then(function(instance) {
           contract = instance;
-          console.log(instance.tokensOfOwner.call())
-          // return instance.exists.call(self.token_id);
+          return instance.exists.call(self.token_id);
           //return instance.exists(self.token_id, {from: account});
         }).then(function(res){
           //console.log(res);

@@ -17,7 +17,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" :disabled="confirmTransferBtnDisabled == 1" v-on:click="transferCard">Confirm Transfer</button>
+        <button type="button" class="btn btn-danger" :disabled="confirmTransferBtnDisabled" v-on:click="transferCard">Confirm Transfer</button>
       </div>
     </div>
   </div>
@@ -63,13 +63,13 @@
           </div>
           <div class="sacrifice-wrapper" v-if="$route.path == '/crypt'">
             <div class="sacrifice-button">
-               <button :disabled="isSacrificingCard" class="btn btn-danger" v-on:click="sacrificeCard">
+               <button :disabled="isGiftingCard || isSacrificingCard" class="btn btn-danger" v-on:click="sacrificeCard">
                 Sacrifice
               </button>
-              <b-spinner v-if="isSacrificingCard" label="Spinning"></b-spinner>
+              <b-spinner v-if="isGiftingCard || isSacrificingCard" label="Spinning"></b-spinner>
             </div>
             <div class="float-right">
-              <b-button class="btn btn-danger btn-gift" v-b-modal="'transfer-modal-'+id">
+              <b-button :disabled="isGiftingCard || isSacrificingCard" class="btn btn-danger btn-gift" v-b-modal="'transfer-modal-'+id">
                 <img src="@/assets/baseline_card_giftcard_white_24dp.png" />
               </b-button>
             </div>
@@ -87,6 +87,8 @@
 </template>
 
 <script>
+import {showPendingToast, showSuccessToast, showRejectedToast} from '../util/showToast';
+
 export default {
   name: 'OwnedCardContent',
   props: ['id','type_id','name','image','edition_total','cset','unlock_czxp','level','cost','buy_czxp','transfer_czxp','sacrifice_czxp','card_class', 'in_store'],
@@ -127,12 +129,13 @@ export default {
       showTransaction : 0,
       transaction_number : 0,
       newWallet : '',
-      confirmTransferBtnDisabled : 0,
+      confirmTransferBtnDisabled : false,
       buyBtnTooltipTextContent: 'Click to buy a copy of this card',
       buyBtnBlockedTooltipTextContent:'You do not have enough Ether or CZXP tokens to purchase this card',
       getBtnTooltipTextContent: 'Click to get a copy of this card at no cost',
       getBtnBlockedTooltipTextContent: 'You do not have enough CZXP tokens to unlock this button and claim this Free card',
       isSacrificingCard: false,
+      isGiftingCard: false
     }
   },
   methods : {
@@ -160,72 +163,50 @@ export default {
     },
     sacrificeCard : function() {
       console.log("Sacrificing card:" + this.id);
-      
+      showPendingToast(this)
       Cryptoz.deployed().then((instance) => {
         this.isSacrificingCard = true;
-        return instance.sacrifice(self.id, {from:self.coinbase});
+        return instance.sacrifice(this.id, {from:this.coinbase});
       }).then((res) => {
         console.log("sacrifice result: ", res);
         this.$store.dispatch('updateOwnerBalances')
         //Send a mutation for the state change to the crypt
         this.$store.dispatch('updateCrypt')
       }).catch((err) => {
+        this.isSacrificingCard = false;
         console.log(err.message);
         if (err.code === 4001) {
-          this.$bvToast.toast(
-            'You have rejected the transaction.',
-            {
-              title: 'Transaction Rejected',
-              autoHideDelay: 5000,
-              solid: true,
-              variant: 'warning'
-            }
-          )
+          showRejectedToast(this)
         }
-      }).finally(() => {
-        self.isSacrificingCard = false;
-      })
+      }).finally(() => {})
     },
     transferCard : function() {
       console.log('Transfer card called..' + this.id);
       
       //Disable the button so they dont mash it up
-      this.confirmTransferBtnDisabled = 1;
-      
-      
+      this.confirmTransferBtnDisabled = true;
       //var toWallet = document.getElementById('toWallet').value
       
       console.log('to ' + this.newWallet)
       console.log('from ' + this.coinbase)
       var contract
-      
       Cryptoz.deployed().then((instance) => {
         contract = instance
-        console.log(this.coinbase+' '+this.newWallet+' '+this.id)
+        this.isGiftingCard = true
+        // console.log(this.coinbase+' '+this.newWallet+' '+this.id)
         var modalName = 'transfer-modal-' + this.id;
         this.$bvModal.hide(modalName)
-        this.$bvToast.toast(
-          'Transaction pending in blockchain.',
-          {
-            title: 'Pending',
-            autoHideDelay: 5000,
-            solid: true
-          }
-        )
+        showPendingToast(this)
         return contract.transferFrom(this.coinbase, this.newWallet, this.id, {from:this.coinbase});
       }).then((res) => {
-        console.log("tranfer result: ", res);
-        this.confirmTransferBtnDisabled = 0;
-        this.$bvToast.toast(
-          'Gifting was successful.',
-          {
-            title: 'Success',
-            autoHideDelay: 5000,
-            solid: true
-          }
-        )
-        return contract.tokensOfOwner(self.coinbase)
+        // console.log("transfer result: ", res);
+        this.confirmTransferBtnDisabled = false;
+        return contract.tokensOfOwner(this.coinbase)
       }).then(this.handleGetAllCards)
+      .catch(() => {
+        this.isGiftingCard = false
+        this.confirmTransferBtnDisabled = false
+      })
         //Send a mutation for the state change to the crypt
         // this.$store.dispatch('updateCrypt')
     }
