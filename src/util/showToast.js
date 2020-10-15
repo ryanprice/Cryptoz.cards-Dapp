@@ -14,7 +14,7 @@ export const showPendingToast = (context) => {
             solid: true,
             noCloseButton: true,
             appendToast: true,
-            toaster: 'b-toaster-bottom-right',
+            toaster: 'b-toaster-bottom-left',
             autoHideDelay: 7000
         }
     )
@@ -37,7 +37,7 @@ export const showSuccessToast = (context, message = null) => {
             solid: true,
             noCloseButton: true,
             appendToast: true,
-            toaster: 'b-toaster-bottom-right'
+            toaster: 'b-toaster-bottom-left'
         }
     )
 }
@@ -59,7 +59,7 @@ export const showRejectedToast = (context) => {
             solid: true,
             noCloseButton: true,
             appendToast: true,
-            toaster: 'b-toaster-bottom-right'
+            toaster: 'b-toaster-bottom-left'
         }
     )
 }
