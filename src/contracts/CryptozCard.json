@@ -15417,7 +15417,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-10-05T23:16:47.407Z",
+  "updatedAt": "2020-10-15T02:55:57.646Z",
   "devdoc": {
     "details": "see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md",
     "methods": {
