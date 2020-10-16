@@ -306,29 +306,16 @@ export default {
       
       Cryptoz.deployed().then(function(instance) {
         return instance.openBoosterCard(self.wagerAmount, {from: self.coinbase});
-      }).then(() => {
-        this.handleBoosterOpened();
+      })
+      .then(res => {
+        if (res === undefined) {
+          throw new Error('result is undefined in openBooster')
+        }
       })
       .catch(err => {
         console.log(err);
         if (err.code === 4001) {
           showRejectedToast(self);
-        }
-      })
-    },
-    handleBoosterOpened : function(result, error) {
-      return new Promise((resolve, reject) => {
-        if(!error){
-          if(result !== undefined){
-            console.log('handleBoosterOpened:' ,result.tx);
-            resolve(result);
-          }else{
-            console.log('USER CANCELLED in handleBoosterOpened');
-            return reject(error);
-          }
-        }else{
-          console.log('Error in handleBoosterOpened:', error);
-          return reject(error);
         }
       })
     },
