@@ -37,7 +37,7 @@
 
       <transition name="fade" mode="out-in">
 
-        <p class="mm-header ml-auto" v-if="web3.isInjected == false">
+        <p class="mm-header ml-auto" v-if="!web3isConnected">
           Metamask is <strong>required</strong> to connect Cryptoz on Ethereum
           <a href="https://metamask.io/" target="_blank">
             <img src="@/assets/metamask_logo.png" width="40%" />
@@ -49,20 +49,20 @@
             <img src="@/assets/metamask-face.png" />
             {{coinbase.substr(0,6) + '...' + coinbase.substr(38)}}
           </div>
-          <span v-b-tooltip.hover :title="wallet" class="wallet-balance">
+          <span v-b-tooltip.hover :title="ethBalance" class="wallet-balance">
             <img src="@/assets/ethereum-symbol.png" />
-            {{wallet.toFixed(4)}}
+            {{ethBalance.toFixed(4)}}
           </span>
         </span>
       
       </transition>
 
-      <b-nav  class="ml-auto">
+      <b-nav class="ml-auto">
         <router-link to="/help">Help</router-link>
       </b-nav>
     
-      <b-nav-item v-if="web3.isInjected == false">
-        <b-button variant="primary" v-on:click="requestPermission()">
+      <b-nav-item v-if="!web3isConnected">
+        <b-button variant="primary" v-on:click="$emit('on-connect')">
           Connect
         </b-button>
       </b-nav-item>
@@ -77,27 +77,22 @@
 
 <script>
 import {mapState} from 'vuex'
-import getPermission from '../../util/getPermission'
+import setWeb3 from '../../util/setWeb3'
 
 export default {
   name: 'AppHeader',
-  computed: mapState({
-    isInjected: state => state.web3.isInjected,
-    network: state => NETWORKS[state.web3.networkId],
-  }),
   beforeCreate () { //Initialize the app
     // console.log('registerWeb3 Action dispatched from AppHeader.vue')
     // this.$store.dispatch('registerWeb3')
   },
   computed: {
-    web3 () {
-      return this.$store.state.web3
+    web3isConnected () {
+      return this.$store.state.web3.isConnected
+        && this.ethBalance !== null
+        && this.coinbase !== null
     },
-    wallet () {
+    ethBalance () {
       return parseFloat(web3.fromWei(this.$store.state.web3.balance), 'ether');
-    },
-    balance(){
-      return this.$store.state.web3.balance;
     },
     coinbase() {
       return this.$store.state.web3.coinbase;
@@ -169,18 +164,18 @@ export default {
       })
       
     },
-    requestPermission : async function() {
-      console.log('Connect to metamask button clicked');
+    // requestPermission : async function() {
+    //   console.log('Connect to metamask button clicked');
       
-      await ethereum.enable();
+    //   await ethereum.enable();
       
-      // Acccounts now exposed
-      console.log('!!!!! WE ARE IN..from Header button');
+    //   // Acccounts now exposed
+    //   console.log('!!!!! WE ARE IN..from Header button');
       
-      this.$store.dispatch('registerWeb3')
+    //   this.$store.dispatch('registerWeb3')
       
       
-    },
+    // },
     GetBonus : function() {
       console.log('GetBonus called...');
       

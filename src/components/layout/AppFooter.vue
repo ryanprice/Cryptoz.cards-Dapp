@@ -14,7 +14,7 @@
 
           <!-- Content -->
           <img class="img-fluid dev-logo" src="./../assets/cardinal.png" />
-          <p v-if="isInjected">You are connected to: {{network}}</p>
+          <p v-if="isConnected">You are connected to: {{network}}</p>
           <p v-else>
             Metamask is <strong>required</strong> to bridge Cryptoz on Ethereum<br>
             <a href="https://metamask.io/" target="_blank">
@@ -93,14 +93,17 @@
 
 <script>
 import {NETWORKS} from '../../util/constants/networks'
-import {mapState} from 'vuex'
 
 export default {
   name: 'AppFooter',
-  computed: mapState({
-    isInjected: state => state.web3.isInjected,
-    network: state => NETWORKS[state.web3.networkId],
-  }),
+  computed: {
+    isConnected() {
+      return this.$store.state.web3.isConnected
+    },
+    network() {
+      return NETWORKS[this.$store.state.web3.networkId]
+    }
+  },
   data () {
     return {
       // 0 - detecting, 1 - no metamask, 2- mm installed , show network
