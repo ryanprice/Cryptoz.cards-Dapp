@@ -89,6 +89,7 @@ var contract = require("truffle-contract");
 import cryptoz_artifacts from './contracts/Cryptoz.json';
 import cryptoz_token_artifacts from './contracts/CzxpToken.json';
 import watchEvents from './util/watchEvents';
+import { showSuccessToast } from './util/showToast'
 
 function setContractProvider(provider) {
   window.Cryptoz.setProvider(provider);
@@ -122,6 +123,18 @@ export default {
       wallet_balance : 0,
       network_name : 'Detecting Ethereum network..Loading',
       eth_network_name : ''
+    }
+  },
+  computed: {
+    coinbase() {
+      return this.$store.state.web3.coinbase;
+    }
+  },
+  watch: {
+    coinbase(newValue, oldValue) {
+      if (newValue && oldValue && newValue !== oldValue) {
+        showSuccessToast(this, 'Successfully changed wallets.');
+      }
     }
   },
   mounted() {
