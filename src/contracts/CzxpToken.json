@@ -9588,12 +9588,12 @@
         }
       },
       "links": {},
-      "address": "0x6eDD27840538f6f7A6923cC8dcCE9695C3308991",
-      "transactionHash": "0xfda8cbe3fc0479c0fdf77d2975e8257d50261cac2d2eee8c91547fbec0de438e"
+      "address": "0x6ac8567D2C57589166c1Fa5E2214D17E6C896eC9",
+      "transactionHash": "0x524e1ef47e79ee05db501f5085270cd4857b40a511341bfe361347be3eee8e1c"
     }
   },
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-10-15T03:14:52.391Z",
+  "updatedAt": "2020-10-18T05:17:33.617Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {

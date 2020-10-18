@@ -46,7 +46,7 @@
       }
     },
     mounted () { //Initialize the component
-    
+      this.setSubscriptions()
     },
     data () {
       return {
@@ -55,28 +55,24 @@
     },
     methods : {
       setSubscriptions : function() {
-        var self = this;
-        
-        window.CzxpToken.deployed().then(function(instance) {
-          return instance.balanceOf(self.coinbase);
+        CzxpToken.deployed().then((instance) => {
+          return instance.balanceOf(this.coinbase);
         }).then(this.setCzxpBalance)
-        
-        window.Cryptoz.deployed().then(function(instance) {
-          return instance.tokensOfOwner(self.coinbase);
+        Cryptoz.deployed().then((instance) => {
+          return instance.tokensOfOwner(this.coinbase);
         }).then(this.setCryptozBalance)
-        
-        window.Cryptoz.deployed().then(function(instance) {
-          return instance.boosterPacksOwned(self.coinbase);
+        Cryptoz.deployed().then((instance) => {
+          return instance.boosterPacksOwned(this.coinbase);
         }).then(this.setBoostersOwned)
       },
-      setCzxpBalance :  function(bal){
-        this.$store.dispatch('updateCZXPBalance', bal)
+      setCzxpBalance: function(balance){
+        this.$store.dispatch('updateCZXPBalance', balance)
       },
-      setCryptozBalance : function(tokens) {
+      setCryptozBalance: function(tokens) {
         this.$store.dispatch('updateCardsOwned', tokens.length)
       },
-      setBoostersOwned : function(_total){
-        this.$store.dispatch('updateBoostersOwned', parseInt(_total).toLocaleString())
+      setBoostersOwned: function(boostersOwned){
+        this.$store.dispatch('updateBoostersOwned', parseInt(boostersOwned).toLocaleString())
       },
     }
   }
