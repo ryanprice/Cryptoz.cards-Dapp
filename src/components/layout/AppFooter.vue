@@ -15,12 +15,6 @@
           <!-- Content -->
           <img class="img-fluid dev-logo" src="./../assets/cardinal.png" />
           <p v-if="isConnected">You are connected to: {{network}}</p>
-          <p v-else>
-            Metamask is <strong>required</strong> to bridge Cryptoz on Ethereum<br>
-            <a href="https://metamask.io/" target="_blank">
-              <img src="@/assets/metamask_logo.png" width="20%" />
-            </a>
-          </p>
 
         </div>
         <!-- Grid column -->
@@ -101,7 +95,9 @@ export default {
       return this.$store.state.web3.isConnected
     },
     network() {
-      return NETWORKS[this.$store.state.web3.networkId]
+      const hexString = this.$store.state.web3.chainId
+      if (!hexString) return "Unidentified Network"
+      return NETWORKS[hexString.split('x')[1]]
     }
   },
   data () {

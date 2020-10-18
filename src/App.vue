@@ -107,7 +107,6 @@ export default {
     window.CzxpToken = contract(cryptoz_token_artifacts)
     // tell provider not to refresh page on network change
     // instead we listen to on chainChanged event
-    window.ethereum.autoRefreshOnNetworkChange = false
 
     // this needs to be set in beforeCreate because vue lifecycle
     // is Parent create -> child create -> child mount -> parent mount
@@ -126,6 +125,8 @@ export default {
     }
   },
   mounted() {
+    window.ethereum.autoRefreshOnNetworkChange = false
+    // we have no way of getting chainId here in web3 v0.20.7
     if (window.web3 && window.web3.currentProvider) {
       this.getWalletInfo()
       this.subscribeToProviderEvents(window.web3.currentProvider)
@@ -134,8 +135,14 @@ export default {
   },
   methods : {
     subscribeToProviderEvents: function(provider) {
+      provider.on("connect", ({chainId}) => {
+        this.$store.dispatch('web3isConnected', true)
+        this.$store.dispatch('chainChanged', chainId)
+        this.getWalletInfo()
+      });
       provider.on("accountsChanged", (accounts) => {
         if (accounts.length > 0) {
+          this.$store.dispatch('web3isConnected', true)
           this.getWalletInfo()
         }
         //user "locks" their wallet via provider
@@ -144,12 +151,16 @@ export default {
         }
       });
       provider.on("chainChanged", (chainId) => {
-        this.$store.dispatch('chainChanged', chainId)
-        this.getWalletInfo()
-        watchEvents()
-      });
-      provider.on("connect", () => {
-        this.getWalletInfo()
+        // without this check it auto-reloads to infinity
+        const currentChainId = localStorage.getItem('ethChainId')
+        if (currentChainId) {
+          this.$store.dispatch('chainChanged', currentChainId)
+        }
+        if (currentChainId !== chainId) {
+          localStorage.setItem('ethChainId', chainId)
+          window.location.reload()
+          return
+        }
       });
       provider.on("disconnect", () => {
         this.disconnectWallet()
@@ -157,7 +168,7 @@ export default {
     },
     onConnect: async function() {
       const web3Modal = new Web3Modal({
-        // cacheProvider: true, // optional
+        cacheProvider: true, // optional
         providerOptions
       });
 
@@ -168,7 +179,6 @@ export default {
       setContractProvider(provider)
       watchEvents()
       this.subscribeToProviderEvents(provider)
-      this.$store.dispatch('web3isConnected', true)
     },
     getWalletInfo: function() {
       window.web3.eth.getCoinbase((err, coinbase) => {
@@ -185,8 +195,9 @@ export default {
     disconnectWallet: function() {
       this.$store.dispatch('web3isConnected', false)
       this.$store.dispatch('updateWallet', {coinbase: null, balance: null})
+      this.$store.dispatch('chainChanged', null)
     },
-  } //methods
+  }
 }
 
 </script>

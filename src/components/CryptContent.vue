@@ -119,18 +119,10 @@ export default {
   watch: {
     'web3': {
       handler(val, oldVal) {
-        if (val.chainId !== oldVal.chainId) {
-          showErrorToast(
-            this,
-            "Detected Network change. Reload Page.",
-            { noCloseButton: false }
-          )
-        }
-        else if (val.isConnected && val.coinbase) {
+        if (val.isConnected && val.coinbase) {
           this.getAllCards()
         }
-
-        if (val.coinbase === null) {
+        else {
           this.clearCards()
         }
       },

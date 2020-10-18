@@ -66,26 +66,3 @@ export const showRejectedToast = (context, message = null, options = {}) => {
         }
     )
 }
-
-export const showErrorToast = (context, message = null, options = {}) => {
-    const h = context.$createElement;
-
-    const vNodesMsg = h(
-        'div', {class: 'toast-wrapper'},
-        [
-           h('b-icon', { props: { icon: 'exclamation-circle', fontScale: 2}}),
-           h('div', {class: 'toast-message'}, [message || 'Unhelpful Error.'])
-        ]
-    )
-
-    context.$bvToast.toast(
-        [vNodesMsg], {
-            variant: 'danger',
-            solid: true,
-            noCloseButton: true,
-            appendToast: true,
-            toaster: 'b-toaster-bottom-left',
-            ...options
-        }
-    )
-}
