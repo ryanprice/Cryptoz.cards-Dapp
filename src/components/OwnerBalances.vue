@@ -46,7 +46,6 @@
       }
     },
     mounted () { //Initialize the component
-      this.setSubscriptions()
     },
     data () {
       return {

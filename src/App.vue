@@ -125,18 +125,6 @@ export default {
       eth_network_name : ''
     }
   },
-  computed: {
-    coinbase() {
-      return this.$store.state.web3.coinbase;
-    }
-  },
-  watch: {
-    coinbase(newValue, oldValue) {
-      if (newValue && oldValue && newValue !== oldValue) {
-        showSuccessToast(this, 'Successfully changed wallets.');
-      }
-    }
-  },
   mounted() {
     window.ethereum.autoRefreshOnNetworkChange = false
     // we have no way of getting chainId here in web3 v0.20.7
@@ -157,6 +145,8 @@ export default {
         if (accounts.length > 0) {
           this.$store.dispatch('web3isConnected', true)
           this.getWalletInfo()
+          watchEvents()
+          showSuccessToast(this, 'Successfully changed wallets.');
         }
         //user "locks" their wallet via provider
         else {

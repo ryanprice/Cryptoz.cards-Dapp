@@ -122,6 +122,7 @@ export default {
         if (val.isConnected && val.coinbase) {
           this.getAllCards()
         }
+
         else {
           this.clearCards()
         }
