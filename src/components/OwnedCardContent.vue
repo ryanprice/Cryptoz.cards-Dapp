@@ -142,7 +142,7 @@ export default {
     buyCard : function(){
       console.log("Buying card:" + this.type_id);
       
-      Cryptoz.deployed().then((instance) => {
+      window.Cryptoz.deployed().then((instance) => {
         return instance.buyCard(this.type_id, {from: this.coinbase, value:(this.cost*1000000000000000000)});
       }).then((res) => {
         console.log(res);
@@ -153,7 +153,7 @@ export default {
     getCard : function(){
       console.log("Claiming card:" + this.type_id);
       
-      Cryptoz.deployed().then((instance) => {
+      window.Cryptoz.deployed().then((instance) => {
         return instance.getFreeCard(this.type_id, {from: this.coinbase});
       }).then((res) => {
         console.log(res)
@@ -164,14 +164,12 @@ export default {
     sacrificeCard : function() {
       console.log("Sacrificing card:" + this.id);
       showPendingToast(this)
-      Cryptoz.deployed().then((instance) => {
+      window.Cryptoz.deployed().then((instance) => {
         this.isSacrificingCard = true;
         return instance.sacrifice(this.id, {from:this.coinbase});
       }).then((res) => {
         console.log("sacrifice result: ", res);
         this.$store.dispatch('updateOwnerBalances')
-        //Send a mutation for the state change to the crypt
-        this.$store.dispatch('updateCrypt')
       }).catch((err) => {
         this.isSacrificingCard = false;
         console.log(err.message);
@@ -190,10 +188,9 @@ export default {
       console.log('to ' + this.newWallet)
       console.log('from ' + this.coinbase)
       var contract
-      Cryptoz.deployed().then((instance) => {
+      window.Cryptoz.deployed().then((instance) => {
         contract = instance
         this.isGiftingCard = true
-        // console.log(this.coinbase+' '+this.newWallet+' '+this.id)
         var modalName = 'transfer-modal-' + this.id;
         this.$bvModal.hide(modalName)
         showPendingToast(this)
@@ -207,8 +204,6 @@ export default {
         this.isGiftingCard = false
         this.confirmTransferBtnDisabled = false
       })
-        //Send a mutation for the state change to the crypt
-        // this.$store.dispatch('updateCrypt')
     }
   }
 }

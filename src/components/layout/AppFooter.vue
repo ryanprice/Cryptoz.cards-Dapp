@@ -123,6 +123,7 @@ export default {
     width: 100%;
     height: 100%;
     background-color: #343a40!important;
+    box-shadow: 0 50vh 0 50vh #343a40;
   }
   .dev-logo{
     width:28%;

@@ -37,13 +37,13 @@
     },
     watch: {
       ownerBalances(newValue, oldValue) {
-        console.log(`Updating ownerBalances from ${oldValue} to ${newValue}`);
+        // console.log(`Updating ownerBalances from ${oldValue} to ${newValue}`);
   
-        // new balances.. reset their boosters, cards and czxp balance
+        // // new balances.. reset their boosters, cards and czxp balance
         if (newValue !== oldValue) {
           this.setSubscriptions();
         }
-      },
+      }
     },
     mounted () { //Initialize the component
     
@@ -57,16 +57,15 @@
       setSubscriptions : function() {
         var self = this;
         
-        CzxpToken.deployed().then(function(instance) {
+        window.CzxpToken.deployed().then(function(instance) {
           return instance.balanceOf(self.coinbase);
         }).then(this.setCzxpBalance)
         
-        Cryptoz.deployed().then(function(instance) {
-          // console.log("get cryptoz cards tokens balance...");
+        window.Cryptoz.deployed().then(function(instance) {
           return instance.tokensOfOwner(self.coinbase);
         }).then(this.setCryptozBalance)
         
-        Cryptoz.deployed().then(function(instance) {
+        window.Cryptoz.deployed().then(function(instance) {
           return instance.boosterPacksOwned(self.coinbase);
         }).then(this.setBoostersOwned)
       },
@@ -74,13 +73,9 @@
         this.$store.dispatch('updateCZXPBalance', bal)
       },
       setCryptozBalance : function(tokens) {
-        //console.log('setCryptozBalance:',bal);
-        //this.cards_owned = parseInt(bal).toLocaleString();
         this.$store.dispatch('updateCardsOwned', tokens.length)
       },
       setBoostersOwned : function(_total){
-        //console.log('setBoostersOwned:',_total);
-        //this.boosters_owned = parseInt(_total).toLocaleString();
         this.$store.dispatch('updateBoostersOwned', parseInt(_total).toLocaleString())
       },
     }

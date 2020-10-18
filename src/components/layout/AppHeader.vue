@@ -7,7 +7,7 @@
     </router-link>
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav>
+      <b-navbar-nav id="cryptoz-nav">
         <b-nav-item>
           <router-link to="/shop">Shop</router-link>
         </b-nav-item>
@@ -20,54 +20,49 @@
         <b-nav-item>
           <router-link to="/view/1">View</router-link>
         </b-nav-item>
+        <b-nav-item>
+          <router-link to="/help">Help</router-link>
+        </b-nav-item>
+        
+        <transition name="fade" mode="out-in">
+          <li class="wallet-nav flex-row" v-if="web3isConnected">
+            <div v-b-tooltip.hover :title="coinbase">
+              <img src="@/assets/metamask-face.png" />
+              {{coinbase.substr(0,6) + '...' + coinbase.substr(38)}}
+            </div>
+            <span v-b-tooltip.hover :title="ethBalance" class="wallet-balance">
+              <img src="@/assets/ethereum-symbol.png" />
+              {{ethBalance.toFixed(4)}}
+            </span>
+          </li>
+        </transition>
+      
+        <b-button
+          id="connect-button"
+          v-if="!web3isConnected"
+          variant="primary"
+          v-on:click="$emit('on-connect')"
+        >
+          Connect To Ethereum
+        </b-button>
+
       </b-navbar-nav>
-  
-      <div class="bonusClass" v-if="coinbase != null && bonusReady == 1  && showSpinner == false" v-on:click="GetBonus">
+    </b-collapse>
+        
+    <div id="bonus-boosters">
+      <div class="bonusClass" v-if="web3isConnected && bonusReady == 1  && showSpinner == false" v-on:click="GetBonus">
         Claim 2 FREE Boosters !
       </div>
-      <div v-else-if="showSpinner == true">
+      <div v-else-if="web3isConnected && showSpinner == true">
           <img src="@/assets/spinner.gif" class="spinner" />
           <transition>
             <span class="spinner-text-style">{{transactionMessage}}</span>
           </transition>
       </div>
-      <div class="bonusClassNo" v-else-if="coinbase != null && bonusReady == 0 && showSpinner == false">
+      <div class="bonusClassNo" v-else-if="web3isConnected && bonusReady == 0 && showSpinner == false">
         Your Next Bonus:<br><strong> {{timeToBonus}}</strong>
       </div>
-
-      <transition name="fade" mode="out-in">
-
-        <p class="mm-header ml-auto" v-if="!web3isConnected">
-          Metamask is <strong>required</strong> to connect Cryptoz on Ethereum
-          <a href="https://metamask.io/" target="_blank">
-            <img src="@/assets/metamask_logo.png" width="40%" />
-          </a>
-        </p>
-        
-        <span class="wallet-nav ml-auto flex-row" v-else>
-          <div v-b-tooltip.hover :title="coinbase">
-            <img src="@/assets/metamask-face.png" />
-            {{coinbase.substr(0,6) + '...' + coinbase.substr(38)}}
-          </div>
-          <span v-b-tooltip.hover :title="ethBalance" class="wallet-balance">
-            <img src="@/assets/ethereum-symbol.png" />
-            {{ethBalance.toFixed(4)}}
-          </span>
-        </span>
-      
-      </transition>
-
-      <b-nav class="ml-auto">
-        <router-link to="/help">Help</router-link>
-      </b-nav>
-    
-      <b-nav-item v-if="!web3isConnected">
-        <b-button variant="primary" v-on:click="$emit('on-connect')">
-          Connect
-        </b-button>
-      </b-nav-item>
-      
-    </b-collapse>
+    </div>
       
     </b-navbar>
       <p></p>
@@ -77,7 +72,6 @@
 
 <script>
 import {mapState} from 'vuex'
-import setWeb3 from '../../util/setWeb3'
 
 export default {
   name: 'AppHeader',
@@ -86,16 +80,16 @@ export default {
     // this.$store.dispatch('registerWeb3')
   },
   computed: {
-    web3isConnected () {
-      return this.$store.state.web3.isConnected
-        && this.ethBalance !== null
-        && this.coinbase !== null
-    },
     ethBalance () {
       return parseFloat(web3.fromWei(this.$store.state.web3.balance), 'ether');
     },
     coinbase() {
       return this.$store.state.web3.coinbase;
+    },
+    web3isConnected() {
+      return this.$store.state.web3.isConnected
+        && this.ethBalance !== null
+        && this.coinbase !== null
     },
     currentEvent() {
       return this.$store.state.lastChainEvent;
@@ -115,14 +109,13 @@ export default {
     coinbase(newValue, oldValue) {
       console.log(`Updating coinbase in header from ${oldValue} to ${newValue}`);
       // new wallet.. check their bonus and tell Owner balances to update
-      if (newValue !== oldValue) {
+      if (newValue !== oldValue && newValue !== null) {
         this.$store.dispatch('updateOwnerBalances')
         this.$store.dispatch('updateUniverseBalances')
         this.setSubscriptions();
       }
     },
     currentEvent(newValue,oldValue) {
-      console.log('HEADER currentEvent:',newValue)
       if(newValue !== oldValue && typeof newValue !== "undefined"){
         if (this.pendingTransaction == newValue.blockHash) {
           this.showSpinner = false;
@@ -143,12 +136,10 @@ export default {
       console.log('Check if the bonus is available for this playa..');
       //console.log(this.coinbase);
       //console.log(this.balance);
-      
-      var self = this
-      
-      Cryptoz.deployed().then(function(instance) {
-        return instance.getTimeToDailyBonus(self.coinbase);
-      }).then(function(res) {
+    
+      window.Cryptoz.deployed().then((instance) => {
+        return instance.getTimeToDailyBonus(this.coinbase);
+      }).then((res) => {
         //console.log('Time to next bonus is:');
         //console.log(res.c[0]*1000);
         var timeToBonusInMilli = res.c[0]*1000;
@@ -156,10 +147,10 @@ export default {
         //console.log('now is ' + now.getTime());
         
         if(now.getTime() >= timeToBonusInMilli){
-          self.bonusReady = 1; //Claim bonus state
+          this.bonusReady = 1; //Claim bonus state
         }else{
-          self.bonusReady = 0; //countdown to bonus state
-          self.timeToBonus = self.GetTimeString(res.c[0]*1000);
+          this.bonusReady = 0; //countdown to bonus state
+          this.timeToBonus = this.GetTimeString(res.c[0]*1000);
         }
       })
       
@@ -183,18 +174,17 @@ export default {
       this.showSpinner = true;
       this.transactionMessage = 'Pending confirmation...';
       
-      var self = this;
-      Cryptoz.deployed().then(function(instance) {
-        return instance.getBonusBoosters({from: self.coinbase, gas:362000});
-      }).then(function(result) {
+      window.Cryptoz.deployed().then((instance) => {
+        return instance.getBonusBoosters({from: this.coinbase, gas:362000});
+      }).then((result) => {
         //change from pending to ready
-        self.pendingTransaction = result.receipt.blockHash;
-        self.transactionMessage = 'Broadcast to chain...';
-      }).catch(function (e) {
+        this.pendingTransaction = result.receipt.blockHash;
+        this.transactionMessage = 'Broadcast to chain...';
+      }).catch((e) => {
         // Transaction rejected or failed
             //reset the claim tokens message
-            self.showSpinner = false;
-            self.transactionMessage = 'Claim 2 FREE Boosters !';
+            this.showSpinner = false;
+            this.transactionMessage = 'Claim 2 FREE Boosters !';
       });
     },
     GetTimeString: function(_timeStamp) {
@@ -245,8 +235,8 @@ export default {
 
   .wallet-nav{
     color: #d48b15;
-    width:22em;
-    margin-left: 2em;
+    flex: 1;
+    justify-content: center;
   }
 
   .wallet-nav img {
@@ -274,13 +264,21 @@ export default {
     opacity: 0;
   }
 
+  #bonus-boosters {
+    position: absolute;
+    right: 3rem;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
   .bonusClass:hover{
-    color:#00FF00;
+    animation: none;
+    color: white;
     margin-right: 0.8em;
     cursor: pointer;
     padding:1px;
-    border: 1px solid #fff;
-    animation: none;
   }
   
   .bonusClassNo{
@@ -311,6 +309,23 @@ export default {
   .flex-row {
     display: flex;
     flex-direction: row;
+  }
+
+  #connect-button {
+    position: absolute;
+    right: 3rem;
+  }
+
+  #cryptoz-nav {
+    /*
+      this calc is to account for the boosters text on the right
+      flex: 1; didnt work so I hacked it. This ensures the wallet
+      info is centered between the main nav and the boosters text.
+    */
+    width: calc(100% - 150px - 3rem);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 
   @keyframes shake {

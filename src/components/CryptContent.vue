@@ -35,7 +35,7 @@
                 </b-button>
               </div>
               <div class="col buy-and-open-booster">
-                <button class="btn btn-danger" v-bind:disabled="balance < 2000000000000000" v-on:click="buyAndOpenBooster">Buy and Open Booster 0.002E
+                <button class="btn btn-danger" v-bind:disabled="web3.balance < 2000000000000000" v-on:click="buyAndOpenBooster">Buy and Open Booster 0.002E
                 </button>
               </div>
             </div>
@@ -90,7 +90,7 @@ import axios from 'axios'
 import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
-import {showPendingToast, showSuccessToast, showRejectedToast} from '../util/showToast';
+import {showPendingToast, showSuccessToast, showRejectedToast, showErrorToast} from '../util/showToast';
 
 export default {
   name: 'CryptContent',
@@ -104,16 +104,10 @@ export default {
       return this.$store.state.web3
     },
     wallet () {
-      return parseFloat(web3.fromWei(this.$store.state.web3.balance), 'ether');
-    },
-    balance(){
-      return this.$store.state.web3.balance;
+      return parseFloat(window.web3.fromWei(this.$store.state.web3.balance), 'ether');
     },
     coinbase() {
       return this.$store.state.web3.coinbase;
-    },
-    cryptContent() {
-      return this.$store.state.cryptContent;
     },
     boostersOwned() {
       return this.$store.state.boostersOwned;
@@ -123,38 +117,40 @@ export default {
     }
   },
   watch: {
-    coinbase(newValue, oldValue) {
-      console.log(`Updating from ${oldValue} to ${newValue}`);
-
-      // new wallet.. reset their boosters and czxp balance
-      if (newValue !== oldValue) {
-        this.getAllCards();
-      }
-    },
-    cryptContent(newValue, oldValue) {
-      console.log(`Updating CryptContent from ${oldValue} to ${newValue}`);
-      
-      // stale crypt contents, refresh now
-      if (newValue !== oldValue) {
-        this.getAllCards();
-      }
-    },
-    currentEvent(newValue, oldValue) {
-      console.log('CRYPT currentEvent:',newValue)
-      if (newValue) {
-        if(this.subscriptionState == 0){
-          this.getAllCards();
+    'web3': {
+      handler(val, oldVal) {
+        if (val.chainId !== oldVal.chainId) {
+          showErrorToast(
+            this,
+            "Detected Network change. Reload Page.",
+            { noCloseButton: false }
+          )
         }
-        if(oldValue && newValue.transactionHash !== oldValue.transactionHash){
-          console.log('CRYPT old:',oldValue ,' new:',newValue);
-          showSuccessToast(this, 'Confirmed! Balance updated')
+        else if (val.isConnected && val.coinbase) {
+          this.getAllCards()
+        }
+
+        if (val.coinbase === null) {
+          this.clearCards()
+        }
+      },
+      deep: true
+    },
+    'currentEvent': {
+      handler: function(newValue, oldValue) {
+        if (newValue) {
+          if(this.subscriptionState == 0){
+            this.getAllCards();
+          }
+          if(oldValue && newValue.transactionHash !== oldValue.transactionHash){
+            showSuccessToast(this, 'Confirmed! Balance updated')
+          }
         }
       }
     }
   },
   mounted () {
     if(this.coinbase !== null){
-      console.log('Crypt is mounted..')
       this.getAllCards();
     }
   },
@@ -176,19 +172,20 @@ export default {
     },
     getAllCards : function() {
       this.subscriptionState = 1;
-      var self = this;
       
-      Cryptoz.deployed().then((instance) => {
-        return instance.tokensOfOwner(self.coinbase)
+      window.Cryptoz.deployed().then((instance) => {
+        return instance.tokensOfOwner(this.coinbase)
       }).then(this.handleGetAllCards)
       
+    },
+    clearCards: function() {
+      this.orderedCards = []
     },
     buyAndOpenBooster : function() {
       console.log('Buy and Open Booster card...');
       showPendingToast(this);
-      var self = this;
-      Cryptoz.deployed().then(function(instance) {
-        return instance.buyBoosterCardAndOpen({from: self.coinbase, value:2000000000000000});
+      window.Cryptoz.deployed().then((instance) => {
+        return instance.buyBoosterCardAndOpen({from: this.coinbase, value:2000000000000000});
       })
       //update boosters owned and total types
       .then(() => {
@@ -198,15 +195,12 @@ export default {
       .catch((err) => {
         console.log(err.message);
         if (err.code === 4001) {
-         showRejectedToast(self);
+         showRejectedToast(this);
         }
       })
     },
     handleGetAllCards : async function(res) {
-      console.log('Handling tokensOfOwner...');
-      
       if(res.length > 0){
-        console.log('Got cards.. start render');
         var self= this;
         //first we update the view
         this.ownsCards = true;
@@ -216,17 +210,14 @@ export default {
 
         //Define a function to do all our handling and chain the data before passing back to our view
         var getCard = function(tokenId){
-          //console.log('token id:' + tokenId);
           return new Promise((resolve, reject) => {
-            Cryptoz.deployed().then(function(instance) {
-              return instance.getOwnedCard.call(tokenId)
+            window.Cryptoz.deployed().then(function(instance) {
+              return instance.getOwnedCard(tokenId)
             }).then(function(elementReturned) {
-              //console.log('A card !' + tokenId);
-              //console.log(elementReturned);
               tokenIdList[tokenId] = elementReturned
               return axios.get('https://cryptoz.cards/services/getCardData.php?card_id=' + elementReturned[0].c[0])
             }).then(function(res){
-              //console.log('edition:' + tokenIdList[tokenId][1].c[0])
+              // console.log('edition:' + tokenIdList[tokenId][1].c[0])
               res.data.id = tokenId;
               var newAttr = [];
               //format the attributes to match our JS objects
@@ -304,7 +295,7 @@ export default {
       
       this.$bvModal.hide('open-booster-modal')
       
-      Cryptoz.deployed().then(function(instance) {
+      window.Cryptoz.deployed().then(function(instance) {
         return instance.openBoosterCard(self.wagerAmount, {from: self.coinbase});
       })
       .then(res => {

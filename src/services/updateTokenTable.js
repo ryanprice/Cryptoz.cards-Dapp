@@ -33,7 +33,7 @@ CzxpToken.setProvider(web3.currentProvider);
 
 
 //watch Cryptoz events
-Cryptoz.deployed().then(function(instance) {
+window.Cryptoz.deployed().then(function(instance) {
   
 //  return instance.totalSupply.call();
 //}).then(function(res){console.log(res.toString(10))})

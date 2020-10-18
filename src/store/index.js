@@ -1,47 +1,26 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
-// import getWeb3 from '../util/getWeb3'
-import pollWeb3 from '../util/pollWeb3'
-import watchEvents from '../util/watchEvents'
-
 
 Vue.use(Vuex)
-
 
 export const store = new Vuex.Store({
  strict: true,
  state,
  mutations: {
-  // registerWeb3Instance (state, payload) {
-  //   console.log('registerWeb3instance Mutation being executed', payload)
-  //   let result = payload
-  //   let web3Copy = state.web3
-  //   web3Copy.coinbase = result.coinbase
-  //   web3Copy.networkId = result.networkId
-  //   web3Copy.balance = result.balance
-  //   web3Copy.isInjected = result.injectedWeb3
-  //   web3Copy.web3Instance = result.web3
-  //   state.web3 = web3Copy
-  //   state.czxpBalance = result.czxpBalance
-  //   state.cardsOwned = result.cardsOwned
-  //   state.boostersOwned = result.boostersOwned
-  //   pollWeb3()
-  //   watchEvents()
-  // },
+   // payload: {coinbase, balance}
   updateWallet (state, payload) {
-    state.web3.coinbase = payload.coinbase
-    state.web3.balance = payload.balance
+    //make sure to shallow copy the object to ensure new reference
+    //for watchers (oldVal vs newVal)
+    state.web3 = {...state.web3, ...payload}
   },
   web3isConnected (state, payload) {
-    console.log('isconnected: ', payload)
-    state.web3.isConnected = payload
+    state.web3 = {...state.web3, isConnected: payload}
   },
-  updateCryptContent (state) {
-    state.cryptContent += 1;
+  chainChanged (state, payload) {
+    state.web3 = {...state.web3, chainId: payload}
   },
-  updateBalances (state, payload) {
-    //console.log('mutate ownerbalances', payload);
+  updateBalances (state) {
     state.ownerBalances += 1;
   },
   updateUniverseBalances(state, payload) {
@@ -69,38 +48,22 @@ export const store = new Vuex.Store({
   },
   updateCryptozTotal(state, payload) {
     state.totalCryptozSupply = payload
-  },
-  userLoggedOut(state,payload) {
-    state.web3.isInjected = false;
   }
  },
  actions: {
-  //  registerWeb3 ({commit}) {
-  //     console.log('registerWeb3 Action being executed', commit)
-  //     getWeb3.then(result => {
-  //       console.log('committing result to registerWeb3Instance mutation', result)
-  //       if(result !== undefined) {
-  //         commit('registerWeb3Instance', result)
-  //       }else{
-  //         console.log('getWeb3 returned Nothing !..error in vuex index')
-  //         console.log(window.web3)
-  //       }
-  //     }).catch(error => {
-  //       console.log("Error in return from getWeb3.then:", error)
-  //     })
-  //   },
-    // pollWeb3Action ({commit}, payload) {
-    //   //console.log('pollWeb3 action being executed')
-    //   commit('pollWeb3Instance', payload)
-    // },
     updateWallet ({commit}, payload) {
       commit('updateWallet', payload)
     },
     web3isConnected({commit}, payload) {
       commit('web3isConnected', payload)
+      if (payload === false) {
+        commit('updateCardsOwned', 0)
+        commit('updateBoostersOwned', 0)
+        commit('updateCZXPBalance', 0)
+      }
     },
-    updateCrypt ({commit}) {
-      commit('updateCryptContent')
+    chainChanged({commit}, payload) {
+      commit('chainChanged', payload)
     },
     updateOwnerBalances ({commit}, payload) {
       //console.log('updateBalances action called')

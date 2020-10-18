@@ -55,15 +55,15 @@
       setSubscriptions : function() {
         console.log("Set the Universe balances...");
 
-        Cryptoz.deployed().then(function(instance) {
+        window.Cryptoz.deployed().then(function(instance) {
           return instance.getTotalTypes.call();
         }).then(this.handleTotalTypes)
         
-        CzxpToken.deployed().then(function(instance) {
+        window.CzxpToken.deployed().then(function(instance) {
           return instance.totalSupply.call();
         }).then(this.handleSetCZXPSupply) //update boosters owned and total types
         
-        Cryptoz.deployed().then(function(instance) {
+        window.Cryptoz.deployed().then(function(instance) {
           return instance.totalSupply.call();
         }).then(this.handleSetCryptozSupply)
         

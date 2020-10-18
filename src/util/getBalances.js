@@ -9,7 +9,7 @@ var contract = require("truffle-contract");
 let getBalances = new Promise(function (resolve, reject) {
   console.log('GetBalances..in js');
 
-    CzxpToken.deployed().then(function(instance) {
+    window.CzxpToken.deployed().then(function(instance) {
       console.log('get czxp balance in js...');
       return instance.balanceOf(this.coinbase);
     }).then(res => {

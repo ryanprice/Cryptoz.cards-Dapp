@@ -192,7 +192,7 @@ export default {
       var self = this;
       
       try{
-        Cryptoz.deployed().then(function(instance) {
+        window.Cryptoz.deployed().then(function(instance) {
           var totalBoostersCost = 2000000000000000 * parseInt(self.totalCreditsToBuy);
           return instance.buyBoosterCard(parseInt(self.totalCreditsToBuy), {from: self.coinbase, value:totalBoostersCost});
         }).then(this.handleBuyBooster) //update boosters owned and total types

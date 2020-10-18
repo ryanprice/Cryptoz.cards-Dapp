@@ -1,10 +1,10 @@
-export const showPendingToast = (context) => {
+export const showPendingToast = (context, message = null, options = {}) => {
     const h = context.$createElement;
     const vNodesMsg = h(
         'div', {class: 'toast-wrapper'},
         [
             h('b-spinner', {props: { type: 'grow', small: true, variant: 'info' } }),
-            h('div', {class: 'toast-message'}, ['Pending Confirmation...'])
+            h('div', {class: 'toast-message'}, [message || 'Pending Confirmation...'])
         ]
     )
 
@@ -15,12 +15,13 @@ export const showPendingToast = (context) => {
             noCloseButton: true,
             appendToast: true,
             toaster: 'b-toaster-bottom-left',
-            autoHideDelay: 7000
+            autoHideDelay: 7000,
+            ...options
         }
     )
 }
 
-export const showSuccessToast = (context, message = null) => {
+export const showSuccessToast = (context, message = null, options = {}) => {
     const h = context.$createElement;
 
     const vNodesMsg = h(
@@ -37,19 +38,20 @@ export const showSuccessToast = (context, message = null) => {
             solid: true,
             noCloseButton: true,
             appendToast: true,
-            toaster: 'b-toaster-bottom-left'
+            toaster: 'b-toaster-bottom-left',
+            ...options
         }
     )
 }
 
-export const showRejectedToast = (context) => {
+export const showRejectedToast = (context, message = null, options = {}) => {
     const h = context.$createElement;
 
     const vNodesMsg = h(
         'div', {class: 'toast-wrapper'},
         [
            h('b-icon', { props: { icon: 'exclamation-circle', fontScale: 2}}),
-           h('div', {class: 'toast-message'}, ['Transaction Rejected.'])
+           h('div', {class: 'toast-message'}, [message || 'Transaction Rejected.'])
         ]
     )
 
@@ -59,7 +61,31 @@ export const showRejectedToast = (context) => {
             solid: true,
             noCloseButton: true,
             appendToast: true,
-            toaster: 'b-toaster-bottom-left'
+            toaster: 'b-toaster-bottom-left',
+            ...options
+        }
+    )
+}
+
+export const showErrorToast = (context, message = null, options = {}) => {
+    const h = context.$createElement;
+
+    const vNodesMsg = h(
+        'div', {class: 'toast-wrapper'},
+        [
+           h('b-icon', { props: { icon: 'exclamation-circle', fontScale: 2}}),
+           h('div', {class: 'toast-message'}, [message || 'Unhelpful Error.'])
+        ]
+    )
+
+    context.$bvToast.toast(
+        [vNodesMsg], {
+            variant: 'danger',
+            solid: true,
+            noCloseButton: true,
+            appendToast: true,
+            toaster: 'b-toaster-bottom-left',
+            ...options
         }
     )
 }

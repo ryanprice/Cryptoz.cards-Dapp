@@ -123,7 +123,7 @@
         var self = this;
         var contract;
         
-        Cryptoz.deployed().then(function(instance) {
+        window.Cryptoz.deployed().then(function(instance) {
           contract = instance;
           return instance.exists.call(self.token_id);
           //return instance.exists(self.token_id, {from: account});
