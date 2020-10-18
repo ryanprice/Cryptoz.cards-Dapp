@@ -197,7 +197,7 @@ export default {
     getWalletInfo: function() {
       window.web3.eth.getCoinbase((err, coinbase) => {
         if (err) {
-          throw new Error(err)
+          console.error('Error: ', err)
         }
         if (coinbase !== null) {
           window.web3.eth.getBalance(coinbase, (err, balance) => {
