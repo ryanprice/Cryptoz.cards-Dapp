@@ -101,7 +101,7 @@
                       <b-button
                         size="md"
                         @click="sacrificeCard(row.item.id)"
-                        v-bind:disabled="cardsBeingGifted[row.item.id] || cardsBeingSacrificed[row.item.id]"
+                        :disabled="cardsBeingGifted[row.item.id] || cardsBeingSacrificed[row.item.id]"
                       >
                         Sacrifice
                       </b-button>
