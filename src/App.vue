@@ -14,30 +14,21 @@ import AppHeader from './components/layout/AppHeader'
 import AppFooter from './components/layout/AppFooter'
 import {mapState} from 'vuex'
 
-window.dynamicSort = function dynamicSort(property) {
-    var sortOrder = 1;
-    if(property[0] === "-") {
-        sortOrder = -1;
-        property = property.substr(1);
+window.dynamicSort = function(property, descending=true) {
+  return function (a,b) {
+    let valA = a[property], valB = b[property]
+    if (!isNaN(valA) && !isNaN(valB)) {
+      valA = parseInt(valA)
+      valB = parseInt(valB)
     }
-    return function (a,b) {
-        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-        return result * sortOrder;
+    if (typeof valA === "string" && typeof valB === "string") {
+      valA = valA.toLowerCase()
+      valB = valB.toLowerCase()
     }
-}
-
-window.sortAttributes = function sortAttributes(property) {
-    //console.log(property);
-    
-    var sortOrder = 1;
-    if(property[0] === "-") {
-        sortOrder = -1;
-        property = property.substr(1);
-    }
-    return function (a,b) {
-        var result = (a.attributes[property] < b.attributes[property]) ? -1 : (a.attributes[property] > b.attributes[property]) ? 1 : 0;
-        return result * sortOrder;
-    }
+    if(valA < valB) { return descending ? 1 : -1; }
+    if(valA > valB) { return descending ? -1 : 1; }
+    return 0;
+  }
 }
 
 import Web3Modal from "web3modal";

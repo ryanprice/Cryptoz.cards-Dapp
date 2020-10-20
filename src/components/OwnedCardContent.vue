@@ -1,28 +1,5 @@
 <template>
-  <div>
-
-<!-- Transfer card Modal -->
-<b-modal class="modal fade" :id="'transfer-modal-'+id">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Gift Cryptoz Card Token #{{id}} to another wallet</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Enter a valid Ethereum wallet address to send this card to:
-        <input id="toWallet" class="form-control" type="text" v-on:input="newWallet = $event.target.value" required />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" :disabled="confirmTransferBtnDisabled" v-on:click="transferCard">Confirm Transfer</button>
-      </div>
-    </div>
-  </div>
-</b-modal>
-    
+  <div id="card-container">
       <div class="col">
         <div class="flip-container" ontouchstart="this.classList.toggle('hover');">
 	        <div class="flipper">
@@ -51,37 +28,8 @@
 		        </div>
           </div>
         </div>
-         <div id="buyBtnwrapper" v-b-tooltip="buyBtnTooltipText">
-            <button id="buyButton" v-if="in_store == 'Store' && cost > 0" :disabled="wallet <= cost || czxpBalance < parseInt(unlock_czxp)" class="btn btn-danger" v-on:click="buyCard">
-                Buy Card {{cost}}E <b-icon-lock-fill v-if="wallet <= cost || czxpBalance < parseInt(unlock_czxp)"></b-icon-lock-fill>
-            </button>
-          </div>
-          <div id="getBtnwrapper" v-b-tooltip.hover="getBtnTooltipText">
-            <button id="get-button" v-if="in_store == 'Store' && cost == 0" class="btn btn-danger" :disabled="czxpBalance < parseInt(unlock_czxp)" v-on:click="getCard">
-            Get Card {{type_id}} <b-icon-lock-fill v-if="czxpBalance < parseInt(unlock_czxp)"></b-icon-lock-fill>
-            </button>
-          </div>
-          <div class="sacrifice-wrapper" v-if="$route.path == '/crypt'">
-            <div class="sacrifice-button">
-               <button :disabled="isGiftingCard || isSacrificingCard" class="btn btn-danger" v-on:click="sacrificeCard">
-                Sacrifice
-              </button>
-              <b-spinner v-if="isGiftingCard || isSacrificingCard" label="Spinning"></b-spinner>
-            </div>
-            <div class="float-right">
-              <b-button :disabled="isGiftingCard || isSacrificingCard" class="btn btn-danger btn-gift" v-b-modal="'transfer-modal-'+id">
-                <img src="@/assets/baseline_card_giftcard_white_24dp.png" />
-              </b-button>
-            </div>
-          </div>
       </div>
       <br>
-      <!--<div v-if="showTransaction == 1" class="alert alert-success alert-dismissible fade show" role="alert">-->
-      <!--  <strong>Success!</strong> Tx# {{transaction_number}}-->
-      <!--  <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
-      <!--    <span aria-hidden="true">&times;</span>-->
-      <!--  </button>-->
-      <!--</div>-->
 
   </div>
 </template>
@@ -91,22 +39,9 @@ import {showPendingToast, showSuccessToast, showRejectedToast} from '../util/sho
 
 export default {
   name: 'OwnedCardContent',
-  props: ['id','type_id','name','image','edition_total','cset','unlock_czxp','level','cost','buy_czxp','transfer_czxp','sacrifice_czxp','card_class', 'in_store'],
+  props: ['id', 'type_id', 'name', 'image', 'edition_total', 'cset', 'unlock_czxp',
+    'level', 'cost', 'buy_czxp', 'transfer_czxp', 'sacrifice_czxp', 'card_class'],
   computed: {
-    buyBtnTooltipText() {
-      if (this.wallet <= this.cost || this.czxpBalance < parseInt(this.unlock_czxp)) {
-        return this.buyBtnBlockedTooltipTextContent
-      } else {
-        return this.buyBtnTooltipTextContent
-      }
-    },
-    getBtnTooltipText() {
-      if (this.czxpBalance < parseInt(this.unlock_czxp)) {
-        return this.getBtnBlockedTooltipTextContent
-      } else {
-        return this.getBtnTooltipTextContent
-      }
-    },
     web3 () {
       return this.$store.state.web3
     },
@@ -122,89 +57,6 @@ export default {
     czxpBalance() {
       return parseInt(this.$store.state.czxpBalance);
     },
-  },
-  data () {
-    return {
-      wei : 1000000000000000000,
-      showTransaction : 0,
-      transaction_number : 0,
-      newWallet : '',
-      confirmTransferBtnDisabled : false,
-      buyBtnTooltipTextContent: 'Click to buy a copy of this card',
-      buyBtnBlockedTooltipTextContent:'You do not have enough Ether or CZXP tokens to purchase this card',
-      getBtnTooltipTextContent: 'Click to get a copy of this card at no cost',
-      getBtnBlockedTooltipTextContent: 'You do not have enough CZXP tokens to unlock this button and claim this Free card',
-      isSacrificingCard: false,
-      isGiftingCard: false
-    }
-  },
-  methods : {
-    buyCard : function(){
-      console.log("Buying card:" + this.type_id);
-      
-      window.Cryptoz.deployed().then((instance) => {
-        return instance.buyCard(this.type_id, {from: this.coinbase, value:(this.cost*1000000000000000000)});
-      }).then((res) => {
-        console.log(res);
-        this.showTransaction =1
-        this.$store.dispatch('updateOwnerBalances')
-      })
-    },
-    getCard : function(){
-      console.log("Claiming card:" + this.type_id);
-      
-      window.Cryptoz.deployed().then((instance) => {
-        return instance.getFreeCard(this.type_id, {from: this.coinbase});
-      }).then((res) => {
-        console.log(res)
-        this.showTransaction =1
-        this.$store.dispatch('updateOwnerBalances')
-      })
-    },
-    sacrificeCard : function() {
-      console.log("Sacrificing card:" + this.id);
-      showPendingToast(this)
-      window.Cryptoz.deployed().then((instance) => {
-        this.isSacrificingCard = true;
-        return instance.sacrifice(this.id, {from:this.coinbase});
-      }).then((res) => {
-        console.log("sacrifice result: ", res);
-        this.$store.dispatch('updateOwnerBalances')
-      }).catch((err) => {
-        this.isSacrificingCard = false;
-        console.log(err.message);
-        if (err.code === 4001) {
-          showRejectedToast(this)
-        }
-      }).finally(() => {})
-    },
-    transferCard : function() {
-      console.log('Transfer card called..' + this.id);
-      
-      //Disable the button so they dont mash it up
-      this.confirmTransferBtnDisabled = true;
-      //var toWallet = document.getElementById('toWallet').value
-      
-      console.log('to ' + this.newWallet)
-      console.log('from ' + this.coinbase)
-      var contract
-      window.Cryptoz.deployed().then((instance) => {
-        contract = instance
-        this.isGiftingCard = true
-        var modalName = 'transfer-modal-' + this.id;
-        this.$bvModal.hide(modalName)
-        showPendingToast(this)
-        return contract.transferFrom(this.coinbase, this.newWallet, this.id, {from:this.coinbase});
-      }).then((res) => {
-        // console.log("transfer result: ", res);
-        this.confirmTransferBtnDisabled = false;
-        return contract.tokensOfOwner(this.coinbase)
-      }).then(this.handleGetAllCards)
-      .catch(() => {
-        this.isGiftingCard = false
-        this.confirmTransferBtnDisabled = false
-      })
-    }
   }
 }
 </script>
@@ -340,8 +192,12 @@ export default {
 	}
 
 .flip-container, .front, .back {
-	width: 232px;
+	width: 240px;
 	height: 410px;
+}
+
+#card-container {
+  height: 410px;
 }
 
 /* flip speed goes here */
@@ -383,19 +239,5 @@ export default {
   .btn-gift{
     color:#fff;
   }
-
-.sacrifice-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sacrifice-button {
-  display: flex;
-}
-
-.sacrifice-button button {
-  margin-right: 10px;
-}
 
 </style>

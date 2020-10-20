@@ -1,26 +1,26 @@
 <template>
   <div>
     
-  <!-- Open Booster Modal -->
-  <b-modal
-    id="open-booster-modal"
-    title="Enter a CZXP wager amount to increase the odds of pulling a rare or epic card:"
-    ok-variant="danger"
-    ok-title="Open Booster"
-    hide-footer
-  >
-      
-        Minimum = 0 Or 2,000,000,000 , Maximum = 1,649,267,441,667,000
-        <input id="wager" class="form-control" type="text" v-on:input="wagerAmount = $event.target.value" value="0" required />
-    <b-row>
-      <b-col>
-        <b-button class="mt-3" variant="danger" block @click="openBooster">Open Booster</b-button>
-      </b-col>
-      <b-col>
-        <b-button class="mt-3" block @click="$bvModal.hide('open-booster-modal')">Cancel</b-button>
-      </b-col>
-    </b-row>
-  </b-modal>
+    <!-- Open Booster Modal -->
+    <b-modal
+      id="open-booster-modal"
+      title="Enter a CZXP wager amount to increase the odds of pulling a rare or epic card:"
+      ok-variant="danger"
+      ok-title="Open Booster"
+      hide-footer
+    >
+        
+          Minimum = 0 Or 2,000,000,000 , Maximum = 1,649,267,441,667,000
+          <input id="wager" class="form-control" type="text" v-on:input="wagerAmount = $event.target.value" value="0" required />
+      <b-row>
+        <b-col>
+          <b-button class="mt-3" variant="danger" block @click="openBooster">Open Booster</b-button>
+        </b-col>
+        <b-col>
+          <b-button class="mt-3" block @click="$bvModal.hide('open-booster-modal')">Cancel</b-button>
+        </b-col>
+      </b-row>
+    </b-modal>
     
     <div class="jumbotron">
       <UniverseBalances></UniverseBalances>
@@ -47,8 +47,8 @@
             
             <div class="row">
               <div class="col text-left"  v-if="ownsCards">
-                <b-dropdown id="dropdown" text="Sort By">
-                    <b-dropdown-item @click="sortByName('name')">Name</b-dropdown-item>
+                <b-dropdown id="sort-dropdown" text="Sort By">
+                    <b-dropdown-item @click="sortByAttr('name', false)">Name</b-dropdown-item>
                     <b-dropdown-item @click="sortByAttr('rarity')">Rarity</b-dropdown-item>
                     <b-dropdown-item @click="sortByAttr('cost')">Cost</b-dropdown-item>
                     <b-dropdown-item @click="sortByAttr('card_set')">Card Set</b-dropdown-item>
@@ -59,26 +59,102 @@
                     <b-dropdown-item @click="sortByAttr('transfer_czxp')">Transfer CZXP</b-dropdown-item>
                     <b-dropdown-item @click="sortByAttr('sacrifice_czxp')">Sacrifice CZXP</b-dropdown-item>
                 </b-dropdown>
+
+                <b-button
+                  id="view-change-button"
+                  @click="() => toggleTableView()">
+                  {{ 'View ' + (isTableView ? 'Gallery' : 'Table') }}
+                </b-button>
               </div>
             </div>
             <br>
-            <div class="row" v-if="ownsCards">
-              <OwnedCardContent v-on:card-updated="handleCardUpdated"
-                v-for="card in orderedCards" :key="card.id"
-                :id="card.id"
-                :type_id="card.attributes.type_id"
-                :name="card.name"
-                :cost="card.attributes.cost"
-                :cset="card.attributes.card_set"
-                :edition_total="card.attributes.edition_total"
-                :level="card.attributes.card_level"
-                :unlock_czxp="card.attributes.unlock_czxp"
-                :buy_czxp="card.attributes.buy_czxp"
-                :transfer_czxp="card.attributes.transfer_czxp"
-                :sacrifice_czxp="card.attributes.sacrifice_czxp"
-                :image="card.image"
-                :card_class="card.attributes.rarity"
-              ></OwnedCardContent>
+            <div v-if="ownsCards">
+              <div v-if="isTableView">
+                <b-table
+                  :items="orderedCards"
+                  :fields="tableFields"
+                  small striped
+                >
+                  <template #cell(name)="row" >
+                    <div class="cell card-name-cell">
+                      <img :src="row.item.image" class="cell mr-4">
+                      {{ row.item.name }}
+                    </div>
+                  </template>
+                  <template #cell(card_level)="row">
+                    <div class="cell">{{ row.item.card_level }}</div>
+                  </template>
+                  <template #cell(edition_total)="row">
+                    <div class="cell">{{ row.item.edition_total }}</div>
+                  </template>
+                  <template #cell(unlock_czxp)="row">
+                    <div class="cell">{{ row.item.unlock_czxp }}</div>
+                  </template>
+                  <template #cell(sacrifice_czxp)="row">
+                    <div class="cell">{{ row.item.sacrifice_czxp }}</div>
+                  </template>
+                  <template #cell(transfer_czxp)="row">
+                    <div class="cell">{{ row.item.transfer_czxp }}</div>
+                  </template>
+                  <template #cell(sacrifice)="row">
+                    <div class="cell">
+                      <b-button
+                        size="md"
+                        @click="sacrificeCard(row.item.id)"
+                        v-bind:disabled="cardsBeingGifted[row.item.id] || cardsBeingSacrificed[row.item.id]"
+                      >
+                        Sacrifice
+                      </b-button>
+                    </div>
+                  </template>
+                  <template #cell(gift)="row">
+                    <div class="cell">
+                      <b-button
+                        size="md"
+                        @click="openGiftModal(row.item.id)"
+                        :disabled="cardsBeingGifted[row.item.id] || cardsBeingSacrificed[row.item.id]"
+                      >
+                        Gift
+                      </b-button>
+                    </div>
+                  </template>
+                </b-table>
+              </div>
+              <div class="row" v-else>
+                <div v-for="card in orderedCards" :key="card.id" class="card-wrapper">
+                  <OwnedCardContent
+                    :id="card.id"
+                    :type_id="card.type_id"
+                    :name="card.name"
+                    :cost="card.cost"
+                    :cset="card.card_set"
+                    :edition_total="card.edition_total"
+                    :level="card.card_level"
+                    :unlock_czxp="card.unlock_czxp"
+                    :buy_czxp="card.buy_czxp"
+                    :transfer_czxp="card.transfer_czxp"
+                    :sacrifice_czxp="card.sacrifice_czxp"
+                    :image="card.image"
+                    :card_class="card.rarity"
+                  ></OwnedCardContent>
+                  <div class="sacrifice-wrapper" v-if="$route.path == '/crypt'">
+                    <div class="sacrifice-button">
+                      <button :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]" class="btn btn-danger" v-on:click="sacrificeCard(card.id)">
+                        Sacrifice
+                      </button>
+                    </div>
+                    <b-spinner v-if="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]" label="Spinning"></b-spinner>
+                    <div class="float-right">
+                      <b-button
+                        @click="openGiftModal(card.id)"
+                        :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]"
+                        class="btn btn-danger btn-gift">
+                          <img src="@/assets/baseline_card_giftcard_white_24dp.png" />
+                      </b-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div v-else><h2>You do not own any Cryptoz<br><router-link to="/shop">To get Free Cryptoz or Buy one, visit the Shop</router-link></h2></div>
         </div>
@@ -86,6 +162,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
 import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
@@ -98,6 +175,31 @@ export default {
     OwnedCardContent,
     UniverseBalances,
     OwnerBalances
+  },
+  data () {
+    return {
+      subscriptionState:0, // 0=idle,1=active
+      ownsCards : false,
+      el : 0,
+      confirmOpenBtnDisabled : 0,
+      wagerAmount : 0,
+      orderedCards: [],
+      isTableView: false,
+      tableFields: ["name", "card_level", "edition_total", "unlock_czxp", "sacrifice_czxp", "transfer_czxp", "sacrifice", "gift"],
+      confirmTransferBtnDisabled : false,
+      cardsBeingSacrificed: {},
+      cardsBeingGifted: {},
+      receivingWallet : ''
+    }
+  },
+  mounted () {
+    const isTable = localStorage.getItem('isTableView')
+    if (isTable !== null) {
+      this.isTableView = JSON.parse(isTable)
+    }
+    if(this.coinbase !== null){
+      this.getAllCards();
+    }
   },
   computed: {
     web3 () {
@@ -142,26 +244,41 @@ export default {
       }
     }
   },
-  mounted () {
-    if(this.coinbase !== null){
-      this.getAllCards();
-    }
-  },
-  data () {
-    return {
-      subscriptionState:0, // 0=idle,1=active
-      czxp_balance : 'Log in Metamask',
-      ownsCards : false,
-      el : 0,
-      confirmOpenBtnDisabled : 0,
-      wagerAmount : 0,
-      orderedCards: []
-    }
-  },
   methods : {
-    handleCardUpdated : function() {
-      console.log('CryptContent got child event..re-render the view');
-      this.getAllCards();
+    openGiftModal: function(id) {
+      const h = this.$createElement
+      const titleVNode = h('h5', `Gift Cryptoz Card Token #${id} to another wallet`, { class: ['modal-title'] })
+      const messageVNode = h('div', { class: ['modal-message'] }, [
+        h('p', 'Enter a valid Ethereum wallet address to send this card to:', { class: [''] }),
+        h('input', {
+          on: { input: e => this.receivingWallet = e.target.value },
+          props: {
+            id: "toWallet",
+          },
+          style: {
+            width: '100%'
+          }
+        })
+      ])
+      // We must pass the generated VNodes as arrays
+      this.$bvModal.msgBoxConfirm([messageVNode], {
+        title: [titleVNode],
+        buttonSize: 'md',
+        centered: true, size: 'md'
+      })
+      .then(value => {
+        if (value) {
+          // user pressed ok
+          this.transferCard(id)
+        }
+        else {
+          // user canceled
+        }
+      })
+      .catch(err => {
+        // An error occurred
+        console.error(err)
+      })
     },
     getAllCards : function() {
       this.subscriptionState = 1;
@@ -171,8 +288,54 @@ export default {
       }).then(this.handleGetAllCards)
       
     },
+    toggleTableView: function() {
+      const nextVal = !this.isTableView
+      this.isTableView = nextVal
+      localStorage.setItem('isTableView', nextVal)
+    },
     clearCards: function() {
       this.orderedCards = []
+    },
+    sacrificeCard : function(id) {
+      showPendingToast(this)
+      Vue.set(this.cardsBeingSacrificed, id, true)
+
+      window.Cryptoz.deployed().then((instance) => {
+        return instance.sacrifice(id, {from:this.coinbase});
+      }).then((res) => {
+        this.$store.dispatch('updateOwnerBalances')
+      }).catch((err) => {
+        // console.error(err);
+        if (err.code === 4001) {
+          showRejectedToast(this)
+        }
+      }).finally(() => {
+        Vue.set(this.cardsBeingSacrificed, id, false)
+      })
+    },
+    transferCard : function(id) {
+      Vue.set(this.cardsBeingGifted, id, true)
+      //Disable the button so they dont mash it up
+      this.confirmTransferBtnDisabled = true;
+      
+      console.log('to ' + this.receivingWallet)
+      console.log('from ' + this.coinbase)
+      var contract
+      window.Cryptoz.deployed().then((instance) => {
+        contract = instance
+        showPendingToast(this)
+        return contract.transferFrom(this.coinbase, this.receivingWallet, id, {from:this.coinbase});
+      }).then((res) => {
+        // console.log("transfer result: ", res);
+        this.confirmTransferBtnDisabled = false;
+        return contract.tokensOfOwner(this.coinbase)
+      }).then(this.handleGetAllCards)
+      .catch(() => {
+        this.confirmTransferBtnDisabled = false
+      })
+      .finally(() => {
+        Vue.set(this.cardsBeingGifted, id, false)
+      })
     },
     buyAndOpenBooster : function() {
       console.log('Buy and Open Booster card...');
@@ -212,8 +375,9 @@ export default {
             }).then(function(res){
               // console.log('edition:' + tokenIdList[tokenId][1].c[0])
               res.data.id = tokenId;
-              var newAttr = [];
               //format the attributes to match our JS objects
+              
+              let newAttr = {}
               res.data.attributes.forEach(function(element){
                 newAttr[element.trait_type] = element.value;
               })
@@ -250,8 +414,11 @@ export default {
                   res.data.attributes.rarity = 'card-bg card-bg-1';
                   break;
               }
+
+              delete res.data.attributes
+              newAttr = {...newAttr, ...res.data};
               
-              resolve(res.data)
+              resolve(newAttr)
             })
             .catch((err) => {
               reject(err)
@@ -303,11 +470,8 @@ export default {
         }
       })
     },
-    sortByName : function(param) {
-      this.orderedCards.sort(dynamicSort(param))
-    },
-    sortByAttr : function(param) {
-      this.orderedCards.sort(sortAttributes(param))
+    sortByAttr : function(param, descending = true) {
+      this.orderedCards.sort(dynamicSort(param, descending))
     }
   }
 }
@@ -341,5 +505,23 @@ export default {
 
   .buy-and-open-booster {
     display: flex;
+  }
+
+  .cell {
+    height: 60px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  #sort-dropdown {
+    margin-right: 1rem;
+  }
+
+  .sacrifice-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-left:0.5rem;
   }
 </style>
