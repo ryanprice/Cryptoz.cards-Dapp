@@ -158,8 +158,6 @@ export default {
   },
   watch: {
     balance(newValue, oldValue) {
-      //console.log(`Updating balance from ${oldValue} to ${newValue}`);
-
       // new wallet.. reset their boosters and czxp balance
       if (newValue >= 2000000000000000) {
         this.buyBoostBtnOn = 1;
@@ -171,7 +169,6 @@ export default {
       }
     },
     currentEvent(newValue,oldValue) {
-      console.log('SHOP currentEvent:',newValue)
       if(newValue !== oldValue && typeof newValue !== "undefined"){
         if (this.pendingTransaction == newValue.blockHash) {
           this.showSpinner = 0;
@@ -215,7 +212,6 @@ export default {
       window.Cryptoz.deployed().then((instance) => {
         return instance.buyCard(cardAttributes.type_id, {from: this.coinbase, value:(cardAttributes.cost*1000000000000000000)});
       }).then((res) => {
-        console.log(res);
         this.showTransaction =1
         this.$store.dispatch('updateOwnerBalances')
       })
@@ -226,14 +222,11 @@ export default {
       window.Cryptoz.deployed().then((instance) => {
         return instance.getFreeCard(cardAttributes.type_id, {from: this.coinbase});
       }).then((res) => {
-        console.log(res)
         this.showTransaction =1
         this.$store.dispatch('updateOwnerBalances')
       })
     },
     buyBoosters : function() {
-      console.log('Buy boosters called..');
-      
       //Hide the modal
       this.$bvModal.hide('buy-boosters-modal')
       
