@@ -163,13 +163,12 @@ export default {
       console.log('CryptContent got child event..re-render the view');
       this.getAllCards();
     },
-    getAllCards : function() {
+    getAllCards : async function() {
       this.subscriptionState = 1;
       
-      window.Cryptoz.deployed().then((instance) => {
-        return instance.tokensOfOwner(this.coinbase)
-      }).then(this.handleGetAllCards)
-      
+      const instance = await window.Cryptoz.deployed();
+      const tokensOfOwner = await instance.tokensOfOwner(this.coinbase);
+      this.handleGetAllCards(tokensOfOwner)
     },
     clearCards: function() {
       this.orderedCards = []
