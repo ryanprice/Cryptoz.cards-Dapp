@@ -46,22 +46,11 @@
             <br>
             
             <div class="row">
-              <div class="col text-left"  v-if="ownsCards">
-                <b-dropdown id="sort-dropdown" text="Sort By">
-                    <b-dropdown-item @click="sortByAttr('name', false)">Name</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('rarity')">Rarity</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('cost')">Cost</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('card_set')">Card Set</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('edition_total')">Edition Total</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('card_level')">Level</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('unlock_czxp')">Unlock CZXP</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('buy_czxp')">Buy CZXP</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('transfer_czxp')">Transfer CZXP</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('sacrifice_czxp')">Sacrifice CZXP</b-dropdown-item>
-                </b-dropdown>
-
+              <div id="button-container" class="row" v-if="ownsCards">
+                <SortDropdown @sort-by-attr="sortByAttr"></SortDropdown>
                 <b-button
                   id="view-change-button"
+                  variant="info"
                   @click="() => toggleTableView()">
                   {{ 'View ' + (isTableView ? 'Gallery' : 'Table') }}
                 </b-button>
@@ -73,11 +62,11 @@
                 <b-table
                   :items="orderedCards"
                   :fields="tableFields"
-                  small striped
+                  small striped responsive
                 >
                   <template #cell(name)="row" >
                     <div class="cell card-name-cell">
-                      <img :src="row.item.image" class="cell mr-4">
+                      <img :src="row.item.image" :class="`cell mr-4 ${row.item.rarity}`">
                       {{ row.item.name }}
                     </div>
                   </template>
@@ -101,9 +90,10 @@
                       <b-button
                         size="md"
                         @click="sacrificeCard(row.item.id)"
+                        variant="danger"
                         :disabled="cardsBeingGifted[row.item.id] || cardsBeingSacrificed[row.item.id]"
                       >
-                        Sacrifice
+                        <span class='emoji'>☠️</span>
                       </b-button>
                     </div>
                   </template>
@@ -112,9 +102,10 @@
                       <b-button
                         size="md"
                         @click="openGiftModal(row.item.id)"
+                        variant="danger"
                         :disabled="cardsBeingGifted[row.item.id] || cardsBeingSacrificed[row.item.id]"
                       >
-                        Gift
+                        <img src="@/assets/baseline_card_giftcard_white_24dp.png" />
                       </b-button>
                     </div>
                   </template>
@@ -139,16 +130,23 @@
                   ></OwnedCardContent>
                   <div class="sacrifice-wrapper" v-if="$route.path == '/crypt'">
                     <div class="sacrifice-button">
-                      <button :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]" class="btn btn-danger" v-on:click="sacrificeCard(card.id)">
-                        Sacrifice
+                      <button
+                        :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]"
+                        class="btn btn-danger"
+                        v-on:click="sacrificeCard(card.id)"
+                        v-b-tooltip="'Sacrifice'"
+                      >
+                        <span class='emoji'>☠️</span>
                       </button>
                     </div>
                     <b-spinner v-if="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]" label="Spinning"></b-spinner>
                     <div class="float-right">
                       <b-button
-                        @click="openGiftModal(card.id)"
                         :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]"
-                        class="btn btn-danger btn-gift">
+                        class="btn btn-danger btn-gift"
+                        @click="openGiftModal(card.id)"
+                        v-b-tooltip="'Gift'"
+                      >
                           <img src="@/assets/baseline_card_giftcard_white_24dp.png" />
                       </b-button>
                     </div>
@@ -167,14 +165,17 @@ import axios from 'axios'
 import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
+import SortDropdown from '@/components/SortDropdown.vue'
 import {showPendingToast, showSuccessToast, showRejectedToast, showErrorToast} from '../util/showToast';
+import {getEditionNumber, getRarity, dynamicSort} from '../helpers'
 
 export default {
   name: 'CryptContent',
   components : {
     OwnedCardContent,
     UniverseBalances,
-    OwnerBalances
+    OwnerBalances,
+    SortDropdown
   },
   data () {
     return {
@@ -184,6 +185,8 @@ export default {
       confirmOpenBtnDisabled : 0,
       wagerAmount : 0,
       orderedCards: [],
+      sortType: null,
+      isDescending: true,
       isTableView: false,
       tableFields: ["name", "card_level", "edition_total", "unlock_czxp", "sacrifice_czxp", "transfer_czxp", "sacrifice", "gift"],
       confirmTransferBtnDisabled : false,
@@ -221,6 +224,10 @@ export default {
   watch: {
     'web3': {
       handler(val, oldVal) {
+        if (val.coinbase !== oldVal.coinbase) {
+          this.$bvModal.hide('gift-modal')
+          this.$bvModal.hide('open-booster-modal')
+        }
         if (val.isConnected && val.coinbase) {
           this.getAllCards()
         }
@@ -264,7 +271,8 @@ export default {
       this.$bvModal.msgBoxConfirm([messageVNode], {
         title: [titleVNode],
         buttonSize: 'md',
-        centered: true, size: 'md'
+        centered: true, size: 'md',
+        id: 'gift-modal'
       })
       .then(value => {
         if (value) {
@@ -430,6 +438,9 @@ export default {
         this.orderedCards = await Promise.all(
           res.map(element => getCard(element.c[0]))
         )
+        if (this.sortType) {
+          this.sortByAttr(this.sortType, this.isDescending)
+        }
         this.$store.dispatch('updateCardsOwned', this.orderedCards.length)
         
       }else{
@@ -470,8 +481,20 @@ export default {
         }
       })
     },
-    sortByAttr : function(param, descending = true) {
-      this.orderedCards.sort(dynamicSort(param, descending))
+    sortByAttr: function(param, isDescending) {
+      this.sortType = param
+      this.isDescending = isDescending
+      switch(param) {
+        case "edition_number":
+          this.orderedCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
+          break
+        case "rarity":
+          this.orderedCards.sort(dynamicSort(param, isDescending, true, getRarity))
+          break
+        default:
+          this.orderedCards.sort(dynamicSort(param, isDescending))
+          break
+      }
     }
   }
 }
@@ -507,21 +530,63 @@ export default {
     display: flex;
   }
 
-  .cell {
+  table .cell {
     height: 60px;
     display: flex;
     flex-direction: row;
     align-items: center;
   }
 
-  #sort-dropdown {
-    margin-right: 1rem;
+  #button-container {
+    margin-left: 1rem;
+    display: flex
+  }
+  
+  #view-change-button {
+    margin-left: 0.5rem;
   }
 
   .sacrifice-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding-left:0.5rem;
+    padding-left:1.2rem;
   }
+
+  .emoji {
+    font-size: 18px;
+  }
+
+  .card-bg {
+    padding:2px;
+  }
+  
+  .card-bg-6{
+    background-color: rgba(84,81,97,0.5);
+    border: 2px solid rgb(84,81,97);
+  }
+
+  .card-bg-5{
+    background-color: rgba(43,164,250,0.5);
+    border: 2px solid rgb(43,164,250);
+  }
+
+  .card-bg-4{
+    background-color: rgba(202,60,44,0.5);
+    border: 2px solid rgb(202,60,44);
+  }
+
+  .card-bg-3{
+    background-color: rgba(87,69,229,0.5);
+    border: 2px solid rgb(87,69,229);
+  }
+
+  /*plat and diamond borders*/
+  /*
+  .card-bg-2{
+  }
+
+  .card-bg-1{
+  }
+  */
 </style>

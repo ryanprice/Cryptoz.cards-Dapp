@@ -14,23 +14,6 @@ import AppHeader from './components/layout/AppHeader'
 import AppFooter from './components/layout/AppFooter'
 import {mapState} from 'vuex'
 
-window.dynamicSort = function(property, descending=true) {
-  return function (a,b) {
-    let valA = a[property], valB = b[property]
-    if (!isNaN(valA) && !isNaN(valB)) {
-      valA = parseInt(valA)
-      valB = parseInt(valB)
-    }
-    if (typeof valA === "string" && typeof valB === "string") {
-      valA = valA.toLowerCase()
-      valB = valB.toLowerCase()
-    }
-    if(valA < valB) { return descending ? 1 : -1; }
-    if(valA > valB) { return descending ? -1 : 1; }
-    return 0;
-  }
-}
-
 import Web3Modal from "web3modal";
 import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
 import WalletConnectProvider from "@walletconnect/web3-provider";

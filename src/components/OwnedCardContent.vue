@@ -79,7 +79,7 @@ export default {
 }
 
 .card-bg-6{
-    background-image: url(assets/cryptoz_card_common_brown.svg);
+  background-image: url(assets/cryptoz_card_common_brown.svg);
 }
 
 .card-bg-5{

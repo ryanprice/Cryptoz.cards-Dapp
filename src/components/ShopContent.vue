@@ -39,9 +39,7 @@
           </p>
           <div class="row">
             <div class="col">
-              <!--button class="btn btn-danger" v-bind:disabled="buyBoostBtnOn == 0" data-toggle="modal" data-target="#buyBoostersPanel">Buy Booster Credits @ 0.002E
-              </button-->
-              <b-button class="btn btn-danger" v-bind:disabled="buyBoostBtnOn == 0 || balance < 2000000000000000" v-b-modal.buy-boosters-modal>Buy Booster Credits @ 0.002E</b-button>
+              <b-button class="btn btn-danger" v-bind:disabled="balance < 2000000000000000" v-b-modal.buy-boosters-modal>Buy Booster Credits @ 0.002E</b-button>
               <transition name="fade">
                 <span v-if="showSpinner==1">
                   <img src="@/assets/spinner.gif" class="spinner" /> <strong>{{transactionStatus}}</strong>
@@ -56,18 +54,7 @@
           <br>
           <div class="row">
               <div class="col text-left">
-                <b-dropdown id="dropdown" text="Sort By">
-                    <b-dropdown-item @click="sortByAttr('name', false)">Name</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('rarity')">Rarity</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('cost')">Cost</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('card_set')">Card Set</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('edition_total')">Edition Total</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('card_level')">Level</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('unlock_czxp')">Unlock CZXP</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('buy_czxp')">Buy CZXP</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('transfer_czxp')">Transfer CZXP</b-dropdown-item>
-                    <b-dropdown-item @click="sortByAttr('sacrifice_czxp')">Sacrifice CZXP</b-dropdown-item>
-                </b-dropdown>
+                <SortDropdown @sort-by-attr="sortByAttr"></SortDropdown>
               </div>
             </div>
           <br>
@@ -88,15 +75,15 @@
                 :image="card.image"
                 :card_class="card.rarity"
               ></OwnedCardContent>
-              <div id="buy-get-button-wrapper">
-                <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip="buyBtnTooltipText">
-                  <button id="buy-button" :disabled="wallet <= card.cost || card.czxpBalance < parseInt(card.unlock_czxp)" class="btn btn-danger" v-on:click="buyCard(card)">
-                    Buy Card {{card.cost}}E <b-icon-lock-fill v-if="wallet <= card.cost || card.czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill>
+              <div id="buy-get-button-wrapper" :class="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''">
+                <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip="buyBtnTooltipText(card.cost, card.unlock_czxp)">
+                  <button id="buy-button" :disabled="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)" class="btn btn-danger" v-on:click="buyCard(card)">
+                    Buy Card {{card.cost}}E <b-icon-lock-fill v-if="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill>
                   </button>
                 </div>
-                <div v-else id="getBtnwrapper" v-b-tooltip.hover="getBtnTooltipText">
-                  <button id="get-button"  class="btn btn-danger" :disabled="card.czxpBalance < parseInt(card.unlock_czxp)" v-on:click="getCard(card)">
-                    Get Card <b-icon-lock-fill v-if="card.czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill>
+                <div v-else id="getBtnwrapper" v-b-tooltip.hover="getBtnTooltipText(card.unlock_czxp)">
+                  <button id="get-button"  class="btn btn-danger" :disabled="czxpBalance < parseInt(card.unlock_czxp)" v-on:click="getCard(card.type_id)">
+                    Get Card <b-icon-lock-fill v-if="czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill>
                   </button>
                 </div>
               </div>
@@ -114,13 +101,16 @@
 import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
+import SortDropdown from '@/components/SortDropdown.vue'
+import {getEditionNumber, getRarity, dynamicSort} from '../helpers'
 
 export default {
   name: 'ShopContent',
   components : {
     OwnedCardContent,
     UniverseBalances,
-    OwnerBalances
+    OwnerBalances,
+    SortDropdown
   },
   computed: {
     web3 () {
@@ -138,23 +128,12 @@ export default {
     totalCyptozTypes() {
       return this.$store.state.totalCryptozTypes;
     },
+    czxpBalance() {
+      return this.$store.state.czxpBalance;
+    },
     currentEvent() {
       return this.$store.state.lastChainEvent;
-    },
-    buyBtnTooltipText() {
-      if (this.wallet <= this.cost || this.czxpBalance < parseInt(this.unlock_czxp)) {
-        return this.buyBtnBlockedTooltipTextContent
-      } else {
-        return this.buyBtnTooltipTextContent
-      }
-    },
-    getBtnTooltipText() {
-      if (this.czxpBalance < parseInt(this.unlock_czxp)) {
-        return this.getBtnBlockedTooltipTextContent
-      } else {
-        return this.getBtnTooltipTextContent
-      }
-    },
+    }
   },
   watch: {
     balance(newValue, oldValue) {
@@ -188,7 +167,7 @@ export default {
       buyBoostBtnOn: 0,
       confirmBoosterBuyBtnDisabled: 0,
       totalCreditsToBuy : 1,
-      allCards : {}, //We never mangle this
+      allCards : {}, //We never mangle this,
       buyBtnTooltipTextContent: 'Click to buy a copy of this card',
       buyBtnBlockedTooltipTextContent:'You do not have enough Ether or CZXP tokens to purchase this card',
       getBtnTooltipTextContent: 'Click to get a copy of this card at no cost',
@@ -216,11 +195,11 @@ export default {
         this.$store.dispatch('updateOwnerBalances')
       })
     },
-    getCard : function(cardAttributes){
-      console.log("Claiming card:" + cardAttributes.type_id);
+    getCard : function(type_id){
+      console.log("Claiming card:" + type_id);
       
       window.Cryptoz.deployed().then((instance) => {
-        return instance.getFreeCard(cardAttributes.type_id, {from: this.coinbase});
+        return instance.getFreeCard(type_id, {from: this.coinbase});
       }).then((res) => {
         this.showTransaction =1
         this.$store.dispatch('updateOwnerBalances')
@@ -234,25 +213,20 @@ export default {
       this.showSpinner = 1;
       this.transactionStatus = 'Pending confirmation...';
       
-      //pass to metamask
-      try{
-        Cryptoz.deployed().then((instance) => {
+      Cryptoz.deployed()
+        .then((instance) => {
           var totalBoostersCost = 2000000000000000 * parseInt(this.totalCreditsToBuy);
           return instance.buyBoosterCard(parseInt(this.totalCreditsToBuy), {from: this.coinbase, value:totalBoostersCost});
-        }).then(this.handleBuyBooster) //update boosters owned and total types
-        
-      }catch(error) {
-        console.error('buyBoosters cancelled/failed:', error);
-      }
+        })
+        .then(this.handleBuyBooster) //update boosters owned and total types
+        .catch(err => {
+          console.err('USER REJECTED!!', err);
+          this.showSpinner = 0;
+        })
       
     },
-    handleBuyBooster : function(error,result) {
-        console.log('Handling buy booster', error, result);
-        if(error)
-        {
-          console.log('USER REJECTED!!');
-          this.showSpinner = 0;
-        }
+    handleBuyBooster : function(result) {
+        console.log('Handling buy booster', result);
         //change from pending to ready
         this.pendingTransaction = result.receipt.blockHash;
         this.transactionStatus = 'Broadcast to chain...';
@@ -325,8 +299,32 @@ export default {
       });
 
     },
-    sortByAttr: function(param, descending = true) {
-      this.storeCards.sort(dynamicSort(param, descending))
+    buyBtnTooltipText(cost, unlock_czxp) {
+      if (this.balance <= cost || this.czxpBalance < parseInt(unlock_czxp)) {
+        return this.buyBtnBlockedTooltipTextContent
+      } else {
+        return this.buyBtnTooltipTextContent
+      }
+    },
+    getBtnTooltipText(unlock_czxp) {
+      if (this.czxpBalance < parseInt(unlock_czxp)) {
+        return this.getBtnBlockedTooltipTextContent
+      } else {
+        return this.getBtnTooltipTextContent
+      }
+    },
+    sortByAttr: function(param, isDescending) {
+      switch(param) {
+        case "edition_number":
+          this.storeCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
+          break
+        case "rarity":
+          this.storeCards.sort(dynamicSort(param, isDescending, true, getRarity))
+          break
+        default:
+          this.storeCards.sort(dynamicSort(param, isDescending))
+          break
+      }
     }
   }
 }
@@ -361,5 +359,9 @@ export default {
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-bottom: 10px solid #dc3545;
+  }
+
+  .disabled-btn::before {
+    opacity: .65;
   }
 </style>
