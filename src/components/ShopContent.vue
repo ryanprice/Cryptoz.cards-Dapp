@@ -270,10 +270,11 @@ export default {
 
         const results = await Promise.all(indexes.map(async id => {
           const cardData = await this.getCard(id + 1);
-          if (cardData !== undefined) {
-            return await this.isCardOwned(cardData);
+          if (!cardData) {
+            return;
           }
-          return cardData;
+
+          return this.addIsOwnedProp(cardData);
         }))
 
         const storeCards = results.filter(result => result !== undefined);
@@ -287,7 +288,7 @@ export default {
       }
     },
 
-    isCardOwned: async function (card) {
+    addIsOwnedProp: async function (card) {
       const instance = await window.Cryptoz.deployed();
       const isOwned = await instance.cardTypesOwned(this.coinbase, card.id);
       card.isOwned  = isOwned;
