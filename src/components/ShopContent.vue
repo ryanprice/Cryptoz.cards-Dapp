@@ -266,21 +266,20 @@ export default {
 
         // Creates an array [0, 1, 2 ...totalCyptozTypes - 1]
         const totalCardTypes = parseInt(this.totalCyptozTypes);
-        const indexes = Array.from(Array(totalCardTypes).keys());
+        const indexes = [...Array(totalCardTypes)].map((_,i) => i)
 
         const results = await Promise.all(indexes.map(async id => {
           const cardData = await this.getCard(id + 1);
+          if (cardData !== undefined) {
+            return await this.isCardOwned(cardData);
+          }
           return cardData;
         }))
 
-        const storeCards = [...results.filter(result => result !== undefined)]
-        const cardsWithOwnedProp = await Promise.all(storeCards.map(async card => {
-            const enhancedCard = await this.isCardOwned(card);
-            return enhancedCard;
-        }));
-        
-        this.allCards = [...cardsWithOwnedProp];
-        this.storeCards = [...cardsWithOwnedProp];
+        const storeCards = results.filter(result => result !== undefined);
+
+        this.allCards = [...storeCards];
+        this.storeCards = [...storeCards];
         showSuccessToast(this, 'Finished Loading Shop.');
       } catch (err) {
         console.log("Error loading cards: ", err);

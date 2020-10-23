@@ -155,11 +155,12 @@ export default {
       console.log("Buying card:" + this.type_id);
       
       window.Cryptoz.deployed().then((instance) => {
-        return instance.buyCard(this.type_id, {from: this.coinbase, value:(this.cost*1000000000000000000)});
+        return instance.buyCard(this.type_id, {from: this.coinbase, value: Math.round(this.cost*this.wei)});
       }).then((res) => {
-        console.log(res);
         this.showTransaction =1
         this.$store.dispatch('updateOwnerBalances')
+      }).catch((err) => {
+        console.log(err);
       })
     },
     getCard : function(){
