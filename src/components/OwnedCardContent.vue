@@ -42,21 +42,6 @@ export default {
   props: ['id', 'type_id', 'name', 'image', 'edition_total', 'cset', 'unlock_czxp',
     'level', 'cost', 'buy_czxp', 'transfer_czxp', 'sacrifice_czxp', 'card_class'],
   computed: {
-    web3 () {
-      return this.$store.state.web3
-    },
-    wallet () {
-      return parseFloat(web3.fromWei(this.$store.state.web3.balance), 'ether');
-    },
-    balance(){
-      return this.$store.state.web3.balance;
-    },
-    coinbase() {
-      return this.$store.state.web3.coinbase;
-    },
-    czxpBalance() {
-      return parseInt(this.$store.state.czxpBalance);
-    },
   }
 }
 </script>

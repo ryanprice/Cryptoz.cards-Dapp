@@ -110,11 +110,11 @@
       }
     },
     mounted() {
-      console.log('Are we getting vars from App.vue ?...' + this.$parent.account);
+      //grab the token id from the url
       this.token_id = this.$route.params.token_id;
-      console.log('from string..' + this.$route.params.token_id);
-      console.log();
-      setTimeout(this.startSubscriptions, 2000)
+      //console.log('from string..' + this.$route.params.token_id);
+      //setTimeout(this.startSubscriptions, 2000)
+      this.startSubscriptions()
     },
     methods: {
       startSubscriptions : function() {
@@ -125,44 +125,29 @@
         
         window.Cryptoz.deployed().then(function(instance) {
           contract = instance;
-          return instance.exists.call(self.token_id);
-          //return instance.exists(self.token_id, {from: account});
+          return instance.getOwnedCard.call(self.token_id);
         }).then(function(res){
-          //console.log(res);
-          //Does the token exist ?
-          if(res){
+          let cardTypeId = res[0].c[0];
+          
+          //If the tokenId is greater than 0, we have something valid
+          if(cardTypeId > 0){
             self.load_state = 1;
+            self.edition_number = res[1].c[0];
+            self.times_transferred = res[2].c[0];
+            self.getCardData(cardTypeId);
             return contract.ownerOf.call(self.token_id);
-            //return contract.ownerOf(self.token_id, {from: account});
           }else{
             self.load_state = 0; //and we stop here
+            return 0;
           }
-           return 0;
-        }).then(function(res){
+        }).then(function(res){ // owners wallet address
           if(res == 0){
             return 0;
           }
-          console.log('owner is:');
-          //console.log(res);
           self.owner = res;
           self.owner_url = 'https://etherscan.io/address/' + res;
-          return contract.getOwnedCard.call(self.token_id);
-          //return contract.getCardByTokenId(self.token_id, {from: account});
-        }).then(function(elementReturned){
-          //console.log('cardBytoken:'); // 3 parts - type_id, edition_number, transfer_count
-          //console.log(elementReturned);
-          //console.log(elementReturned[0].c[0]);
-          if(elementReturned ==0)
-          {
-            return 0
-          }
-          
-          self.edition_number = elementReturned[1].c[0];
-          self.times_transferred = elementReturned[2].c[0];
-          
-          self.getCardData(elementReturned[0].c[0]);
+          return;
         })
-        
         
       },
       getCardData : function(card_id) {

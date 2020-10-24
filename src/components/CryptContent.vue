@@ -284,13 +284,12 @@ export default {
         console.error(err)
       })
     },
-    getAllCards : function() {
+    getAllCards : async function() {
       this.subscriptionState = 1;
       
-      window.Cryptoz.deployed().then((instance) => {
-        return instance.tokensOfOwner(this.coinbase)
-      }).then(this.handleGetAllCards)
-      
+      const instance = await window.Cryptoz.deployed();
+      const tokensOfOwner = await instance.tokensOfOwner(this.coinbase);
+      this.handleGetAllCards(tokensOfOwner)
     },
     toggleTableView: function() {
       const nextVal = !this.isTableView

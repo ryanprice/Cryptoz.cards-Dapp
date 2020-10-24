@@ -17,7 +17,7 @@
                   </p>
                 </div>
               </a>
-              
+  <!-- DISABLED FOR NOW
               <a href="https://rarebits.io/" target="_blank">
                 <div class="market-btn">
                   <img class="rb-logo" src="https://lever-client-logos.s3.amazonaws.com/b5195801-463f-4953-9cee-332ab2414511-1526322100422.png" align="absmiddle" />
@@ -27,7 +27,7 @@
                   </p>
                 </div>
               </a>
-              
+   -->
             </div>
             
             <div class="col-6">
