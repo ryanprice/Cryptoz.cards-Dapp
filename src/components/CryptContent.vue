@@ -196,10 +196,6 @@ export default {
     }
   },
   mounted () {
-    const isTable = localStorage.getItem('isTableView')
-    if (isTable !== null) {
-      this.isTableView = JSON.parse(isTable)
-    }
     if(this.coinbase !== null){
       this.getAllCards();
     }
@@ -227,9 +223,9 @@ export default {
         if (val.coinbase !== oldVal.coinbase) {
           this.$bvModal.hide('gift-modal')
           this.$bvModal.hide('open-booster-modal')
-        }
-        if (val.isConnected && val.coinbase) {
-          this.getAllCards()
+          if (val.isConnected) {
+            this.getAllCards()
+          }
         }
 
         else {
@@ -299,7 +295,6 @@ export default {
     toggleTableView: function() {
       const nextVal = !this.isTableView
       this.isTableView = nextVal
-      localStorage.setItem('isTableView', nextVal)
     },
     clearCards: function() {
       this.orderedCards = []
