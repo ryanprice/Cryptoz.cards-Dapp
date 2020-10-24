@@ -77,13 +77,13 @@
                     <div class="cell">{{ row.item.edition_total }}</div>
                   </template>
                   <template #cell(unlock_czxp)="row">
-                    <div class="cell">{{ row.item.unlock_czxp }}</div>
+                    <div class="cell">{{ parseInt(row.item.unlock_czxp).toLocaleString() }}</div>
                   </template>
                   <template #cell(sacrifice_czxp)="row">
-                    <div class="cell">{{ row.item.sacrifice_czxp }}</div>
+                    <div class="cell">{{ parseInt(row.item.sacrifice_czxp).toLocaleString() }}</div>
                   </template>
                   <template #cell(transfer_czxp)="row">
-                    <div class="cell">{{ row.item.transfer_czxp }}</div>
+                    <div class="cell">{{ parseInt(row.item.transfer_czxp).toLocaleString() }}</div>
                   </template>
                   <template #cell(sacrifice)="row">
                     <div class="cell">
@@ -134,7 +134,7 @@
                         :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]"
                         class="btn btn-danger"
                         v-on:click="sacrificeCard(card.id)"
-                        v-b-tooltip="'Sacrifice'"
+                        v-b-tooltip.hover="'Sacrifice'"
                       >
                         <span class='emoji'>☠️</span>
                       </button>
@@ -145,7 +145,7 @@
                         :disabled="cardsBeingGifted[card.id] || cardsBeingSacrificed[card.id]"
                         class="btn btn-danger btn-gift"
                         @click="openGiftModal(card.id)"
-                        v-b-tooltip="'Gift'"
+                        v-b-tooltip.hover="'Gift'"
                       >
                           <img src="@/assets/baseline_card_giftcard_white_24dp.png" />
                       </b-button>

@@ -13,7 +13,8 @@
     <b-button
       v-if="sortType"
       id="toggle-order-button"
-      @click="toggleOrder">
+      @click="toggleOrder"
+      v-b-tooltip.hover="'Toggle sort order'">
         {{ isDescending ? '🡦' : '🡥' }}
     </b-button>
   </div>
@@ -41,8 +42,6 @@
           sacrifice_czxp: 'Sacrifice CZXP'
         }
       }
-    },
-    mounted() {
     },
     methods: {
       callSort(param) {

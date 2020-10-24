@@ -96,7 +96,7 @@
             :card_class="card.rarity"
           ></OwnedCardContent>
           <div id="buy-get-button-wrapper" :class="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''">
-            <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip="buyBtnTooltipText(card.cost, card.unlock_czxp)">
+            <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip.hover="buyBtnTooltipText(card.cost, card.unlock_czxp)">
               <button id="buy-button" :disabled="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)" class="btn btn-danger" v-on:click="buyCard(card)">
                 Buy Card {{card.cost}}E <b-icon-lock-fill v-if="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill>
               </button>
@@ -155,11 +155,6 @@ export default {
     },
   },
   watch: {
-    totalCyptozTypes(newValue, oldValue) {
-      if (newValue !== oldValue && newValue > 0) {
-          this.getAllTypes();
-      }
-    },
     currentEvent(newValue,oldValue) {
       if(newValue !== oldValue && typeof newValue !== "undefined"){
         if (this.pendingTransaction === newValue.blockHash) {
@@ -168,6 +163,11 @@ export default {
         }
       }
     },
+    totalCyptozTypes(newValue, oldValue) {
+      if (newValue !== oldValue && newValue > 0) {
+        this.getAllTypes();
+      }
+    }
   },
   data() {
     return {
@@ -191,7 +191,7 @@ export default {
     console.log(
       "The shop is mounted, call for the cards, if we have a contract.."
     );
-    if (typeof Cryptoz !== "undefined") {
+    if (typeof Cryptoz !== "undefined" && this.coinbase) {
       await this.getAllTypes();
     } else {
       console.log("Cryptoz contract not defined !!!!!!!!!!");
@@ -211,6 +211,7 @@ export default {
     getCardForFree : function(type_id){
       console.log("Claiming card:" + type_id);
       
+      showPendingToast(this);
       window.Cryptoz.deployed().then((instance) => {
         return instance.getFreeCard(type_id, {from: this.coinbase});
       }).then((res) => {
@@ -263,69 +264,14 @@ export default {
           }
           return this.addIsOwnedProp(cardData);
         }))
-        const storeCards = results.filter(result => result !== undefined);
-        this.allCards = [...storeCards];
-        this.storeCards = [...storeCards];
-        showSuccessToast(this, 'Finished Loading Shop.');
+        this.storeCards = results.filter(result => result !== undefined);
+        if (this.storeCards.length > 0) {
+          showSuccessToast(this, 'Finished Loading Shop.');
+        }
       } catch (err) {
         console.log("Error loading cards: ", err);
         showErrorToast(this, "Failed to load shop.");
       }
-    },
-    handleGotCardData : function(response) {
-      if (response.status !== 200) {
-        console.log('Looks like there was a problem from FETCH. Status Code: ' +
-          response.status);
-        return;
-      }
-
-      // Examine the text in the response
-      response.json().then((res) => {
-        if(res.attributes[3].value !== 'Store'){
-          return;
-        }
-        
-        var newAttr = {};
-        //format the attributes to match our JS objects
-        res.attributes.forEach(function(element){
-          newAttr[element.trait_type] = element.value;
-        })
-              
-        //Overwrite our JSON reponse with vue friendly card binding data
-        res.attributes = newAttr;
-        
-        //Append the bg
-        switch(res.attributes.rarity){
-          case "Common":
-            newAttr.rarity = 'card-bg card-bg-6';
-            break;
-          case "Uncommon":
-            newAttr.rarity = 'card-bg card-bg-5';
-            break;
-          case "Rare":
-            newAttr.rarity = 'card-bg card-bg-4';
-            break;
-          case "Epic":
-            newAttr.rarity = 'card-bg card-bg-3';
-            break;
-          case "Diamond":
-            newAttr.rarity = 'card-bg card-bg-2';
-            break;
-          case "Platinum":
-            newAttr.rarity = 'card-bg card-bg-1';
-            break;
-        }
-        
-        if(res.attributes.edition_total === 0){
-          newAttr.edition_total = "Unlimited"
-        }
-        delete res.attributes //already handled these
-        for (let attr in res) {
-          newAttr[attr] = res[attr]
-        }
-        this.allCards[newAttr.type_id] = newAttr;
-        this.storeCards.push(newAttr);
-      })
     },
     addIsOwnedProp: async function (card) {
       const instance = await window.Cryptoz.deployed();
@@ -334,12 +280,10 @@ export default {
 
       return card;
     },
-  
     getCard: async function(cardId) {
       const res = await axios.get(
         `https://cryptoz.cards/services/getCardData.php?card_id=${cardId}`
       );
-        console.log(res)
       if (res.status !== 200) {
         console.log(
           "Looks like there was a problem from FETCH. Status Code: " +
@@ -387,8 +331,6 @@ export default {
       }
 
       this.allCards[cardObj.type_id] = cardObj;
-      this.storeCards.push(cardObj);
-      console.log(cardObj)
       return cardObj;
     },
     buyBtnTooltipText(cost, unlock_czxp) {
