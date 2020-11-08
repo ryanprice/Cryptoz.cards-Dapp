@@ -40,7 +40,7 @@
             <b-jumbotron
               id="sponsor-link-wrapper"
               class="jumbo"
-              lead="Your Sponsor Link"
+              lead="Your Affiliate Link"
             >
               <p>Copy the link by clicking the button below.</p>
               <p>
@@ -87,11 +87,9 @@
                   <div>Please enter a valid address.</div>
                 </b-form-invalid-feedback>
               </b-input-group>
-              <v-else>
-                <b-alert variant="success" show
+                <b-alert v-else variant="success" show
                   >You are already linked to sponsor.</b-alert
                 >
-              </v-else>
             </b-jumbotron>
           </b-modal>
 
