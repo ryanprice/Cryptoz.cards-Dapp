@@ -12,10 +12,10 @@
           <div>Enter 0 for no wager</div>
           <div><b>To wager:</b> Minimum = 2,000,000,000, Maximum = 1,649,267,441,667,000 </div>
           <b-form-input class="form-control" :state="isWagerValid"  required type="number" v-model="wagerAmount" ></b-form-input>
-          <b-form-invalid-feedback id="input-live-feedback" v-if="!notEnoughWager">
+          <b-form-invalid-feedback  v-if="!notEnoughWager">
             <div>You need to enter a number between 2,000,000,000 and 1,649,267,441,667,000 to wager.</div>
           </b-form-invalid-feedback>
-          <b-form-invalid-feedback id="input-live-feedback" v-if="notEnoughWager">
+          <b-form-invalid-feedback v-if="notEnoughWager">
             <div>You do not have enough CZXP tokens</div>
           </b-form-invalid-feedback>
       <b-row>
