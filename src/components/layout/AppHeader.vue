@@ -83,8 +83,11 @@
                     >Link</b-button
                   >
                 </b-input-group-append>
-                <b-form-invalid-feedback id="input-live-feedback">
+               <b-form-invalid-feedback v-if="notSameSponsorError">
                   <div>Please enter a valid address.</div>
+                </b-form-invalid-feedback>
+                <b-form-invalid-feedback v-else>
+                  <div>You can't link your own address.</div>
                 </b-form-invalid-feedback>
               </b-input-group>
                 <b-alert v-else variant="success" show
@@ -186,6 +189,12 @@ export default {
       return `${siteURL}?sponsor=${this.coinbase}`;
     },
     isSponsorValid() {
+      if (this.sponsorAddress.toLowerCase() === this.coinbase.toLowerCase()) {
+        this.notSameSponsorError = false;
+        return false;
+      }
+
+      this.notSameSponsorError = true;
       return isAddress(this.sponsorAddress.toLowerCase());
     },
   },
@@ -193,6 +202,7 @@ export default {
     return {
       pendingTransaction: 0,
       showSpinner: false,
+      notSameSponsorError: true,
       transactionMessage: "Pending confirmation...",
       showLogin: 1,
       bonusReady: 2,
@@ -260,12 +270,8 @@ export default {
     linkSponsor: async function() {
       try {
         const instance = await window.Cryptoz.deployed();
-        console.log(instance);
-        const temp = await instance.sponsors.call(
-          "0xdd3D015D0a541244699d7776222443538557523c"
-        );
         const result = await instance.linkMySponsor(
-          "0x69cfAbaD3678789FE33d3BEEc5d4c759Ec24595A",
+          this.sponsorAddress,
           { from: this.coinbase }
         );
         console.log(result);
