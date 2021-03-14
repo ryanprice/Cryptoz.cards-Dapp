@@ -496,6 +496,8 @@ export default {
       .then(res => {
         if (res === undefined) {
           throw new Error('result is undefined in openBooster')
+        } else {
+          this.getAllCards()
         }
       })
       .catch(err => {
