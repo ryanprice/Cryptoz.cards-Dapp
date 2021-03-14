@@ -262,18 +262,19 @@ export default {
       },
       deep: true
     },
-    'currentEvent': {
-      handler: function(newValue, oldValue) {
-        if (newValue) {
-          if(this.subscriptionState == 0){
-            this.getAllCards();
-          }
-          if(oldValue && newValue.transactionHash !== oldValue.transactionHash){
-            showSuccessToast(this, 'Confirmed! Balance updated')
-          }
-        }
-      }
-    }
+    // TODO: figure out a more intelligent way of reloading cards.
+    // 'currentEvent': {
+    //   handler: function(newValue, oldValue) {
+    //     if (newValue) {
+    //       if(this.subscriptionState == 0){
+    //         this.getAllCards();
+    //       }
+    //       if(oldValue && newValue.transactionHash !== oldValue.transactionHash){
+    //         showSuccessToast(this, 'Confirmed! Balance updated')
+    //       }
+    //     }
+    //   }
+    // }
   },
   methods : {
     openGiftModal: function(id) {
