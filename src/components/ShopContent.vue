@@ -78,7 +78,7 @@
         </div>
       <br>
       <div class="row">
-        <div v-for="card in storeCards" :key="card.type_id">
+        <div v-for="card in sortedCards" :key="card.type_id">
           <OwnedCardContent
             :type_id="card.type_id"
             :name="card.name"
@@ -179,6 +179,9 @@ export default {
     currentEvent() {
       return this.$store.state.lastChainEvent;
     },
+    storeCards() {
+      return this.$store.state.shop.cards;
+    },
   },
   watch: {
     currentEvent(newValue,oldValue) {
@@ -194,17 +197,22 @@ export default {
       if (newValue !== oldValue && newValue > 0) {
         this.getAllTypes();
       }
+    },
+    storeCards(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.sortedCards = [...newVal]
+      }
     }
   },
   data() {
     return {
+      sortedCards: [],
       pendingTransaction: 0,
       showSpinner: 0,
       transactionStatus: "Pending confirmation...",
       showUnlimited: 1,
       transaction_number: "",
       typesOnChain: [],
-      storeCards: [],
       buyBoostBtnOn: 0,
       confirmBoosterBuyBtnDisabled: 0,
       totalCreditsToBuy : 1,
@@ -296,7 +304,7 @@ export default {
           autoHideDelay: 1000
         });
         //reset the view
-        this.storeCards = [];
+        // this.storeCards = [];
 
         events.get(async (err, logs) => {
           if(err){console.error(err)}
@@ -312,21 +320,21 @@ export default {
           
         
           const results = await Promise.all(
-
-              typeIdsOnChain.map(async id => {
-                              //console.log("getting card:",id);
-                              const cardData = await this.getCard(id);
-            
-                  if (!cardData || cardData.id  == 74) { //keep 74 hidden from shop
-                      return;
-                  }
-                  //console.log("results:",results);
-                  return this.addIsOwnedProp(cardData);
-              })
-              
+            typeIdsOnChain.map(async id => {
+              //console.log("getting card:",id);
+              const cardData = await this.getCard(id);
+        
+              if (!cardData || cardData.id  == 74) { //keep 74 hidden from shop
+                  return;
+              }
+              //console.log("results:",results);
+              return this.addIsOwnedProp(cardData);
+            })
           )
-          this.storeCards = results.filter(result => result !== undefined);
-          if (this.storeCards.length > 0) {
+          const storeCards = results.filter(result => result !== undefined);
+          this.$store.dispatch('setStoreCards', storeCards)
+
+          if (storeCards.length > 0) {
             showSuccessToast(this, 'Finished Loading Shop.');
           }
         })
@@ -453,13 +461,13 @@ export default {
     sortByAttr: function(param, isDescending) {
       switch(param) {
         case "edition_number":
-          this.storeCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
+          this.sortedCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
           break
         case "rarity":
-          this.storeCards.sort(dynamicSort(param, isDescending, true, getRarity))
+          this.sortedCards.sort(dynamicSort(param, isDescending, true, getRarity))
           break
         default:
-          this.storeCards.sort(dynamicSort(param, isDescending))
+          this.sortedCards.sort(dynamicSort(param, isDescending))
           break
       }
     }

@@ -358,7 +358,6 @@ export default {
         showPendingToast(this)
         return contract.transferFrom(this.coinbase, this.receivingWallet, id, {from:this.coinbase});
       }).then((res) => {
-        // console.log("transfer result: ", res);
         this.confirmTransferBtnDisabled = false;
         return contract.tokensOfOwner(this.coinbase)
       }).then(this.handleGetAllCards)
@@ -370,7 +369,6 @@ export default {
       })
     },
     buyAndOpenBooster : function() {
-      console.log('Buy and Open Booster card...');
       showPendingToast(this);
       window.Cryptoz.deployed().then((instance) => {
         return instance.buyBoosterCardAndOpen({from: this.coinbase, value:2000000000000000});
@@ -406,10 +404,7 @@ export default {
 
               return getCardTypes(elementReturned[0].c[0])
             }).then(function(res){
-            //console.log(res);
-              // console.log('edition:' + tokenIdList[tokenId][1].c[0])
               res.id = tokenId;
-              //format the attributes to match our JS objects
               
               let newAttr = {}
               res.attributes.forEach(function(element){
@@ -478,9 +473,6 @@ export default {
     },
     handleBuyBooster : function(result) {
       console.log('Handling buy booster...');
-      // console.log(result);
-      
-      //change from pending to ready
     },
     openBooster : function () {
       

@@ -73,6 +73,23 @@ function setContractProvider(provider) {
   window.CzxpToken.setProvider(provider);
 }
 
+function onCardMinted({
+  cardTypeId,
+  editionNumber,
+}) {
+  console.log('MINTED')
+  console.log({
+    cardTypeId,
+    editionNumber,
+  })
+}
+
+function subscribeToEvents() {
+  watchEvents({
+    onCardMinted
+  })
+}
+
 export default {
   name: 'App',
   components: {
@@ -93,7 +110,7 @@ export default {
     // and we need provider to be set in child components
     if (window.web3 && window.web3.currentProvider) {
       setContractProvider(window.web3.currentProvider)
-      watchEvents()
+      subscribeToEvents()
     }
   },
   data() {
@@ -145,7 +162,6 @@ export default {
   methods : {
     subscribeToProviderEvents: function(provider) {
       provider.on("connect", ({chainId}) => {
-      console.log("app mounted chain is:",chainId);
         this.$store.dispatch('web3isConnected', true)
         this.$store.dispatch('chainChanged', chainId)
         this.getWalletInfo()
@@ -154,7 +170,7 @@ export default {
         if (accounts.length > 0) {
           this.$store.dispatch('web3isConnected', true)
           this.getWalletInfo()
-          watchEvents()
+          subscribeToEvents()
         }
         //user "locks" their wallet via provider
         else {
@@ -163,7 +179,6 @@ export default {
       });
       provider.on("chainChanged", (chainId) => {
         // without this check it auto-reloads to infinity
-        console.log("OnChainChanged:",web3.version.network);
         const currentChainId = localStorage.getItem('ethChainId')
         if (currentChainId) {
           this.$store.dispatch('chainChanged', currentChainId)
@@ -189,7 +204,7 @@ export default {
       const web3 = new Web3(provider)
       window.web3 = web3
       setContractProvider(provider)
-      watchEvents()
+      subscribeToEvents()
       this.subscribeToProviderEvents(provider)
     },
     getWalletInfo: function() {

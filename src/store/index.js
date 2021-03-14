@@ -48,6 +48,9 @@ export const store = new Vuex.Store({
   },
   updateCryptozTotal(state, payload) {
     state.totalCryptozSupply = payload
+  },
+  setStoreCards(state, payload) {
+    state.shop.cards = payload
   }
  },
  actions: {
@@ -94,6 +97,9 @@ export const store = new Vuex.Store({
     },
     userLoggedOut({commit}){
       commit('userLoggedOut')
+    },
+    setStoreCards({commit}, payload) {
+      commit('setStoreCards', payload)
     }
  }
 })

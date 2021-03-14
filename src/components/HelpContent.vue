@@ -338,8 +338,8 @@ export default {
     if(this.query !== ''){
         switch(this.query){
             case "read-cards" :
-                console.log('open tab 2');
-                //this.accordion-1-5 = "visible";
+              console.log('open tab 2');
+              //this.accordion-1-5 = "visible";
         }
     }
   }
