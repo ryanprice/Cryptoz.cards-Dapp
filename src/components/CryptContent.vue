@@ -176,6 +176,7 @@ import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
 import SortDropdown from '@/components/SortDropdown.vue'
 import {showPendingToast, showSuccessToast, showRejectedToast, showErrorToast} from '../util/showToast';
+import getCardTypes from '../util/getCardType'
 import {getEditionNumber, getRarity, dynamicSort} from '../helpers'
 
 export default {
@@ -402,53 +403,54 @@ export default {
               return instance.getOwnedCard(tokenId)
             }).then(function(elementReturned) {
               tokenIdList[tokenId] = elementReturned
-              return axios.get('https://cryptoz.cards/services/getCardData.php?card_id=' + elementReturned[0].c[0])
+
+              return getCardTypes(elementReturned[0].c[0])
             }).then(function(res){
             //console.log(res);
               // console.log('edition:' + tokenIdList[tokenId][1].c[0])
-              res.data.id = tokenId;
+              res.id = tokenId;
               //format the attributes to match our JS objects
               
               let newAttr = {}
-              res.data.attributes.forEach(function(element){
+              res.attributes.forEach(function(element){
                 newAttr[element.trait_type] = element.value;
               })
               
               //Overwrite our JSON reponse with vue friendly card binding data
-              res.data.attributes = newAttr;
+              res.attributes = newAttr;
 
               //Edition total
               // #4  , #4 of 300
-              if(res.data.attributes.edition_total == 0) //unlimited
+              if(res.attributes.edition_total == 0) //unlimited
               {
-                res.data.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0];
+                res.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0];
               }else{
-                res.data.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0] +' of '+res.data.attributes.edition_total;
+                res.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0] +' of '+res.attributes.edition_total;
               }
               
-              switch(res.data.attributes.rarity){
+              switch(res.attributes.rarity){
                 case "Common":
-                  res.data.attributes.rarity = 'card-bg card-bg-6';
+                  res.attributes.rarity = 'card-bg card-bg-6';
                   break;
                 case "Uncommon":
-                  res.data.attributes.rarity = 'card-bg card-bg-5';
+                  res.attributes.rarity = 'card-bg card-bg-5';
                   break;
                 case "Rare":
-                  res.data.attributes.rarity = 'card-bg card-bg-4';
+                  res.attributes.rarity = 'card-bg card-bg-4';
                   break;
                 case "Epic":
-                  res.data.attributes.rarity = 'card-bg card-bg-3';
+                  res.attributes.rarity = 'card-bg card-bg-3';
                   break;
                 case "Diamond":
-                  res.data.attributes.rarity = 'card-bg card-bg-2';
+                  res.attributes.rarity = 'card-bg card-bg-2';
                   break;
                 case "Platinum":
-                  res.data.attributes.rarity = 'card-bg card-bg-1';
+                  res.attributes.rarity = 'card-bg card-bg-1';
                   break;
               }
 
-              delete res.data.attributes
-              newAttr = {...newAttr, ...res.data};
+              delete res.attributes
+              newAttr = {...newAttr, ...res};
               
               resolve(newAttr)
             })
