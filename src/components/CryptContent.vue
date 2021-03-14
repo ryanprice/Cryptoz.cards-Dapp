@@ -4,7 +4,7 @@
     <!-- Open Booster Modal -->
     <b-modal
       id="open-booster-modal"
-      title="Enter a CZXP wager amount to increase the odds of pulling a rare or epic card:"
+      title="Enter a CZXP burn wager amount to increase the odds of pulling a rare or epic card ( czxp gone forever ):"
       ok-variant="danger"
       ok-title="Open Booster"
       hide-footer
