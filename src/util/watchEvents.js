@@ -34,8 +34,8 @@ let watchEvents = function ({
           console.log('created event!')
           console.log({event})
           onCardMinted({
-            cardTypeId: event.args.cardTypeId.c[0],
-            editionNumber: event.args.editionNumber.c[0],
+            cardTypeId: parseInt(event.args.cardTypeId).toString(),
+            editionNumber: parseInt(event.args.editionNumber).toString(),
           })
         }
       }
