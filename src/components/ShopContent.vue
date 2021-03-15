@@ -84,7 +84,8 @@
             :name="card.name"
             :cost="card.cost"
             :cset="card.card_set"
-            :edition_label="card.edition_label"
+            :edition_current="card.edition_current"
+            :edition_total="card.edition_total"
             :in_store="card.in_store"
             :level="card.card_level"
             :unlock_czxp="card.unlock_czxp"
@@ -93,6 +94,7 @@
             :sacrifice_czxp="card.sacrifice_czxp"
             :image="card.image"
             :card_class="card.rarity"
+            :card_owned="false"
           ></OwnedCardContent>
          <div
             v-if="card.soldOut == 1"
@@ -225,9 +227,6 @@ export default {
     }
   },
   async mounted() {
-    console.log(
-      "The shop is mounted, call for the cards, if we have a contract.."
-    );
     if (typeof Cryptoz !== "undefined" && this.coinbase) {
       await this.getAllTypes();
     } else {
@@ -311,8 +310,6 @@ export default {
           let typeIdsOnChain = logs.map(e => {
             return e.args.cardTypeId.c[0];
           })
-
-          //console.log("list of Ids from logs:",typeIdsOnChain);
           
         //Dirty hack until we figure this event log shite out
          typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
@@ -320,13 +317,11 @@ export default {
         
           const results = await Promise.all(
             typeIdsOnChain.map(async id => {
-              //console.log("getting card:",id);
               const cardData = await this.getCard(id);
         
               if (!cardData || cardData.id  == 74) { //keep 74 hidden from shop
                   return;
               }
-              //console.log("results:",results);
               return this.addIsOwnedProp(cardData);
             })
           )
@@ -434,7 +429,6 @@ export default {
           
           // Set human readable edition total
           cardObj.edition_label = cardObj.edition_current + '/' + cardObj.edition_total;
-          console.log({edition_label: cardObj.edition_label})
         })
         .catch(err => {
           console.error('Error getting NFTs minted:', err);

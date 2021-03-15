@@ -127,7 +127,8 @@
                     :name="card.name"
                     :cost="card.cost"
                     :cset="card.card_set"
-                    :edition_label="card.edition_label"
+                    :edition_current="card.edition_current"
+                    :edition_total="card.edition_total"
                     :level="card.card_level"
                     :unlock_czxp="card.unlock_czxp"
                     :buy_czxp="card.buy_czxp"
@@ -136,6 +137,7 @@
                     :image="card.image"
                     :card_class="card.rarity"
                     :in_store="card.in_store"
+                    :card_owned="true"
                   ></OwnedCardContent>
                   <div class="sacrifice-wrapper" v-if="$route.path == '/crypt'">
                     <div class="sacrifice-button">

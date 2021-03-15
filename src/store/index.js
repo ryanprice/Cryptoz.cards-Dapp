@@ -55,7 +55,8 @@ export const store = new Vuex.Store({
   updateMintedCountForCard(state, payload) {
     const { cardTypeId, editionNumber } = payload
 
-    // state.shop.cards.find()
+    const cardIndex = state.shop.cards.findIndex(card => card.type_id === cardTypeId)
+    state.shop.cards[cardIndex].edition_current = editionNumber
   }
  },
  actions: {
@@ -105,6 +106,9 @@ export const store = new Vuex.Store({
     },
     setStoreCards({commit}, payload) {
       commit('setStoreCards', payload)
+    },
+    updateMintedCountForCard({commit}, payload) {
+      commit('updateMintedCountForCard', payload)
     }
  }
 })

@@ -492,7 +492,7 @@ a:hover {
 }
 
 #bonus-boosters {
-  height: 70px;
+  height: 100%;
   min-width: 140px;
   display: flex;
   align-items: center;
@@ -545,12 +545,20 @@ a:hover {
   min-width: 190px;
 }
 
+#connect-button:empty {
+  min-width: 0;
+}
+
 #cryptoz-nav {
   width: calc(100%);
   display: flex;
   flex-direction: row;
   align-items: center;
   position: relative;
+}
+
+.eth-link, .bsc-link {
+  white-space: nowrap;
 }
 
 @keyframes shake {

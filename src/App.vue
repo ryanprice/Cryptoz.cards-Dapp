@@ -79,10 +79,6 @@ function onCardMinted({
   editionNumber,
 }) {
   store.dispatch('updateMintedCountForCard', { cardTypeId, editionNumber })
-  console.log({
-    cardTypeId,
-    editionNumber,
-  })
 }
 
 function subscribeToEvents() {

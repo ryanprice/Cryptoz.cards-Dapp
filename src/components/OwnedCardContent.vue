@@ -85,7 +85,8 @@ export default {
     "type_id",
     "name",
     "image",
-    "edition_label",
+    "edition_current",
+    "edition_total",
     "cset",
     "unlock_czxp",
     "level",
@@ -95,6 +96,7 @@ export default {
     "sacrifice_czxp",
     "card_class",
     "in_store",
+    "card_owned"
   ],
   computed: {
     activeColor() {
@@ -104,6 +106,18 @@ export default {
         return "#FFFF33"; //yellow
       }
     },
+    edition_label() {
+      if (!this.card_owned) {
+        return this.edition_current + '/' + this.edition_total
+      }
+      else {
+        if (this.edition_total == 0) {
+          return '#'+this.edition_current;
+        } else {
+          return '#'+this.edition_current +' of '+this.edition_total;
+        }
+      }
+    }
   },
 };
 </script>
