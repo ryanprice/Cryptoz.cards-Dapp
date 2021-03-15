@@ -11,7 +11,7 @@
             <div id="1" :class="card_class">
               <!--img class="card-img" :src="'static/assets/' + url" /-->
               <img class="card-img" :src="image" />
-              <span class="card-edition">{{ edition_total }}</span>
+              <span class="card-edition">{{ edition_label }}</span>
               <div class="card-item-name text-center">
                 {{ name }}<br />{{ cset }}
               </div>
@@ -85,7 +85,7 @@ export default {
     "type_id",
     "name",
     "image",
-    "edition_total",
+    "edition_label",
     "cset",
     "unlock_czxp",
     "level",

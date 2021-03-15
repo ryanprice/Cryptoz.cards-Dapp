@@ -127,7 +127,7 @@
                     :name="card.name"
                     :cost="card.cost"
                     :cset="card.card_set"
-                    :edition_total="card.edition_total"
+                    :edition_label="card.edition_label"
                     :level="card.card_level"
                     :unlock_czxp="card.unlock_czxp"
                     :buy_czxp="card.buy_czxp"
@@ -413,14 +413,15 @@ export default {
               
               //Overwrite our JSON reponse with vue friendly card binding data
               res.attributes = newAttr;
+              res.attributes.edition_current = tokenIdList[tokenId][1].c[0]
 
               //Edition total
               // #4  , #4 of 300
               if(res.attributes.edition_total == 0) //unlimited
               {
-                res.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0];
+                res.attributes.edition_label = '#'+res.attributes.edition_current;
               }else{
-                res.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0] +' of '+res.attributes.edition_total;
+                res.attributes.edition_label = '#'+res.attributes.edition_current +' of '+res.attributes.edition_total;
               }
               
               switch(res.attributes.rarity){
@@ -444,8 +445,10 @@ export default {
                   break;
               }
 
-              delete res.attributes
               newAttr = {...newAttr, ...res};
+              delete newAttr.attributes
+
+              console.log({newAttr})
               
               resolve(newAttr)
             })

@@ -67,6 +67,7 @@ import cryptoz_artifacts from './contracts/Cryptoz.json';
 import cryptoz_token_artifacts from './contracts/CzxpToken.json';
 import watchEvents from './util/watchEvents';
 import { showSuccessToast } from './util/showToast'
+import {store} from './store/index'
 
 function setContractProvider(provider) {
   window.Cryptoz.setProvider(provider);
@@ -77,7 +78,7 @@ function onCardMinted({
   cardTypeId,
   editionNumber,
 }) {
-  console.log('MINTED')
+  store.dispatch('updateMintedCountForCard', { cardTypeId, editionNumber })
   console.log({
     cardTypeId,
     editionNumber,
@@ -85,9 +86,7 @@ function onCardMinted({
 }
 
 function subscribeToEvents() {
-  watchEvents({
-    onCardMinted
-  })
+  watchEvents({ onCardMinted })
 }
 
 export default {

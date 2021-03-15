@@ -51,6 +51,11 @@ export const store = new Vuex.Store({
   },
   setStoreCards(state, payload) {
     state.shop.cards = payload
+  },
+  updateMintedCountForCard(state, payload) {
+    const { cardTypeId, editionNumber } = payload
+
+    // state.shop.cards.find()
   }
  },
  actions: {

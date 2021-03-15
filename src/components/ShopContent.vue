@@ -54,7 +54,7 @@
       </p>
       <div class="row">
         <div class="col">
-          <b-button v-b-tooltip.hover="'+120 CZXP per credit'"
+          <b-button
             class="btn btn-danger"
             v-bind:disabled="balance < 2000000000000000"
             v-b-modal.buy-boosters-modal
@@ -84,7 +84,7 @@
             :name="card.name"
             :cost="card.cost"
             :cset="card.card_set"
-            :edition_total="card.edition_total"
+            :edition_label="card.edition_label"
             :in_store="card.in_store"
             :level="card.card_level"
             :unlock_czxp="card.unlock_czxp"
@@ -147,7 +147,6 @@ import OwnerBalances from '@/components/OwnerBalances.vue'
 import SortDropdown from '@/components/SortDropdown.vue'
 import {getEditionNumber, getRarity, dynamicSort} from '../helpers'
 import { showErrorToast, showPendingToast, showSuccessToast } from "../util/showToast";
-import getCardType from '../util/getCardType'
 
 export default {
   name: "ShopContent",
@@ -254,7 +253,7 @@ export default {
       window.Cryptoz.deployed().then((instance) => {
         return instance.getFreeCard(type_id, {from: this.coinbase});
       }).then((res) => {
-        this.showTransaction =1
+        this.showTransaction = 1
         this.$store.dispatch('updateOwnerBalances')
       })
     },
@@ -332,6 +331,7 @@ export default {
             })
           )
           const storeCards = results.filter(result => result !== undefined);
+          console.log({storeCards})
           this.$store.dispatch('setStoreCards', storeCards)
 
           if (storeCards.length > 0) {
@@ -352,22 +352,27 @@ export default {
       return card;
     },
     getCard: async function(cardId) {
-      const res = await getCardType(cardId)
-      if (!res) {
-        console.log(`Failed to fetch card ${cardId}.json`);
+      const res = await axios.get(
+        `https://cryptoz.cards/services/getCardData.php?card_id=${cardId}`
+      );
+      if (res.status !== 200) {
+        console.log(
+          "Looks like there was a problem from FETCH. Status Code: " +
+            response.status
+        );
         return;
       }
 
-      let cardObj = {...res};
+      let cardObj = {...res.data};
 
       cardObj.id = cardId;
 
-      if (res.attributes[3].value !== "Store") {
+      if (res.data.attributes[3].value !== "Store") {
         return;
       }
       
       //format the attributes to match our JS objects
-      res.attributes.forEach(function(element) {
+      res.data.attributes.forEach(function(element) {
         cardObj[element.trait_type] = element.value;
       });
 
@@ -393,51 +398,52 @@ export default {
       }
       
       //Get NFTs minted already to inject in our edition totals
-        window.Cryptoz.deployed()
-      .then((instance) => {
-        return instance.cardTypeToEdition(cardObj.id);
-      })
-      .then((result) => {
-      
-            //Edition bug hack
-            if(cardObj.id == 102){ //dragon edition limit bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 5;
-            }
-            if(cardObj.id == 103){ //bleeding fury edition limit bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 1;
-            }
-            if(cardObj.id == 5){ //stu bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 110;
-            }
-            if(cardObj.id == 22){ //thrny bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 179;
-            }
-            if(cardObj.id == 56){ //shroom ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 112;
-            }
+      window.Cryptoz.deployed()
+        .then((instance) => {
+          return instance.cardTypeToEdition(cardObj.id);
+        })
+        .then((result) => {
+          cardObj.edition_current = parseInt(result)
+
+          //Edition bug hack
+          // if(cardObj.id == 102){ //dragon edition limit bug ?
+          //   cardObj.soldOut = 1;
+          //   cardObj.edition_current = 5;
+          // }
+          // if(cardObj.id == 103){ //bleeding fury edition limit bug ?
+          //   cardObj.soldOut = 1;
+          //   cardObj.edition_current = 1;
+          // }
+          // if(cardObj.id == 5){ //stu bug ?
+          //   cardObj.soldOut = 1;
+          //   cardObj.edition_current = 110;
+          // }
+          // if(cardObj.id == 22){ //thrny bug ?
+          //   cardObj.soldOut = 1;
+          //   cardObj.edition_current = 179;
+          // }
+          // if(cardObj.id == 56){ //shroom ?
+          //   cardObj.soldOut = 1;
+          //   cardObj.edition_current = 112;
+          // }
             
-          //Set soldOut flag first
-          if(parseInt(result) == cardObj.edition_total){
-              cardObj.soldOut = 1;
+          // Set soldOut flag first
+          if(cardObj.edition_current == cardObj.edition_total) {
+            cardObj.soldOut = 1;
           }
           
-          //Set human readable edition total
-          cardObj.edition_total =  parseInt(result).toLocaleString() + '/' + cardObj.edition_total;
-      })
-      .catch(err => {
-        console.error('Error getting NFTs minted:', err);
-        this.showSpinner = 0;
-      })
-      
+          // Set human readable edition total
+          cardObj.edition_label = cardObj.edition_current + '/' + cardObj.edition_total;
+          console.log({edition_label: cardObj.edition_label})
+        })
+        .catch(err => {
+          console.error('Error getting NFTs minted:', err);
+          this.showSpinner = 0;
+        })
 
       if (cardObj.edition_total === 0) {
         cardObj.edition_total = "Unlimited";
-      }else{
+      } else{
           
       }
 
