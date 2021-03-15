@@ -30,14 +30,14 @@ let watchEvents = function ({
     
     cryptozEvents.watch(function(error, event){
       switch (event.event) {
-        case 'LogCardCreated': {
-          console.log('created event!')
-          console.log({event})
+        case 'LogCardCreated':
           onCardMinted({
             cardTypeId: parseInt(event.args.cardTypeId).toString(),
             editionNumber: parseInt(event.args.editionNumber).toString(),
           })
-        }
+          break
+        default:
+          break
       }
       if (!error){
         // console.log('Cryptoz events captured! : ', event);

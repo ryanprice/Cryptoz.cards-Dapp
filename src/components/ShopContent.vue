@@ -401,26 +401,21 @@ export default {
           cardObj.edition_current = parseInt(result)
 
           //Edition bug hack
-          // if(cardObj.id == 102){ //dragon edition limit bug ?
-          //   cardObj.soldOut = 1;
-          //   cardObj.edition_current = 5;
-          // }
-          // if(cardObj.id == 103){ //bleeding fury edition limit bug ?
-          //   cardObj.soldOut = 1;
-          //   cardObj.edition_current = 1;
-          // }
-          // if(cardObj.id == 5){ //stu bug ?
-          //   cardObj.soldOut = 1;
-          //   cardObj.edition_current = 110;
-          // }
-          // if(cardObj.id == 22){ //thrny bug ?
-          //   cardObj.soldOut = 1;
-          //   cardObj.edition_current = 179;
-          // }
-          // if(cardObj.id == 56){ //shroom ?
-          //   cardObj.soldOut = 1;
-          //   cardObj.edition_current = 112;
-          // }
+          if(cardObj.id == 102){ //dragon edition limit bug ?
+            cardObj.edition_total = 5;
+          }
+          if(cardObj.id == 103){ //bleeding fury edition limit bug ?
+            cardObj.edition_total = 1;
+          }
+          if(cardObj.id == 5){ //stu bug ?
+            cardObj.edition_total = 110;
+          }
+          if(cardObj.id == 22){ //thrny bug ?
+            cardObj.edition_total = 179;
+          }
+          if(cardObj.id == 56){ //shroom ?
+            cardObj.edition_total = 112;
+          }
             
           // Set soldOut flag first
           if(cardObj.edition_current == cardObj.edition_total) {
