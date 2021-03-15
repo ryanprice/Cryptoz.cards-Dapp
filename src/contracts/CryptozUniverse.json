@@ -217,8 +217,8 @@
   "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint32\"}],\"name\":\"allCardTypes\",\"outputs\":[{\"name\":\"cardTypeId\",\"type\":\"uint32\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"set\",\"type\":\"string\"},{\"name\":\"weiCost\",\"type\":\"uint256\"},{\"name\":\"buyCzxp\",\"type\":\"uint256\"},{\"name\":\"transferCzxp\",\"type\":\"uint256\"},{\"name\":\"sacrificeCzxp\",\"type\":\"uint256\"},{\"name\":\"unlockCzxp\",\"type\":\"uint256\"},{\"name\":\"cardLevel\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getTotalTypes\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"rarity\",\"outputs\":[{\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"cardTypesIds\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"cardTypeToEdition\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"beneficiary\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"czxpAmount\",\"type\":\"uint256\"}],\"name\":\"CZXPGained\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{\"isOwner()\":{\"details\":\"Returns true if the caller is the current owner.\"},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner.     * NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/rprice/Downloads/cryptoz.cards/contracts/CryptozUniverse.sol\":\"CryptozUniverse\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/rprice/Downloads/cryptoz.cards/contracts/CZXPToken.sol\":{\"keccak256\":\"0xd49cd324136cb9005be5c0359f72557704f9992501764d1d0c0d3b3bb3919560\",\"urls\":[\"bzzr://5417d7c719cc94cb7706addfd181d186a382c8f191d956f129e60b9f344261b0\",\"dweb:/ipfs/QmWUYZxsNgMc51kPC4ZHpxoHx6NWkcgKn3gh3u567wrNWZ\"]},\"/home/rprice/Downloads/cryptoz.cards/contracts/CryptozUniverse.sol\":{\"keccak256\":\"0x78688b05257b7eb0b224403e7ea322711a239690dfee694bbd86dfb1dc4d8acf\",\"urls\":[\"bzzr://64030e05912941b6a3e3d31b402824a9020e426f6ead9d5999cc010a90a9ddb2\",\"dweb:/ipfs/QmTvmeAidzV78EfeD7iJybK8PaZnRGLTwJs69hHfb88Rny\"]},\"/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/GSN/Context.sol\":{\"keccak256\":\"0x90a3995645af7562d84b9d69363ffa5ae7217714ab61e951bf7bc450f40e4061\",\"urls\":[\"bzzr://51482c01bddf23793bddee43b60ab9578a62948a4f2082def24ea792a553b055\",\"dweb:/ipfs/QmNPrJ4MWKUAWzKXpUqeyKRUfosaoANZAqXgvepdrCwZAG\"]},\"/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x640b6dee7a4b830bdfd52b5031a07fc2b12209f5b2e29e5d364a7d37f69d8076\",\"urls\":[\"bzzr://292843005e754e752644f767477ec5ad7a1ffc91ddb18c38b8079c62f3993cad\",\"dweb:/ipfs/QmbZaJyXdpsYGykVhHH9qpVGQg9DGCxE2QufbCUy3daTgq\"]},\"/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/ownership/Ownable.sol\":{\"keccak256\":\"0x6fb9d7889769d7cc161225f9ef7a90e468ba9788b253816f8d8b6894d3472c24\",\"urls\":[\"bzzr://ab46c9368bc3abdded5eb85858304518c8a0291060ab42087075d759dbf3925f\",\"dweb:/ipfs/Qmb7TChG6DsEDX7LooJ4vmxot19f7VXX8S1zUGPeJTWbwZ\"]},\"/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol\":{\"keccak256\":\"0xb15af804e2bc97db51e4e103f13de9fe13f87e6b835d7a88c897966c0e58506e\",\"urls\":[\"bzzr://6200c125af376381ae6c5415b8f3c1cb83889be20a7a51d67ac607487a10313b\",\"dweb:/ipfs/QmP5spYP8vs2jvLF8zNrXUbqB79hMsoEvMHiLcBxerWKcm\"]},\"/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0xe5bb0f57cff3e299f360052ba50f1ea0fff046df2be070b6943e0e3c3fdad8a9\",\"urls\":[\"bzzr://cf2d583b8dce38d0617fdcd65f2fd9f126fe17b7f683b5a515ea9d2762d8b062\",\"dweb:/ipfs/QmQMvwEcPhoRXzbXyrdoeRtvLoifUW9Qh7Luho7bmUPRkc\"]}},\"version\":1}",
   "bytecode": "0x60c0604052601b60808190527f68747470733a2f2f63727970746f7a2e63617264732f646174612f000000000060a090815261003e91600191906100ab565b506000600b8190556100576001600160e01b036100a616565b600080546001600160a01b0319166001600160a01b0383169081178255604051929350917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a350610143565b335b90565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106100ec57805160ff1916838001178555610119565b82800160010185558215610119579182015b828111156101195782518255916020019190600101906100fe565b50610125929150610129565b5090565b6100a891905b80821115610125576000815560010161012f565b6106c5806101526000396000f3fe608060405234801561001057600080fd5b50600436106100935760003560e01c80638da5cb5b116100665780638da5cb5b146102335780638f32d59b14610257578063918923c414610273578063b4a1676914610290578063f2fde38b146102ad57610093565b806342ed1d2914610098578063715018a6146101dc5780637f276455146101e65780638b58c56914610200575b600080fd5b6100bb600480360360208110156100ae57600080fd5b503563ffffffff166102d3565b604051808a63ffffffff1663ffffffff16815260200180602001806020018981526020018881526020018781526020018681526020018581526020018460ff1660ff16815260200183810383528b818151815260200191508051906020019080838360005b83811015610138578181015183820152602001610120565b50505050905090810190601f1680156101655780820380516001836020036101000a031916815260200191505b5083810382528a5181528a516020918201918c019080838360005b83811015610198578181015183820152602001610180565b50505050905090810190601f1680156101c55780820380516001836020036101000a031916815260200191505b509b50505050505050505050505060405180910390f35b6101e4610440565b005b6101ee6104e3565b60408051918252519081900360200190f35b61021d6004803603602081101561021657600080fd5b50356104e9565b6040805160ff9092168252519081900360200190f35b61023b6104fe565b604080516001600160a01b039092168252519081900360200190f35b61025f61050d565b604080519115158252519081900360200190f35b6101ee6004803603602081101561028957600080fd5b5035610531565b6101ee600480360360208110156102a657600080fd5b503561054f565b6101e4600480360360208110156102c357600080fd5b50356001600160a01b0316610561565b6007602090815260009182526040918290208054600180830180548651600261010094831615949094026000190190911692909204601f810186900486028301860190965285825263ffffffff90921694929390929083018282801561037a5780601f1061034f5761010080835404028352916020019161037a565b820191906000526020600020905b81548152906001019060200180831161035d57829003601f168201915b50505060028085018054604080516020601f600019610100600187161502019094169590950492830185900485028101850190915281815295969594509092509083018282801561040c5780601f106103e15761010080835404028352916020019161040c565b820191906000526020600020905b8154815290600101906020018083116103ef57829003601f168201915b5050506003840154600485015460058601546006870154600788015460089098015496979396929550909350919060ff1689565b61044861050d565b610499576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b60085490565b60046020526000908152604090205460ff1681565b6000546001600160a01b031690565b600080546001600160a01b03166105226105c6565b6001600160a01b031614905090565b6008818154811061053e57fe5b600091825260209091200154905081565b60096020526000908152604090205481565b61056961050d565b6105ba576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6105c3816105ca565b50565b3390565b6001600160a01b03811661060f5760405162461bcd60e51b815260040180806020018281038252602681526020018061066b6026913960400191505060405180910390fd5b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b039290921691909117905556fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a265627a7a723058208a1f1c0ba783aff139e5bfbdc34f57dbd97cc1098417ad45a9f9ec4bf3b80af064736f6c63430005090032",
   "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100935760003560e01c80638da5cb5b116100665780638da5cb5b146102335780638f32d59b14610257578063918923c414610273578063b4a1676914610290578063f2fde38b146102ad57610093565b806342ed1d2914610098578063715018a6146101dc5780637f276455146101e65780638b58c56914610200575b600080fd5b6100bb600480360360208110156100ae57600080fd5b503563ffffffff166102d3565b604051808a63ffffffff1663ffffffff16815260200180602001806020018981526020018881526020018781526020018681526020018581526020018460ff1660ff16815260200183810383528b818151815260200191508051906020019080838360005b83811015610138578181015183820152602001610120565b50505050905090810190601f1680156101655780820380516001836020036101000a031916815260200191505b5083810382528a5181528a516020918201918c019080838360005b83811015610198578181015183820152602001610180565b50505050905090810190601f1680156101c55780820380516001836020036101000a031916815260200191505b509b50505050505050505050505060405180910390f35b6101e4610440565b005b6101ee6104e3565b60408051918252519081900360200190f35b61021d6004803603602081101561021657600080fd5b50356104e9565b6040805160ff9092168252519081900360200190f35b61023b6104fe565b604080516001600160a01b039092168252519081900360200190f35b61025f61050d565b604080519115158252519081900360200190f35b6101ee6004803603602081101561028957600080fd5b5035610531565b6101ee600480360360208110156102a657600080fd5b503561054f565b6101e4600480360360208110156102c357600080fd5b50356001600160a01b0316610561565b6007602090815260009182526040918290208054600180830180548651600261010094831615949094026000190190911692909204601f810186900486028301860190965285825263ffffffff90921694929390929083018282801561037a5780601f1061034f5761010080835404028352916020019161037a565b820191906000526020600020905b81548152906001019060200180831161035d57829003601f168201915b50505060028085018054604080516020601f600019610100600187161502019094169590950492830185900485028101850190915281815295969594509092509083018282801561040c5780601f106103e15761010080835404028352916020019161040c565b820191906000526020600020905b8154815290600101906020018083116103ef57829003601f168201915b5050506003840154600485015460058601546006870154600788015460089098015496979396929550909350919060ff1689565b61044861050d565b610499576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b60085490565b60046020526000908152604090205460ff1681565b6000546001600160a01b031690565b600080546001600160a01b03166105226105c6565b6001600160a01b031614905090565b6008818154811061053e57fe5b600091825260209091200154905081565b60096020526000908152604090205481565b61056961050d565b6105ba576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6105c3816105ca565b50565b3390565b6001600160a01b03811661060f5760405162461bcd60e51b815260040180806020018281038252602681526020018061066b6026913960400191505060405180910390fd5b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b039290921691909117905556fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a265627a7a723058208a1f1c0ba783aff139e5bfbdc34f57dbd97cc1098417ad45a9f9ec4bf3b80af064736f6c63430005090032",
-  "sourceMap": "1284:51:3:-;612:4963;1284:51;;612:4963;1284:51;;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;2740:1:3;2727:14;;;;718:12:18;-1:-1:-1;;;;;718:10:18;:12;:::i;:::-;740:6;:18;;-1:-1:-1;;;;;;740:18:18;-1:-1:-1;;;;;740:18:18;;;;;;;773:43;;740:18;;-1:-1:-1;740:18:18;773:43;;740:6;;773:43;664:159;612:4963:3;;788:96:13;867:10;788:96;;:::o;612:4963:3:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;612:4963:3;;;-1:-1:-1;612:4963:3;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "612:4963:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;612:4963:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2223:8;;;1697:47;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1697:47:3;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1697:47:3;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1684:137:18;;;:::i;:::-;;2268:95:3;;;:::i;:::-;;;;;;;;;;;;;;;;1497:39;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1497:39:3;;:::i;:::-;;;;;;;;;;;;;;;;;;;899:77:18;;;:::i;:::-;;;;-1:-1:-1;;;;;899:77:18;;;;;;;;;;;;;;1250:92;;;:::i;:::-;;;;;;;;;;;;;;;;;;1786:29:3;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1786:29:3;;:::i;1915:52::-;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1915:52:3;;:::i;1970:107:18:-;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1970:107:18;-1:-1:-1;;;;;1970:107:18;;:::i;1697:47:3:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;1697:47:3;;;;;;;;;;;-1:-1:-1;;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1697:47:3;;-1:-1:-1;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1697:47:3;;-1:-1:-1;1697:47:3;;;;;:::o;1684:137:18:-;1103:9;:7;:9::i;:::-;1095:54;;;;;-1:-1:-1;;;1095:54:18;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1782:1;1766:6;;1745:40;;-1:-1:-1;;;;;1766:6:18;;;;1745:40;;1782:1;;1745:40;1812:1;1795:19;;-1:-1:-1;;;;;;1795:19:18;;;1684:137::o;2268:95:3:-;2336:12;:19;2268:95;:::o;1497:39::-;;;;;;;;;;;;;;;:::o;899:77:18:-;937:7;963:6;-1:-1:-1;;;;;963:6:18;899:77;:::o;1250:92::-;1290:4;1329:6;;-1:-1:-1;;;;;1329:6:18;1313:12;:10;:12::i;:::-;-1:-1:-1;;;;;1313:22:18;;1306:29;;1250:92;:::o;1786:29:3:-;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1786:29:3;:::o;1915:52::-;;;;;;;;;;;;;:::o;1970:107:18:-;1103:9;:7;:9::i;:::-;1095:54;;;;;-1:-1:-1;;;1095:54:18;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2042:28;2061:8;2042:18;:28::i;:::-;1970:107;:::o;788:96:13:-;867:10;788:96;:::o;2178:225:18:-;-1:-1:-1;;;;;2251:22:18;;2243:73;;;;-1:-1:-1;;;2243:73:18;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2352:6;;;2331:38;;-1:-1:-1;;;;;2331:38:18;;;;2352:6;;;2331:38;;;2379:6;:17;;-1:-1:-1;;;;;;2379:17:18;-1:-1:-1;;;;;2379:17:18;;;;;;;;;;2178:225::o",
+  "sourceMap": "1284:51:3:-;612:4963;1284:51;;612:4963;1284:51;;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;2740:1:3;2727:14;;;;718:12:16;-1:-1:-1;;;;;718:10:16;:12;:::i;:::-;740:6;:18;;-1:-1:-1;;;;;;740:18:16;-1:-1:-1;;;;;740:18:16;;;;;;;773:43;;740:18;;-1:-1:-1;740:18:16;773:43;;740:6;;773:43;664:159;612:4963:3;;788:96:11;867:10;788:96;;:::o;612:4963:3:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;612:4963:3;;;-1:-1:-1;612:4963:3;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "612:4963:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;612:4963:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2223:8;;;1697:47;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1697:47:3;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1697:47:3;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1684:137:16;;;:::i;:::-;;2268:95:3;;;:::i;:::-;;;;;;;;;;;;;;;;1497:39;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1497:39:3;;:::i;:::-;;;;;;;;;;;;;;;;;;;899:77:16;;;:::i;:::-;;;;-1:-1:-1;;;;;899:77:16;;;;;;;;;;;;;;1250:92;;;:::i;:::-;;;;;;;;;;;;;;;;;;1786:29:3;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1786:29:3;;:::i;1915:52::-;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1915:52:3;;:::i;1970:107:16:-;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1970:107:16;-1:-1:-1;;;;;1970:107:16;;:::i;1697:47:3:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;1697:47:3;;;;;;;;;;;-1:-1:-1;;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1697:47:3;;-1:-1:-1;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;1697:47:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1697:47:3;;-1:-1:-1;1697:47:3;;;;;:::o;1684:137:16:-;1103:9;:7;:9::i;:::-;1095:54;;;;;-1:-1:-1;;;1095:54:16;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1782:1;1766:6;;1745:40;;-1:-1:-1;;;;;1766:6:16;;;;1745:40;;1782:1;;1745:40;1812:1;1795:19;;-1:-1:-1;;;;;;1795:19:16;;;1684:137::o;2268:95:3:-;2336:12;:19;2268:95;:::o;1497:39::-;;;;;;;;;;;;;;;:::o;899:77:16:-;937:7;963:6;-1:-1:-1;;;;;963:6:16;899:77;:::o;1250:92::-;1290:4;1329:6;;-1:-1:-1;;;;;1329:6:16;1313:12;:10;:12::i;:::-;-1:-1:-1;;;;;1313:22:16;;1306:29;;1250:92;:::o;1786:29:3:-;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;1786:29:3;:::o;1915:52::-;;;;;;;;;;;;;:::o;1970:107:16:-;1103:9;:7;:9::i;:::-;1095:54;;;;;-1:-1:-1;;;1095:54:16;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2042:28;2061:8;2042:18;:28::i;:::-;1970:107;:::o;788:96:11:-;867:10;788:96;:::o;2178:225:16:-;-1:-1:-1;;;;;2251:22:16;;2243:73;;;;-1:-1:-1;;;2243:73:16;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2352:6;;;2331:38;;-1:-1:-1;;;;;2331:38:16;;;;2352:6;;;2331:38;;;2379:6;:17;;-1:-1:-1;;;;;;2379:17:16;-1:-1:-1;;;;;2379:17:16;;;;;;;;;;2178:225::o",
   "source": "pragma solidity ^0.5.0;\n\n/******************************************\n\nOur Matra our Motto for coding The Cryptoz Universe.\n\n      Fail EARLY and Fail LOUD !!!!!!!\n\n1.    First - Check all pre-conditions\n2.    Then  - make changes to contract state\n3.    Final - interact with other contracts\n\nPull funds over pushing them\nPlatform limits like max of 1023 loop interations.\n\nall Events start with Log\n\n******************************************/\nimport \"./CZXPToken.sol\";\nimport \"../node_modules/@openzeppelin/contracts/ownership/Ownable.sol\";\nimport \"../node_modules/@openzeppelin/contracts/math/SafeMath.sol\";\n\ncontract CryptozUniverse is Ownable {\n    using SafeMath for uint256;\n\n//Definitons\n    struct cardType{\n        uint32 cardTypeId;\n        string name;\n        string set;\n        //uint8 assetType; //1=human,2=animal,3=plant, 4=thing\n        //uint8 notStoreOrBonus; //0 =inStore, 1 = pack, 2= bonus\n        //uint8 rarity; //1 = diamond,6 = common\n        //uint16 totalAvailable;\n        uint256 weiCost;\n        uint256 buyCzxp;\n        uint256 transferCzxp;\n        uint256 sacrificeCzxp;\n        uint256 unlockCzxp;\n        uint8 cardLevel;\n    }\n\n    struct Card{\n        uint32 cardTypeId;\n        uint256 editionNumber;\n        uint256 transferCount;\n    }\n\n    string baseTokenURI = 'https://cryptoz.cards/data/'; //append ID on\n//storage\n\n    //Containers for the card types\n    mapping(uint256 => uint8) cardAssetType;\n    mapping(uint256 => uint8) storeBoosterBonus;\n    mapping(uint256 => uint8) public rarity; // lookup cardTypeId return rarity\n    mapping(uint256 => uint16) totalAvailable;\n\n    //All the cards in the Cryptoz Universe\n    Card[] internal Cards;\n\n    mapping(uint32 => cardType) public allCardTypes;        // All card type definitions\n    uint256[] public cardTypesIds; //Just an array of all the id\n\n    //track editionNumberTotal, always increments, starts at 1\n    mapping(uint256 => uint256) public cardTypeToEdition;\n\n// Event Logs\n    event CZXPGained(address indexed beneficiary, uint256 czxpAmount);\n\n//Other variables we need\n    address payable internal CzxpContractAddress_;\n\n\n    /**\n     * Not much going on here so exit.\n     */\n    function() external{\n        revert();\n    }\n\n    /**\n     *\n     */\n     function getTotalTypes() public view returns(uint){\n         return cardTypesIds.length;\n     }\n\n    /**\n     *  Internal function called from Cryptoz once all the checks are done\n     */\n    function awardCzxp(address _beneficiary, uint czxpReward) internal {\n        //Give the czxp tokens\n        CzxpToken(CzxpContractAddress_).awardCzxp(_beneficiary, czxpReward);\n    }\n\n    /**\n     * Random as it gets for now. Return a val between 1-10000\n     */\n    uint nonce = 0;\n    function selectRandom(uint256 range) internal returns (uint) {\n        uint randomnumber = uint(keccak256(abi.encodePacked(now, msg.sender, nonce))) % range;\n        nonce++;\n        return randomnumber;\n    }\n    \n    function getProbs(uint wager) internal returns (uint16,uint16,uint16,uint16)  {\n        \n        uint8[4] memory group = [1,2,3,4];\n        uint8[4] memory Fac = [1,2,6,24];\n        uint[4] memory DistGroup;\n        uint16[4] memory FinalProbs;\n\n        for(uint i=0; i<4; i++){\n            DistGroup[i] = (((getLambda(wager)**group[i]) / getLambda(wager)) / Fac[i]) * 100;\n        }\n        \n        uint DistTotal = DistGroup[0] + DistGroup[1] + DistGroup[2] + DistGroup[3];\n        \n        for(uint j=0; j<4; j++){\n            FinalProbs[j] = uint16(DistGroup[j] * 10000 / DistTotal);\n        }\n        return(FinalProbs[0],FinalProbs[1],FinalProbs[2],FinalProbs[3]);\n    }\n    \n    function getLambda(uint wager) internal returns (uint) {\n        uint Dist   = log2(wager / 280000);\n        return Dist / 4;\n    }\n    \n    function log2(uint x) internal returns (uint y){\n       assembly {\n            let arg := x\n            x := sub(x,1)\n            x := or(x, div(x, 0x02))\n            x := or(x, div(x, 0x04))\n            x := or(x, div(x, 0x10))\n            x := or(x, div(x, 0x100))\n            x := or(x, div(x, 0x10000))\n            x := or(x, div(x, 0x100000000))\n            x := or(x, div(x, 0x10000000000000000))\n            x := or(x, div(x, 0x100000000000000000000000000000000))\n            x := add(x, 1)\n            let m := mload(0x40)\n            mstore(m,           0xf8f9cbfae6cc78fbefe7cdc3a1793dfcf4f0e8bbd8cec470b6a28a7a5a3e1efd)\n            mstore(add(m,0x20), 0xf5ecf1b3e9debc68e1d9cfabc5997135bfb7a7a3938b7b606b5b4b3f2f1f0ffe)\n            mstore(add(m,0x40), 0xf6e4ed9ff2d6b458eadcdf97bd91692de2d4da8fd2d0ac50c6ae9a8272523616)\n            mstore(add(m,0x60), 0xc8c0b887b0a8a4489c948c7f847c6125746c645c544c444038302820181008ff)\n            mstore(add(m,0x80), 0xf7cae577eec2a03cf3bad76fb589591debb2dd67e0aa9834bea6925f6a4a2e0e)\n            mstore(add(m,0xa0), 0xe39ed557db96902cd38ed14fad815115c786af479b7e83247363534337271707)\n            mstore(add(m,0xc0), 0xc976c13bb96e881cb166a933a55e490d9d56952b8d4e801485467d2362422606)\n            mstore(add(m,0xe0), 0x753a6d1b65325d0c552a4d1345224105391a310b29122104190a110309020100)\n            mstore(0x40, add(m, 0x100))\n            let magic := 0x818283848586878898a8b8c8d8e8f929395969799a9b9d9e9faaeb6bedeeff\n            let shift := 0x100000000000000000000000000000000000000000000000000000000000000\n            let a := div(mul(x, magic), shift)\n            y := div(mload(add(m,sub(255,a))), shift)\n            y := add(y, mul(256, gt(arg, 0x8000000000000000000000000000000000000000000000000000000000000000)))\n        }\n    }\n}\n",
   "sourcePath": "/home/rprice/Downloads/cryptoz.cards/contracts/CryptozUniverse.sol",
   "ast": {
@@ -259,7 +259,7 @@
         "id": 2101,
         "nodeType": "ImportDirective",
         "scope": 2412,
-        "sourceUnit": 3322,
+        "sourceUnit": 3190,
         "src": "471:71:3",
         "symbolAliases": [],
         "unitAlias": ""
@@ -270,7 +270,7 @@
         "id": 2102,
         "nodeType": "ImportDirective",
         "scope": 2412,
-        "sourceUnit": 3204,
+        "sourceUnit": 3072,
         "src": "543:67:3",
         "symbolAliases": [],
         "unitAlias": ""
@@ -284,10 +284,10 @@
               "id": 2103,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3321,
+              "referencedDeclaration": 3189,
               "src": "640:7:3",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$3321",
+                "typeIdentifier": "t_contract$_Ownable_$3189",
                 "typeString": "contract Ownable"
               }
             },
@@ -297,8 +297,8 @@
           }
         ],
         "contractDependencies": [
-          2905,
-          3321
+          2773,
+          3189
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -306,8 +306,8 @@
         "id": 2411,
         "linearizedBaseContracts": [
           2411,
-          3321,
-          2905
+          3189,
+          2773
         ],
         "name": "CryptozUniverse",
         "nodeType": "ContractDefinition",
@@ -319,10 +319,10 @@
               "id": 2105,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3203,
+              "referencedDeclaration": 3071,
               "src": "660:8:3",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$3203",
+                "typeIdentifier": "t_contract$_SafeMath_$3071",
                 "typeString": "library SafeMath"
               }
             },
@@ -1175,10 +1175,10 @@
                       "name": "revert",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5047,
-                        5048
+                        4915,
+                        4916
                       ],
-                      "referencedDeclaration": 5047,
+                      "referencedDeclaration": 4915,
                       "src": "2223:6:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_revert_pure$__$returns$__$",
@@ -1643,7 +1643,7 @@
                                   "name": "now",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5044,
+                                  "referencedDeclaration": 4912,
                                   "src": "2870:3:3",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_uint256",
@@ -1658,7 +1658,7 @@
                                     "name": "msg",
                                     "nodeType": "Identifier",
                                     "overloadedDeclarations": [],
-                                    "referencedDeclaration": 5042,
+                                    "referencedDeclaration": 4910,
                                     "src": "2875:3:3",
                                     "typeDescriptions": {
                                       "typeIdentifier": "t_magic_message",
@@ -1714,7 +1714,7 @@
                                   "name": "abi",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5029,
+                                  "referencedDeclaration": 4897,
                                   "src": "2853:3:3",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_abi",
@@ -1761,7 +1761,7 @@
                             "name": "keccak256",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 5036,
+                            "referencedDeclaration": 4904,
                             "src": "2843:9:3",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
@@ -4642,7 +4642,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 3322,
+          "SourceUnit": 3190,
           "absolutePath": "/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/ownership/Ownable.sol",
           "file": "../node_modules/@openzeppelin/contracts/ownership/Ownable.sol",
           "scope": 2412,
@@ -4657,7 +4657,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 3204,
+          "SourceUnit": 3072,
           "absolutePath": "/home/rprice/Downloads/cryptoz.cards/node_modules/@openzeppelin/contracts/math/SafeMath.sol",
           "file": "../node_modules/@openzeppelin/contracts/math/SafeMath.sol",
           "scope": 2412,
@@ -4673,16 +4673,16 @@
       {
         "attributes": {
           "contractDependencies": [
-            2905,
-            3321
+            2773,
+            3189
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             2411,
-            3321,
-            2905
+            3189,
+            2773
           ],
           "name": "CryptozUniverse",
           "scope": 2412
@@ -4697,7 +4697,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 3321,
+                  "referencedDeclaration": 3189,
                   "type": "contract Ownable"
                 },
                 "id": 2103,
@@ -4715,7 +4715,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "SafeMath",
-                  "referencedDeclaration": 3203,
+                  "referencedDeclaration": 3071,
                   "type": "library SafeMath"
                 },
                 "id": 2105,
@@ -5631,10 +5631,10 @@
                                 null
                               ],
                               "overloadedDeclarations": [
-                                5047,
-                                5048
+                                4915,
+                                4916
                               ],
-                              "referencedDeclaration": 5047,
+                              "referencedDeclaration": 4915,
                               "type": "function () pure",
                               "value": "revert"
                             },
@@ -6242,7 +6242,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 5036,
+                                      "referencedDeclaration": 4904,
                                       "type": "function (bytes memory) pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6296,7 +6296,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 5029,
+                                              "referencedDeclaration": 4897,
                                               "type": "abi",
                                               "value": "abi"
                                             },
@@ -6315,7 +6315,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 5044,
+                                          "referencedDeclaration": 4912,
                                           "type": "uint256",
                                           "value": "now"
                                         },
@@ -6341,7 +6341,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 5042,
+                                              "referencedDeclaration": 4910,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -9212,7 +9212,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-14T23:14:06.907Z",
+  "updatedAt": "2021-03-12T18:03:52.234Z",
   "devdoc": {
     "methods": {
       "isOwner()": {
