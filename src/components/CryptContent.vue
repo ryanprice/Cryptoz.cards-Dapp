@@ -336,6 +336,7 @@ export default {
         return instance.sacrifice(id, {from:this.coinbase});
       }).then((res) => {
         this.$store.dispatch('updateOwnerBalances')
+        this.getAllCards()
       }).catch((err) => {
         // console.error(err);
         if (err.code === 4001) {
