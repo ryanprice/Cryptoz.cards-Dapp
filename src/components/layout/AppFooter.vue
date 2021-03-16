@@ -16,6 +16,13 @@
           <img class="img-fluid dev-logo" src="./../assets/cardinal.png" />
           <p v-if="isConnected">You are connected to: {{network}}</p>
 
+        <div class="col-md-6 mt-md-0 mt-3">
+                
+                <a v-bind:class="classObject" href="https://bscscan.com/token/0x2b974da27c9dd35412d71dd36e3e108486c45444" target="_blank">CZXP Contract - 0x2b974da27c9dd35412d71dd36e3e108486c45444</a>
+              <br/>
+                <a v-bind:class="classObject" href="https://bscscan.com/token/0x8a0c542ba7bbbab7cf3551ffcc546cdc5362d2a1" target="_blank">Cryptoz Contract - 0x8a0c542ba7bbbab7cf3551ffcc546cdc5362d2a1</a>
+              
+        </div>
         </div>
         <!-- Grid column -->
 
@@ -29,16 +36,18 @@
 
             <ul class="list-unstyled">
               <li>
-                <a v-bind:class="classObject" href="https://t.me/cryptozcard" target="_blank">Telegram</a>
-              </li>
-              <li>
-                <a v-bind:class="classObject" href="https://www.instagram.com/cryptoz.cards/" target="_blank">Instagram</a>
-              </li>
-              <li>
                 <a class="twitter-follow-button" data-show-count="false"
                     href="https://twitter.com/CryptozNFT">
                     Follow @CryptozNFT
                 </a>
+              </li>
+              <li>
+                <a v-bind:class="classObject" href="https://cryptoz-cards.medium.com/">
+                    Blog
+                </a>
+              </li>
+              <li>
+                <a v-bind:class="classObject" href="https://t.me/cryptozcard" target="_blank">Telegram</a>
               </li>
             </ul>
 
