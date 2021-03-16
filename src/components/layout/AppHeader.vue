@@ -212,7 +212,7 @@ export default {
       return `${siteURL}?sponsor=${this.coinbase}`;
     },
     getTweet() {
-      return `https://twitter.com/intent/tweet?text=Click my%20sponsor%20link%20to%20 claim%20Your%20Free%20Platinum%20%23Cryptoz%20NFT%20Now!%0D%0A%0D%0A&hashtags=bsc,nft,nfts,NFTCommunity,nftcollectors,nftart,cryptoart&url=${this.getSponsorRoute}%0D%0A%0D%0A&related=CryptozNFT&via=CryptozNFT`;
+      return `https://twitter.com/intent/tweet?text=Click my%20sponsor%20link%20to%20 claim%20Your%20Free%20Platinum%20%23Cryptoz%20NFT%20Now!%0D%0A%0D%0A&hashtags=bsc,nft,nfts,NFTCommunity,nftcollectors,nftart,collectthecrypt&url=${this.getSponsorRoute}%0D%0A%0D%0A&related=CryptozNFT&via=CryptozNFT`;
     },
     isSponsorValid() {
       if (this.sponsorAddress === '') {

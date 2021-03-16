@@ -78,7 +78,7 @@
             >
               <b-card-body>
                 <div class="card-body">
-                    <img src="@/assets/cryptoz_cards_explained.jpg" />
+                    <b-img src="assets/cryptos_legend_binance.png" fluid></b-img>
                 </div>
                 <p><h2>Rarity Distribution</h2>
                     <p>The rarity distribution for each Booster card pull is as follows:</p>
@@ -117,10 +117,11 @@
                     <li><a href="https://www.binance.com/" target="_blank">Trade at Binance</a></li>
                   </ul>
                   As of this writing, the transaction cost by the Binance Smart Chain (gas) to
-                  interact with Cryptoz will cost approx $0.60 to $25.50 USD per
+                  interact with Cryptoz will cost approx $0.30 to $25.50 USD per
                   transaction, depending on how fast you would like the
                   transactions confirmed and what exactly you are trying to do.
-                  This fee is not charged by Cryptoz, but by the Binance Smart Chain
+                  <br/>
+                  This fee is not charged by the Cryptoz contract, but by the Binance Smart Chain
                   platform to execute contract code for you by you on this massive worldscale
                   computer.
                 </div>
@@ -221,7 +222,7 @@
                   the current total number of Cryptoz types available at the
                   current time. We will continue to load new sets containing approx
                   10-20 cards every month until we reach the hard limit of a
-                  total of 5000 types. The BSC contracts do not allow us or
+                  total of 5000 types. The Cryptoz contracts will not allow
                   anyone to edit or overwrite a card types definition once they
                   have been loaded.
                 </div>
@@ -282,24 +283,28 @@
             >
               <b-card-body>
                 <div class="card-body">
-                  There are multiple ways in which you can get CZXP - CryptoZ
+                  There are multiple ways in which you can get CZXP <img class="czxp-logo" src="./assets/cryptokeeper_coin_binance.svg" /> CryptoZ
                   eXPerience tokens:
                   <ul>
                     <li><router-link to="/shop"
                         >Buy Booster Credits</router-link> - 120 CZXP per</li>
                     <li>
                       <router-link to="/shop"
-                        >Buy a Limited edition Cryptoz card</router-link> - Check back of card
+                        >Mint a Limited edition Cryptoz card from the Shop</router-link> - Check back of card
                       for amount
                     </li>
                     <li>
                       <router-link to="/shop"
-                        >Claim a FREE Limited Edition Cryptoz Card</router-link> - Check back of
+                        >Mint a FREE Limited Edition Cryptoz Card from the Shop</router-link> - Check back of
                       card for amount
                     </li>
                     <li>
+                      Buy and Open a Booster from Your <router-link to="/crypt"
+                        >NFT Crypt</router-link>
+                    </li>
+                    <li>
                       <router-link to="/crypt"
-                        >Sacrifice a Cryptoz card</router-link> - Check back of card for amount
+                        >Sacrifice a Cryptoz NFT card ( permanently )</router-link> - Check back of card for amount
                     </li>
                     <li>
                       Buy or exchange czxp on
@@ -313,6 +318,7 @@
                       purchase actions. Click the Affiliate link in the header for more information.
                     </li>
                   </ul>
+                  <p><strong>Note : Minting a Booster Credit does NOT award you CZXP tokens.</strong></p>
                 </div>
               </b-card-body>
             </b-collapse>
