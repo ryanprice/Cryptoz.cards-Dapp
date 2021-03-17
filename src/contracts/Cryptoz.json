@@ -33910,7 +33910,307 @@
       "address": "0x8a0C542bA7bBBab7cF3551fFcc546CdC5362d2a1",
       "transactionHash": "0xe74d281c2e694a99babf3b649914cf5a69528ef4a9aeeb7d9d58197ebdfa30b1"
     },
-    "1615917264697": {
+    "97": {
+      "events": {
+        "0x566651c26d6867f4a0341c33295b297504f1f8445ef05b6a80d7faa24280cd2e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "cardTypeId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "name": "cardName",
+              "type": "string"
+            }
+          ],
+          "name": "LogCardTypeLoaded",
+          "type": "event"
+        },
+        "0x754b873e2c8c399f6640a7626b451a807c85ac989484c6f925703341b6da0f35": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "cardTypeId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "name": "editionNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "buyer",
+              "type": "address"
+            }
+          ],
+          "name": "LogCardPurchased",
+          "type": "event"
+        },
+        "0x66e021f2e6bf1b4f79e6e5622acffc29c6230663c0432ac8c08a5edcb1f23382": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "buyer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "packsOpened",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogPackOpened",
+          "type": "event"
+        },
+        "0xae0e6a0647510165444e35f4e1fa484c98bdb58988c4770c3bfe61b369114ecb": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "sponsor",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "affiliate",
+              "type": "address"
+            }
+          ],
+          "name": "LogSponsorLinked",
+          "type": "event"
+        },
+        "0x003da85d6058444eca57e3b88be14c734f4f239affe28b7629966e318de2a90e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "sponsor",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "affiliate",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "CzxpReward",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogSponsorReward",
+          "type": "event"
+        },
+        "0xdea0c85af515c9fffcca886846213edc28206526b243af2f064b6962032ce185": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "player",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "newBonusBalance",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDailyReward",
+          "type": "event"
+        },
+        "0x0db7c2749c43f1a3f16904833bf2cf21b6f6e675613def2bd07ec6b2de65bf8b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "winner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "boostersAwarded",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogRewardBoosters",
+          "type": "event"
+        },
+        "0xa175b558bfdf1ae124f50d3f430abaaab74e5549ded822767a55f3c6d906c6b1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "cardTokenId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "editionNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "cardTypeId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "rarity",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "name": "CzxpGained",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogCardCreated",
+          "type": "event"
+        },
+        "0x5aa0c75e571d3ecae876f03a84d247806f1af6caf4f377701179de62b7095f14": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "cardTokenId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "cardTypeId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "CzxpGained",
+              "type": "uint256"
+            }
+          ],
+          "name": "SacrificeCardEvent",
+          "type": "event"
+        },
+        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "Transfer",
+          "type": "event"
+        },
+        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "approved",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "Approval",
+          "type": "event"
+        },
+        "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "operator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "approved",
+              "type": "bool"
+            }
+          ],
+          "name": "ApprovalForAll",
+          "type": "event"
+        },
+        "0x12cfaf8ef067a8c4ae90b22b4b14ae6157ca200a5e7a6adf5ffcb4875f129430": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "beneficiary",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "czxpAmount",
+              "type": "uint256"
+            }
+          ],
+          "name": "CZXPGained",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x7B1664842cdbB450BE8E1fA9Bb18aB147D097398",
+      "transactionHash": "0x51783d3b8c5898f5fe9aa513f952961c07f4e53799c9679b7e33b97bcb6dfbcc"
+    },
+    "1615928367417": {
       "events": {
         "0x566651c26d6867f4a0341c33295b297504f1f8445ef05b6a80d7faa24280cd2e": {
           "anonymous": false,
@@ -34212,7 +34512,7 @@
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-16T17:56:41.149Z",
+  "updatedAt": "2021-03-16T23:31:01.264Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {
