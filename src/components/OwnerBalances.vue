@@ -1,5 +1,5 @@
 <template>
-  
+
   <b-row>
     <b-col>
       <strong>Your <b-icon-lightning-fill /> Booster credits :</strong> {{boosters_owned}}
@@ -8,14 +8,14 @@
       <strong>Your Cryptoz NFTs :</strong> {{cards_owned}}
     </b-col>
     <b-col class="text-right">
-      <strong>Your CZXP Balance :</strong> {{parseInt(czxp_balance).toLocaleString()}}
+      <strong>Your CZXP <img class="czxp-logo" src="./assets/cryptokeeper_coin_binance.svg" align="middle" /> Balance :</strong> {{parseInt(czxp_balance).toLocaleString()}}
     </b-col>
   </b-row>
-  
+
 </template>
 <script>
   import {ownerBalances} from 'vuex'
-  
+
   export default {
     name: 'OwnerBalances',
     computed: {
@@ -48,7 +48,7 @@
     },
     data () {
       return {
-        
+
       }
     },
     methods : {
@@ -74,7 +74,11 @@
       },
     }
   }
-  
+
 </script>
 <style scoped>
+.czxp-logo {
+  width : 4%;
+  vertical-align:middle;
+}
 </style>
