@@ -257,7 +257,7 @@
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5038,
+                          "referencedDeclaration": 5042,
                           "src": "257:3:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
@@ -308,7 +308,7 @@
                         "name": "now",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5040,
+                        "referencedDeclaration": 5044,
                         "src": "271:3:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -393,7 +393,7 @@
                       "name": "block",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5028,
+                      "referencedDeclaration": 5032,
                       "src": "369:5:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_block",
@@ -486,7 +486,7 @@
                     "name": "now",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 5040,
+                    "referencedDeclaration": 5044,
                     "src": "462:3:6",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
@@ -576,7 +576,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5040,
+                      "referencedDeclaration": 5044,
                       "src": "584:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -609,7 +609,7 @@
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5038,
+                          "referencedDeclaration": 5042,
                           "src": "605:3:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
@@ -688,7 +688,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 5038,
+                                "referencedDeclaration": 5042,
                                 "src": "685:3:6",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -739,7 +739,7 @@
                               "name": "now",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 5040,
+                              "referencedDeclaration": 5044,
                               "src": "699:3:6",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_uint256",
@@ -814,7 +814,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 5038,
+                                "referencedDeclaration": 5042,
                                 "src": "742:3:6",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -1214,7 +1214,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 5038,
+                                      "referencedDeclaration": 5042,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -1253,7 +1253,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 5040,
+                                  "referencedDeclaration": 5044,
                                   "type": "uint256",
                                   "value": "now"
                                 },
@@ -1388,7 +1388,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5028,
+                              "referencedDeclaration": 5032,
                               "type": "block",
                               "value": "block"
                             },
@@ -1489,7 +1489,7 @@
                           "overloadedDeclarations": [
                             null
                           ],
-                          "referencedDeclaration": 5040,
+                          "referencedDeclaration": 5044,
                           "type": "uint256",
                           "value": "now"
                         },
@@ -1600,7 +1600,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5040,
+                              "referencedDeclaration": 5044,
                               "type": "uint256",
                               "value": "now"
                             },
@@ -1650,7 +1650,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 5038,
+                                      "referencedDeclaration": 5042,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -1730,7 +1730,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 5038,
+                                              "referencedDeclaration": 5042,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -1769,7 +1769,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 5040,
+                                          "referencedDeclaration": 5044,
                                           "type": "uint256",
                                           "value": "now"
                                         },
@@ -1864,7 +1864,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 5038,
+                                              "referencedDeclaration": 5042,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -1999,7 +1999,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-10T18:44:48.350Z",
+  "updatedAt": "2021-03-14T23:14:06.920Z",
   "devdoc": {
     "methods": {}
   },

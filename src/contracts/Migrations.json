@@ -184,7 +184,7 @@
                         "name": "msg",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5038,
+                        "referencedDeclaration": 5042,
                         "src": "146:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_message",
@@ -288,7 +288,7 @@
                         "name": "msg",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5038,
+                        "referencedDeclaration": 5042,
                         "src": "212:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_message",
@@ -869,7 +869,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 5038,
+                                  "referencedDeclaration": 5042,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -1006,7 +1006,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 5038,
+                                  "referencedDeclaration": 5042,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -1462,12 +1462,6 @@
     "version": "0.5.9+commit.e560f70d.Emscripten.clang"
   },
   "networks": {
-    "56": {
-      "events": {},
-      "links": {},
-      "address": "0xDA82146DBee1682C308178a7EA7DdaB9b3CB7245",
-      "transactionHash": "0xa18f04283952aa7d707fcca383566d15d5d6ae31748f17caf283db3295d2bad8"
-    },
     "97": {
       "events": {},
       "links": {},
