@@ -60,7 +60,6 @@ export default {
     },
     methods: {
         buyCzxp : function() {
-            //console.log("buy cxzp clicked !", this.totalCzxpToBuy, this.coinbase);
             window.CzxpToken.deployed().then((instance) => {
                 return instance.buy({from: this.coinbase, value:(this.totalCzxpToBuy*1000000000000000000)});
             }).then((res) => {

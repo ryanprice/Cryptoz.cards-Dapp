@@ -54,7 +54,7 @@
       </p>
       <div class="row">
         <div class="col">
-          <b-button v-b-tooltip.hover="'+120 CZXP per credit'"
+          <b-button
             class="btn btn-danger"
             v-bind:disabled="balance < 2000000000000000"
             v-b-modal.buy-boosters-modal
@@ -78,12 +78,13 @@
         </div>
       <br>
       <div class="row">
-        <div v-for="card in storeCards" :key="card.type_id">
+        <div v-for="card in sortedCards" :key="card.type_id">
           <OwnedCardContent
             :type_id="card.type_id"
             :name="card.name"
             :cost="card.cost"
             :cset="card.card_set"
+            :edition_current="card.edition_current"
             :edition_total="card.edition_total"
             :in_store="card.in_store"
             :level="card.card_level"
@@ -93,6 +94,7 @@
             :sacrifice_czxp="card.sacrifice_czxp"
             :image="card.image"
             :card_class="card.rarity"
+            :card_owned="false"
           ></OwnedCardContent>
          <div
             v-if="card.soldOut == 1"
@@ -147,7 +149,6 @@ import OwnerBalances from '@/components/OwnerBalances.vue'
 import SortDropdown from '@/components/SortDropdown.vue'
 import {getEditionNumber, getRarity, dynamicSort} from '../helpers'
 import { showErrorToast, showPendingToast, showSuccessToast } from "../util/showToast";
-import getCardType from '../util/getCardType'
 
 export default {
   name: "ShopContent",
@@ -179,6 +180,9 @@ export default {
     currentEvent() {
       return this.$store.state.lastChainEvent;
     },
+    storeCards() {
+      return this.$store.state.shop.cards;
+    },
   },
   watch: {
     currentEvent(newValue,oldValue) {
@@ -194,17 +198,22 @@ export default {
       if (newValue !== oldValue && newValue > 0) {
         this.getAllTypes();
       }
+    },
+    storeCards(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.sortedCards = [...newVal]
+      }
     }
   },
   data() {
     return {
+      sortedCards: [],
       pendingTransaction: 0,
       showSpinner: 0,
       transactionStatus: "Pending confirmation...",
       showUnlimited: 1,
       transaction_number: "",
       typesOnChain: [],
-      storeCards: [],
       buyBoostBtnOn: 0,
       confirmBoosterBuyBtnDisabled: 0,
       totalCreditsToBuy : 1,
@@ -218,9 +227,6 @@ export default {
     }
   },
   async mounted() {
-    console.log(
-      "The shop is mounted, call for the cards, if we have a contract.."
-    );
     if (typeof Cryptoz !== "undefined" && this.coinbase) {
       await this.getAllTypes();
     } else {
@@ -246,7 +252,7 @@ export default {
       window.Cryptoz.deployed().then((instance) => {
         return instance.getFreeCard(type_id, {from: this.coinbase});
       }).then((res) => {
-        this.showTransaction =1
+        this.showTransaction = 1
         this.$store.dispatch('updateOwnerBalances')
       })
     },
@@ -296,7 +302,7 @@ export default {
           autoHideDelay: 1000
         });
         //reset the view
-        this.storeCards = [];
+        // this.storeCards = [];
 
         events.get(async (err, logs) => {
           if(err){console.error(err)}
@@ -304,29 +310,26 @@ export default {
           let typeIdsOnChain = logs.map(e => {
             return e.args.cardTypeId.c[0];
           })
-
-          //console.log("list of Ids from logs:",typeIdsOnChain);
           
         //Dirty hack until we figure this event log shite out
          typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
           
         
           const results = await Promise.all(
-
-              typeIdsOnChain.map(async id => {
-                              //console.log("getting card:",id);
-                              const cardData = await this.getCard(id);
-            
-                  if (!cardData || cardData.id  == 74) { //keep 74 hidden from shop
-                      return;
-                  }
-                  //console.log("results:",results);
-                  return this.addIsOwnedProp(cardData);
-              })
-              
+            typeIdsOnChain.map(async id => {
+              const cardData = await this.getCard(id);
+        
+              if (!cardData || cardData.id  == 74) { //keep 74 hidden from shop
+                  return;
+              }
+              return this.addIsOwnedProp(cardData);
+            })
           )
-          this.storeCards = results.filter(result => result !== undefined);
-          if (this.storeCards.length > 0) {
+          const storeCards = results.filter(result => result !== undefined);
+          console.log({storeCards})
+          this.$store.dispatch('setStoreCards', storeCards)
+
+          if (storeCards.length > 0) {
             showSuccessToast(this, 'Finished Loading Shop.');
           }
         })
@@ -344,22 +347,27 @@ export default {
       return card;
     },
     getCard: async function(cardId) {
-      const res = await getCardType(cardId)
-      if (!res) {
-        console.log(`Failed to fetch card ${cardId}.json`);
+      const res = await axios.get(
+        `https://cryptoz.cards/services/getCardData.php?card_id=${cardId}`
+      );
+      if (res.status !== 200) {
+        console.log(
+          "Looks like there was a problem from FETCH. Status Code: " +
+            response.status
+        );
         return;
       }
 
-      let cardObj = {...res};
+      let cardObj = {...res.data};
 
       cardObj.id = cardId;
 
-      if (res.attributes[3].value !== "Store") {
+      if (res.data.attributes[3].value !== "Store") {
         return;
       }
       
       //format the attributes to match our JS objects
-      res.attributes.forEach(function(element) {
+      res.data.attributes.forEach(function(element) {
         cardObj[element.trait_type] = element.value;
       });
 
@@ -385,51 +393,46 @@ export default {
       }
       
       //Get NFTs minted already to inject in our edition totals
-        window.Cryptoz.deployed()
-      .then((instance) => {
-        return instance.cardTypeToEdition(cardObj.id);
-      })
-      .then((result) => {
-      
-            //Edition bug hack
-            if(cardObj.id == 102){ //dragon edition limit bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 5;
-            }
-            if(cardObj.id == 103){ //bleeding fury edition limit bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 1;
-            }
-            if(cardObj.id == 5){ //stu bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 110;
-            }
-            if(cardObj.id == 22){ //thrny bug ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 179;
-            }
-            if(cardObj.id == 56){ //shroom ?
-                cardObj.soldOut = 1;
-                cardObj.edition_total = 112;
-            }
+      window.Cryptoz.deployed()
+        .then((instance) => {
+          return instance.cardTypeToEdition(cardObj.id);
+        })
+        .then((result) => {
+          cardObj.edition_current = parseInt(result)
+
+          //Edition bug hack
+          if(cardObj.id == 102){ //dragon edition limit bug ?
+            cardObj.edition_total = 5;
+          }
+          if(cardObj.id == 103){ //bleeding fury edition limit bug ?
+            cardObj.edition_total = 1;
+          }
+          if(cardObj.id == 5){ //stu bug ?
+            cardObj.edition_total = 110;
+          }
+          if(cardObj.id == 22){ //thrny bug ?
+            cardObj.edition_total = 179;
+          }
+          if(cardObj.id == 56){ //shroom ?
+            cardObj.edition_total = 112;
+          }
             
-          //Set soldOut flag first
-          if(parseInt(result) == cardObj.edition_total){
-              cardObj.soldOut = 1;
+          // Set soldOut flag first
+          if(cardObj.edition_current == cardObj.edition_total) {
+            cardObj.soldOut = 1;
           }
           
-          //Set human readable edition total
-          cardObj.edition_total =  parseInt(result).toLocaleString() + '/' + cardObj.edition_total;
-      })
-      .catch(err => {
-        console.error('Error getting NFTs minted:', err);
-        this.showSpinner = 0;
-      })
-      
+          // Set human readable edition total
+          cardObj.edition_label = cardObj.edition_current + '/' + cardObj.edition_total;
+        })
+        .catch(err => {
+          console.error('Error getting NFTs minted:', err);
+          this.showSpinner = 0;
+        })
 
       if (cardObj.edition_total === 0) {
         cardObj.edition_total = "Unlimited";
-      }else{
+      } else{
           
       }
 
@@ -453,13 +456,13 @@ export default {
     sortByAttr: function(param, isDescending) {
       switch(param) {
         case "edition_number":
-          this.storeCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
+          this.sortedCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
           break
         case "rarity":
-          this.storeCards.sort(dynamicSort(param, isDescending, true, getRarity))
+          this.sortedCards.sort(dynamicSort(param, isDescending, true, getRarity))
           break
         default:
-          this.storeCards.sort(dynamicSort(param, isDescending))
+          this.sortedCards.sort(dynamicSort(param, isDescending))
           break
       }
     }

@@ -24,7 +24,11 @@ let state = {
  totalCryptozTypes:0,
  
 //blockchain events [objects]
- lastChainEvent:''
+ lastChainEvent:'',
+
+ shop: {
+   cards: [],
+ },
 }
 
 export default state

@@ -127,6 +127,7 @@
                     :name="card.name"
                     :cost="card.cost"
                     :cset="card.card_set"
+                    :edition_current="card.edition_current"
                     :edition_total="card.edition_total"
                     :level="card.card_level"
                     :unlock_czxp="card.unlock_czxp"
@@ -136,6 +137,7 @@
                     :image="card.image"
                     :card_class="card.rarity"
                     :in_store="card.in_store"
+                    :card_owned="true"
                   ></OwnedCardContent>
                   <div class="sacrifice-wrapper" v-if="$route.path == '/crypt'">
                     <div class="sacrifice-button">
@@ -359,7 +361,6 @@ export default {
         showPendingToast(this)
         return contract.transferFrom(this.coinbase, this.receivingWallet, id, {from:this.coinbase});
       }).then((res) => {
-        // console.log("transfer result: ", res);
         this.confirmTransferBtnDisabled = false;
         return contract.tokensOfOwner(this.coinbase)
       }).then(this.handleGetAllCards)
@@ -371,7 +372,6 @@ export default {
       })
     },
     buyAndOpenBooster : function() {
-      console.log('Buy and Open Booster card...');
       showPendingToast(this);
       window.Cryptoz.deployed().then((instance) => {
         return instance.buyBoosterCardAndOpen({from: this.coinbase, value:2000000000000000});
@@ -407,10 +407,7 @@ export default {
 
               return getCardTypes(elementReturned[0].c[0])
             }).then(function(res){
-            //console.log(res);
-              // console.log('edition:' + tokenIdList[tokenId][1].c[0])
               res.id = tokenId;
-              //format the attributes to match our JS objects
               
               let newAttr = {}
               res.attributes.forEach(function(element){
@@ -419,14 +416,15 @@ export default {
               
               //Overwrite our JSON reponse with vue friendly card binding data
               res.attributes = newAttr;
+              res.attributes.edition_current = tokenIdList[tokenId][1].c[0]
 
               //Edition total
               // #4  , #4 of 300
               if(res.attributes.edition_total == 0) //unlimited
               {
-                res.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0];
+                res.attributes.edition_label = '#'+res.attributes.edition_current;
               }else{
-                res.attributes.edition_total = '#'+tokenIdList[tokenId][1].c[0] +' of '+res.attributes.edition_total;
+                res.attributes.edition_label = '#'+res.attributes.edition_current +' of '+res.attributes.edition_total;
               }
               
               switch(res.attributes.rarity){
@@ -450,8 +448,10 @@ export default {
                   break;
               }
 
-              delete res.attributes
               newAttr = {...newAttr, ...res};
+              delete newAttr.attributes
+
+              console.log({newAttr})
               
               resolve(newAttr)
             })
@@ -479,9 +479,6 @@ export default {
     },
     handleBuyBooster : function(result) {
       console.log('Handling buy booster...');
-      // console.log(result);
-      
-      //change from pending to ready
     },
     openBooster : function () {
       

@@ -48,6 +48,15 @@ export const store = new Vuex.Store({
   },
   updateCryptozTotal(state, payload) {
     state.totalCryptozSupply = payload
+  },
+  setStoreCards(state, payload) {
+    state.shop.cards = payload
+  },
+  updateMintedCountForCard(state, payload) {
+    const { cardTypeId, editionNumber } = payload
+
+    const cardIndex = state.shop.cards.findIndex(card => card.type_id === cardTypeId)
+    state.shop.cards[cardIndex].edition_current = editionNumber
   }
  },
  actions: {
@@ -94,6 +103,12 @@ export const store = new Vuex.Store({
     },
     userLoggedOut({commit}){
       commit('userLoggedOut')
+    },
+    setStoreCards({commit}, payload) {
+      commit('setStoreCards', payload)
+    },
+    updateMintedCountForCard({commit}, payload) {
+      commit('updateMintedCountForCard', payload)
     }
  }
 })

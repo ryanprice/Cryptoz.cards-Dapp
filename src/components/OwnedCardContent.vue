@@ -11,7 +11,7 @@
             <div id="1" :class="card_class">
               <!--img class="card-img" :src="'static/assets/' + url" /-->
               <img class="card-img" :src="image" />
-              <span class="card-edition">{{ edition_total }}</span>
+              <span class="card-edition">{{ edition_label }}</span>
               <div class="card-item-name text-center">
                 {{ name }}<br />{{ cset }}
               </div>
@@ -85,6 +85,7 @@ export default {
     "type_id",
     "name",
     "image",
+    "edition_current",
     "edition_total",
     "cset",
     "unlock_czxp",
@@ -95,6 +96,7 @@ export default {
     "sacrifice_czxp",
     "card_class",
     "in_store",
+    "card_owned"
   ],
   computed: {
     activeColor() {
@@ -104,6 +106,18 @@ export default {
         return "#FFFF33"; //yellow
       }
     },
+    edition_label() {
+      if (!this.card_owned) {
+        return this.edition_current + '/' + this.edition_total
+      }
+      else {
+        if (this.edition_total == 0) {
+          return '#'+this.edition_current;
+        } else {
+          return '#'+this.edition_current +' of '+this.edition_total;
+        }
+      }
+    }
   },
 };
 </script>
