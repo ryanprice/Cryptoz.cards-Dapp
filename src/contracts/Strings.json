@@ -1,15 +1,15 @@
 {
   "contractName": "Strings",
   "abi": [],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/rprice/Downloads/cryptoz.cards/contracts/Strings.sol\":\"Strings\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/rprice/Downloads/cryptoz.cards/contracts/Strings.sol\":{\"keccak256\":\"0xbb33f0ca4a6b54061140e5ae292a0a526d29039c3bb8f9f6b252288adda002c3\",\"urls\":[\"bzzr://9ebc0ed1671096d826c55bf69a707450bc10fce15ab9fdd52dcdc956068bab8f\",\"dweb:/ipfs/QmaEf3TAYMC2qqveTCepKQN9qsy7ueUxMpxwTaVJRNaf2X\"]}},\"version\":1}",
-  "bytecode": "0x60556023600b82828239805160001a607314601657fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a723058206c396b01adb0d52ad7d0603987cb394240bf606392a38745108b03ddc0abfe9164736f6c63430005090032",
-  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a723058206c396b01adb0d52ad7d0603987cb394240bf606392a38745108b03ddc0abfe9164736f6c63430005090032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.9+commit.e560f70d\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/ryanpricelondon/cryptoz.cards/contracts/Strings.sol\":\"Strings\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/ryanpricelondon/cryptoz.cards/contracts/Strings.sol\":{\"keccak256\":\"0xbb33f0ca4a6b54061140e5ae292a0a526d29039c3bb8f9f6b252288adda002c3\",\"urls\":[\"bzzr://9ebc0ed1671096d826c55bf69a707450bc10fce15ab9fdd52dcdc956068bab8f\",\"dweb:/ipfs/QmaEf3TAYMC2qqveTCepKQN9qsy7ueUxMpxwTaVJRNaf2X\"]}},\"version\":1}",
+  "bytecode": "0x60556023600b82828239805160001a607314601657fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a72305820e159606f080b7662274727d16af8afbe0c62b02cd7510095dc2a52cf12075dcb64736f6c63430005090032",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea265627a7a72305820e159606f080b7662274727d16af8afbe0c62b02cd7510095dc2a52cf12075dcb64736f6c63430005090032",
   "sourceMap": "25:1942:5:-;;132:2:-1;166:7;155:9;146:7;137:37;255:7;249:14;246:1;241:23;235:4;232:33;222:2;;269:9;222:2;293:9;290:1;283:20;323:4;314:7;306:22;347:7;338;331:24",
   "deployedSourceMap": "25:1942:5:-;;;;;;;;",
   "source": "pragma solidity ^0.5.0;\n\nlibrary Strings {\n  // via https://github.com/oraclize/ethereum-api/blob/master/oraclizeAPI_0.5.sol\n  function strConcat(string memory _a, string memory _b, string memory _c, string memory _d, string memory _e) internal pure returns (string memory) {\n      bytes memory _ba = bytes(_a);\n      bytes memory _bb = bytes(_b);\n      bytes memory _bc = bytes(_c);\n      bytes memory _bd = bytes(_d);\n      bytes memory _be = bytes(_e);\n      string memory abcde = new string(_ba.length + _bb.length + _bc.length + _bd.length + _be.length);\n      bytes memory babcde = bytes(abcde);\n      uint k = 0;\n      for (uint i = 0; i < _ba.length; i++) babcde[k++] = _ba[i];\n      for (uint i = 0; i < _bb.length; i++) babcde[k++] = _bb[i];\n      for (uint i = 0; i < _bc.length; i++) babcde[k++] = _bc[i];\n      for (uint i = 0; i < _bd.length; i++) babcde[k++] = _bd[i];\n      for (uint i = 0; i < _be.length; i++) babcde[k++] = _be[i];\n      return string(babcde);\n    }\n\n    function strConcat(string memory _a, string memory _b, string memory _c, string memory _d) internal pure returns (string memory) {\n        return strConcat(_a, _b, _c, _d, \"\");\n    }\n\n    function strConcat(string memory _a, string memory _b, string memory _c) internal pure returns (string memory) {\n        return strConcat(_a, _b, _c, \"\", \"\");\n    }\n\n    function strConcat(string memory _a, string memory _b) internal pure returns (string memory) {\n        return strConcat(_a, _b, \"\", \"\", \"\");\n    }\n\n    function uint2str(uint _i) internal pure returns (string memory _uintAsString) {\n        if (_i == 0) {\n            return \"0\";\n        }\n        uint j = _i;\n        uint len;\n        while (j != 0) {\n            len++;\n            j /= 10;\n        }\n        bytes memory bstr = new bytes(len);\n        uint k = len - 1;\n        while (_i != 0) {\n            bstr[k--] = byte(uint8(48 + _i % 10));\n            _i /= 10;\n        }\n        return string(bstr);\n    }\n}",
-  "sourcePath": "/home/rprice/Downloads/cryptoz.cards/contracts/Strings.sol",
+  "sourcePath": "/home/ryanpricelondon/cryptoz.cards/contracts/Strings.sol",
   "ast": {
-    "absolutePath": "/home/rprice/Downloads/cryptoz.cards/contracts/Strings.sol",
+    "absolutePath": "/home/ryanpricelondon/cryptoz.cards/contracts/Strings.sol",
     "exportedSymbols": {
       "Strings": [
         2791
@@ -4358,7 +4358,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/home/rprice/Downloads/cryptoz.cards/contracts/Strings.sol",
+      "absolutePath": "/home/ryanpricelondon/cryptoz.cards/contracts/Strings.sol",
       "exportedSymbols": {
         "Strings": [
           2791
@@ -8980,7 +8980,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-14T23:14:06.915Z",
+  "updatedAt": "2021-03-17T15:39:43.239Z",
   "devdoc": {
     "methods": {}
   },
