@@ -2,7 +2,7 @@
   <div>
     <b-modal
       id="buy-boosters-modal"
-      title="Buy Booster Credits @ 0.002 E each"
+      title="Buy Booster Credits @ 0.002 BNB each"
       hide-footer
     >
       <h5 class="modal-title">Booster cards will never be sold in the shop</h5>
