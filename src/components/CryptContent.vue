@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+
     <!-- Open Booster Modal -->
     <b-modal
       id="open-booster-modal"
@@ -28,13 +28,13 @@
         </b-col>
       </b-row>
     </b-modal>
-    
+
     <div class="jumbotron">
       <UniverseBalances></UniverseBalances>
-      
+
           <h1>Your NFT Wallet</h1>
           <p>This is where all your NFT Cryptoz tokens can be accessed. Sort, search, gift and sacrifice. Sacrificing is permanent, not only in your wallet but across the entire Cryptoz Universe. That unique NFT is burned forever.</p>
-          
+
           <!-- Loads cards here -->
             <div class="row">
               <div class="col">
@@ -42,16 +42,16 @@
                 </b-button>
               </div>
               <div class="col buy-and-open-booster">
-                <b-button v-b-tooltip.hover="'Mint 1 random booster NFT +120 CZXP'" class="btn btn-danger" v-bind:disabled="web3.balance < 2000000000000000" v-on:click="buyAndOpenBooster">Buy and Open <b-icon-lightning-fill /> Booster 0.002E
+                <b-button v-b-tooltip.hover="'Mint 1 random booster NFT +120 CZXP'" class="btn btn-danger" v-bind:disabled="web3.balance < 2000000000000000" v-on:click="buyAndOpenBooster">Buy and Open <b-icon-lightning-fill /> Booster 0.002 BNB
                 </b-button>
               </div>
             </div>
             <br>
-            
+
             <OwnerBalances></OwnerBalances>
-            
+
             <br>
-            
+
             <div class="row">
               <div id="button-container" class="row" v-if="ownsCards">
                 <SortDropdown @sort-by-attr="sortByAttr"></SortDropdown>
@@ -318,7 +318,7 @@ export default {
     },
     getAllCards : async function() {
       this.subscriptionState = 1;
-      
+
       const instance = await window.Cryptoz.deployed();
       const tokensOfOwner = await instance.tokensOfOwner(this.coinbase);
       this.handleGetAllCards(tokensOfOwner)
@@ -352,7 +352,7 @@ export default {
       Vue.set(this.cardsBeingGifted, id, true)
       //Disable the button so they dont mash it up
       this.confirmTransferBtnDisabled = true;
-      
+
       console.log('to ' + this.receivingWallet)
       console.log('from ' + this.coinbase)
       var contract
@@ -393,7 +393,7 @@ export default {
         var self= this;
         //first we update the view
         this.ownsCards = true;
-        
+
         //Place to track our token array data
         var tokenIdList = {};
 
@@ -408,12 +408,12 @@ export default {
               return getCardTypes(elementReturned[0].c[0])
             }).then(function(res){
               res.id = tokenId;
-              
+
               let newAttr = {}
               res.attributes.forEach(function(element){
                 newAttr[element.trait_type] = element.value;
               })
-              
+
               //Overwrite our JSON reponse with vue friendly card binding data
               res.attributes = newAttr;
               res.attributes.edition_current = tokenIdList[tokenId][1].c[0]
@@ -426,7 +426,7 @@ export default {
               }else{
                 res.attributes.edition_label = '#'+res.attributes.edition_current +' of '+res.attributes.edition_total;
               }
-              
+
               switch(res.attributes.rarity){
                 case "Common":
                   res.attributes.rarity = 'card-bg card-bg-6';
@@ -452,7 +452,7 @@ export default {
               delete newAttr.attributes
 
               console.log({newAttr})
-              
+
               resolve(newAttr)
             })
             .catch((err) => {
@@ -460,7 +460,7 @@ export default {
             })
           })
         }
-        
+
         //asynchronously get all our cards
         this.orderedCards = await Promise.all(
           res.map(element => getCard(element.c[0]))
@@ -469,7 +469,7 @@ export default {
           this.sortByAttr(this.sortType, this.isDescending)
         }
         this.$store.dispatch('updateCardsOwned', this.orderedCards.length)
-        
+
       }else{
         console.log('no cards returned from handleGetAllCards()');
         this.ownsCards = false; //set the message to buy or get Cryptoz
@@ -481,15 +481,15 @@ export default {
       console.log('Handling buy booster...');
     },
     openBooster : function () {
-      
+
       console.log('Wagering..' + this.wagerAmount);
-      
+
       //Change buy button to pending.. or show some pending state
       showPendingToast(this);
       var self = this;
-      
+
       this.$bvModal.hide('open-booster-modal')
-      
+
       window.Cryptoz.deployed().then(function(instance) {
         return instance.openBoosterCard(self.wagerAmount, {from: self.coinbase});
       })
@@ -567,7 +567,7 @@ export default {
     margin-left: 1rem;
     display: flex
   }
-  
+
   #view-change-button {
     margin-left: 0.5rem;
   }
@@ -586,7 +586,7 @@ export default {
   .card-bg {
     padding:2px;
   }
-  
+
   .card-bg-6{
     background-color: rgba(84,81,97,0.5);
     border: 2px solid rgb(84,81,97);
