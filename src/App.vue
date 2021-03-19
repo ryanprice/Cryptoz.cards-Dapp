@@ -154,7 +154,7 @@ export default {
           return t;
         }(document, "script", "twitter-wjs"));
   },
-  methods : {
+  methods: {
     subscribeToProviderEvents: function(provider) {
       provider.on("connect", ({chainId}) => {
         this.$store.dispatch('web3isConnected', true)
@@ -203,20 +203,12 @@ export default {
       this.subscribeToProviderEvents(provider)
     },
     getWalletInfo: function() {
-      window.web3.eth.getCoinbase((err, coinbase) => {
-        if (err) {
-          console.error('Error: ', err)
-        }
-        if (coinbase !== null) {
-          window.web3.eth.getBalance(coinbase, (err, balance) => {
-            this.$store.dispatch('updateWallet', {coinbase, balance})
-          })
-        }
-      })
+      console.log('getWalletinfo')
+      this.$store.dispatch('updateWallet')
     },
     disconnectWallet: function() {
       this.$store.dispatch('web3isConnected', false)
-      this.$store.dispatch('updateWallet', {coinbase: null, balance: null})
+      this.$store.dispatch('disconnectWallet')
       this.$store.dispatch('chainChanged', null)
     },
   }

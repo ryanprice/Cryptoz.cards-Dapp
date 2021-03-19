@@ -60,9 +60,21 @@ export const store = new Vuex.Store({
   }
  },
  actions: {
-    updateWallet ({commit}, payload) {
-        console.log('update wallet eth balance action called',payload);
-      commit('updateWallet', payload)
+    updateWallet ({commit}) {
+      window.web3.eth.getCoinbase((err, coinbase) => {
+        if (err) {
+          console.error('Error: ', err)
+        }
+        if (coinbase !== null) {
+          window.web3.eth.getBalance(coinbase, (err, balance) => {
+            commit('updateWallet', {coinbase, balance})
+          })
+        }
+      })
+      // commit('updateWallet', payload)
+    },
+    disconnnectWallet({commit}) {
+      commit('updateWallet', {coinbase: null, balance: null})
     },
     web3isConnected({commit}, payload) {
       commit('web3isConnected', payload)

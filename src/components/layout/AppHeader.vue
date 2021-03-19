@@ -110,19 +110,22 @@
 
           <transition name="fade" mode="out-in">
             <li class="wallet-nav flex-row" v-if="web3isConnected">
-              <div v-b-tooltip.hover :title="coinbase">
-                <img src="@/assets/metamask-face.png" />
-                {{ coinbase.substr(0, 6) + "..." + coinbase.substr(38) }}
+              <div
+                :title="coinbase"
+                v-b-tooltip.hover="{ customClass: 'tooltip-1' }"
+              >
+                <img src="@/assets/metamask-face.png" class="header-icon" />
+                <span>{{ coinbase.substr(0, 6) + "..." + coinbase.substr(38) }}</span>
               </div>
-              <span
-                v-b-tooltip.hover
+              <div
+                v-b-tooltip.hover="{ customClass: 'tooltip-2' }"
                 :title="ethBalance"
                 class="wallet-balance"
               >
                 <!--img v-if="this.$store.state.web3.chainId != 0x38 || this.$store.state.web3.chainId != 0x61" src="@/assets/ethereum-symbol.png" /-->
-                <img src="@/assets/binance-coin-logo.webp" />
-                {{ ethBalance.toFixed(4) }}
-              </span>
+                <img src="@/assets/binance-coin-logo.webp" class="header-icon" />
+                <span>{{ ethBalance.toFixed(4) }}</span>
+              </div>
             </li>
           </transition>
 
@@ -248,15 +251,15 @@ export default {
       }
     },
     ethBalance(newValue, oldValue) {
-      console.log(
-        `Updating ethBalance in header from ${oldValue} to ${newValue}`
-      );
+      // console.log(
+      //   `Updating ethBalance in header from ${oldValue} to ${newValue}`
+      // );
       // new wallet.. check their bonus and tell Owner balances to update
-      if (newValue !== oldValue && newValue !== null) {
+      // if (newValue !== oldValue && newValue !== null) {
         //this.$store.dispatch('updateOwnerBalances')
         //this.$store.dispatch('updateUniverseBalances')
         //this.setSubscriptions();
-      }
+      // }
     },
     coinbase(newValue, oldValue) {
       console.log(
@@ -286,12 +289,12 @@ export default {
       
       const instance = await window.Cryptoz.deployed();
       const sponsors = await instance.sponsors.call(address);
-      console.log("checking sponsor..", sponsors);
+      // console.log("checking sponsor..", sponsors);
       if (sponsors && sponsors !== baseAddress) {
-        console.log("hey",this.$route.query.sponsor);
+        // console.log("hey",this.$route.query.sponsor);
         this.shouldShowSponsor = false;
       } else {
-      console.log("hey1",this.$route.query.sponsor);
+      // console.log("hey1",this.$route.query.sponsor);
         if (this.$route.query.sponsor) {
           this.sponsorAddress = this.$route.query.sponsor;
           this.$bvModal.show("sponsor-modal");
@@ -305,11 +308,11 @@ export default {
           this.sponsorAddress,
           { from: this.coinbase }
         );
-        console.log(result);
+        // console.log(result);
         showSuccessToast(this, "Sponsor linked!");
         this.$emit("LogSponsorLinked", [this.sponsorAddress, this.coinbase]);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         showErrorToast(this, "Failed to link sponsor.");
       }
     },
@@ -326,7 +329,7 @@ export default {
     },
     setSubscriptions: function() {
       //Lets do a check for the Daily bonus'
-      console.log("Check if the bonus is available for this playa..");
+      // console.log("Check if the bonus is available for this playa..");
       //console.log(this.coinbase);
       //console.log(this.balance);
 
@@ -427,6 +430,14 @@ export default {
   margin-right: 3rem;
 }
 
+.tooltip-1 {
+  top: 65px!important;
+}
+
+.tooltip-2 {
+  top: 45px!important;
+}
+
 .router-link-active {
   color: #ffffff;
 }
@@ -458,10 +469,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.wallet-nav img {
-  width: 30px;
 }
 
 li {
@@ -521,6 +528,10 @@ a:hover {
 .wallet-balance {
   color: lightgreen;
   margin: 0 4em 0 1em;
+}
+
+.header-icon {
+  height: 20px;
 }
 
 .bonusClass {

@@ -111,7 +111,7 @@ export default {
         return this.edition_current + '/' + this.edition_total
       }
       else {
-        if (this.edition_total == 0) {
+        if (this.edition_total === 0) {
           return '#'+this.edition_current;
         } else {
           return '#'+this.edition_current +' of '+this.edition_total;

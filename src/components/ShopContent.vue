@@ -281,28 +281,16 @@ export default {
         //change from pending to ready
         this.pendingTransaction = result.receipt.blockHash;
         this.transactionStatus = 'Broadcast to chain...';
-        
-        //Update the Eth balance
-        if (this.coinbase !== null) {
-          window.web3.eth.getBalance(this.coinbase, (err, balance) => {
-            this.$store.dispatch('updateWallet', {balance})
-          })
-        }
+        this.$store.dispatch('updateWallet')
     },
     getAllTypes: async function(){
       try {
         let instance = await window.Cryptoz.deployed();
-        let events = await instance.LogCardTypeLoaded({},{fromBlock: 'latest'});
-        //let events = await instance.LogCardTypeLoaded({'cardTypeId':[81,103]},{address:0x60D7a79367B35573B27E4F020794AEF299E9fd49});
-    
+        let events = await instance.LogCardTypeLoaded({},{fromBlock: 'latest'});    
 
-        //Lets get all the cards now
-        console.log("Get all the cards...");
         showPendingToast(this, 'Loading Store Cards...', {
           autoHideDelay: 1000
         });
-        //reset the view
-        // this.storeCards = [];
 
         events.get(async (err, logs) => {
           if(err){console.error(err)}
@@ -326,7 +314,6 @@ export default {
             })
           )
           const storeCards = results.filter(result => result !== undefined);
-          console.log({storeCards})
           this.$store.dispatch('setStoreCards', storeCards)
 
           if (storeCards.length > 0) {
@@ -421,20 +408,11 @@ export default {
           if(cardObj.edition_current == cardObj.edition_total) {
             cardObj.soldOut = 1;
           }
-          
-          // Set human readable edition total
-          cardObj.edition_label = cardObj.edition_current + '/' + cardObj.edition_total;
         })
         .catch(err => {
           console.error('Error getting NFTs minted:', err);
           this.showSpinner = 0;
         })
-
-      if (cardObj.edition_total === 0) {
-        cardObj.edition_total = "Unlimited";
-      } else{
-          
-      }
 
       this.allCards[cardObj.type_id] = cardObj;
       return cardObj;

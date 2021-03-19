@@ -258,10 +258,6 @@ export default {
             this.getAllCards()
           }
         }
-
-        else {
-          this.clearCards()
-        }
       },
       deep: true
     },
@@ -346,6 +342,7 @@ export default {
         }
       }).finally(() => {
         Vue.set(this.cardsBeingSacrificed, id, false)
+        this.$store.dispatch('updateWallet')
       })
     },
     transferCard : function(id) {
@@ -353,8 +350,8 @@ export default {
       //Disable the button so they dont mash it up
       this.confirmTransferBtnDisabled = true;
 
-      console.log('to ' + this.receivingWallet)
-      console.log('from ' + this.coinbase)
+      // console.log('to ' + this.receivingWallet)
+      // console.log('from ' + this.coinbase)
       var contract
       window.Cryptoz.deployed().then((instance) => {
         contract = instance
@@ -369,6 +366,7 @@ export default {
       })
       .finally(() => {
         Vue.set(this.cardsBeingGifted, id, false)
+        this.$store.dispatch('updateWallet')
       })
     },
     buyAndOpenBooster : function() {
@@ -386,6 +384,9 @@ export default {
         if (err.code === 4001) {
          showRejectedToast(this);
         }
+      })
+      .finally(() => {
+        this.$store.dispatch('updateWallet')
       })
     },
     handleGetAllCards : async function(res) {
@@ -451,8 +452,6 @@ export default {
               newAttr = {...newAttr, ...res};
               delete newAttr.attributes
 
-              console.log({newAttr})
-
               resolve(newAttr)
             })
             .catch((err) => {
@@ -465,6 +464,8 @@ export default {
         this.orderedCards = await Promise.all(
           res.map(element => getCard(element.c[0]))
         )
+        this.orderedCards.sort((a,b) => b.id - a.id)
+        
         if (this.sortType) {
           this.sortByAttr(this.sortType, this.isDescending)
         }
@@ -476,9 +477,6 @@ export default {
       }
       //we are done, clear the state
       this.subscriptionState = 0;
-    },
-    handleBuyBooster : function(result) {
-      console.log('Handling buy booster...');
     },
     openBooster : function () {
 
@@ -505,6 +503,9 @@ export default {
         if (err.code === 4001) {
           showRejectedToast(self);
         }
+      })
+      .finally(() => {
+        this.$store.dispatch('updateWallet')
       })
     },
     sortByAttr: function(param, isDescending) {

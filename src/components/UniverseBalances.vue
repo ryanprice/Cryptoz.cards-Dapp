@@ -43,7 +43,7 @@
     },
     watch: {
       universeBalances(newValue, oldValue) {
-        console.log(`Updating universeBalances from ${oldValue} to ${newValue}`);
+        // console.log(`Updating universeBalances from ${oldValue} to ${newValue}`);
   
         // new balances.. reset Universe totals
         if (newValue !== oldValue) {
@@ -53,7 +53,7 @@
     },
     methods : {
       setSubscriptions : function() {
-        console.log("Set the Universe balances...");
+        // console.log("Set the Universe balances...");
 
         window.Cryptoz.deployed().then(function(instance) {
           return instance.getTotalTypes.call();

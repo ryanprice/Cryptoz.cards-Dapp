@@ -25,6 +25,7 @@
               :name="card.name"
               :cost="card.attributes.cost"
               :cset="card.attributes.card_set"
+              :edition_current="edition_current"
               :edition_total="card.attributes.edition_total"
               :level="card.attributes.card_level"
               :unlock_czxp="card.attributes.unlock_czxp"
@@ -34,6 +35,7 @@
               :image="card.image"
               :card_class="card.attributes.rarity"
               :in_store="card.attributes.in_store"
+              :card_owned="true"
             ></OwnedCardContent>
           </div>
           <div class="col">
@@ -47,7 +49,7 @@
             </div>            
             <div class="flex-row">
               <div class="text-right font-weight-bold label">Editon:</div>
-              <div class="">{{ card.attributes.edition_total }}</div>
+              <div class="">{{ edition_current }}</div>
             </div>            
             <div class="flex-row">
               <div class="text-right font-weight-bold label">Times Transferred:</div>
@@ -133,7 +135,7 @@ export default {
       owner_url: "",
       rarity: "",
       times_transferred: "Loading..",
-      edition_number: "Loading...",
+      edition_current: "Loading...",
       etherscan_token_id: "https://etherscan.com/contract/token/",
     };
   },
@@ -146,7 +148,7 @@ export default {
   },
   methods: {
     startSubscriptions: function () {
-      console.log("subscriptions in tokenContent...");
+      // console.log("subscriptions in tokenContent...");
 
       var self = this;
       var contract;
@@ -158,12 +160,12 @@ export default {
         })
         .then(function (res) {
           //returns TypeId, Edition, # times transfed
-          console.log("CardOwned results:", res);
+          // console.log("CardOwned results:", res);
           let cardTypeId = res[0].c[0];
 
           //If the tokenId is greater than 0, we have something valid
           if (cardTypeId > 0) {
-            self.edition_number = res[1].c[0];
+            self.edition_current = res[1].c[0];
             self.times_transferred = res[2].c[0];
             self.getCardData(cardTypeId);
             return contract.ownerOf.call(self.token_id);
@@ -202,16 +204,16 @@ export default {
       res.data.attributes = newAttr;
 
       //Set human readable edition number and total
-      if (res.data.attributes.edition_total == 0) {
-        //unlimited
-        res.data.attributes.edition_total = "#" + this.edition_number;
-      } else {
-        res.data.attributes.edition_total =
-          "#" +
-          this.edition_number +
-          " of " +
-          res.data.attributes.edition_total;
-      }
+      // if (res.data.attributes.edition_total == 0) {
+      //   //unlimited
+      //   res.data.attributes.edition_total = "#" + this.edition_current;
+      // } else {
+      //   res.data.attributes.edition_total =
+      //     "#" +
+      //     this.edition_current +
+      //     " of " +
+      //     res.data.attributes.edition_total;
+      // }
 
       //Get the human label for rarity
       this.rarity = res.data.attributes.rarity;
@@ -239,7 +241,6 @@ export default {
       }
 
       if (res.data.attributes.edition_total === 0) {
-        res.data.attributes.edition_total = "Unlimited";
         res.data.attributes.cost = "Booster Only";
       }
 
