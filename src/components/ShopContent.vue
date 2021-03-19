@@ -300,13 +300,13 @@ export default {
             return e.args.cardTypeId.c[0];
           })
 
+          //push March 19,2021
+          typeIdsOnChain.push(3,13,18,19,26);
         //Dirty hack until we figure this event log shite out
          typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
 
-
           const results = await Promise.all(
             typeIdsOnChain.map(async id => {
-            //  if (id === 74) return; //keep 74 hidden from shop
 
               const cardData = await this.getCard(id);
 
