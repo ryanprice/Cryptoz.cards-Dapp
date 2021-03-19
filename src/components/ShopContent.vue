@@ -304,8 +304,8 @@ export default {
           typeIdsOnChain.push(34,38,41,43);
           //push March 19,2021
           typeIdsOnChain.push(13,18,19,26);
-        //Dirty hack until we figure this event log shite out
-         typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
+          //Dirty hack until we figure this event log shite out
+          typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
 
           const results = await Promise.all(
             typeIdsOnChain.map(async id => {
