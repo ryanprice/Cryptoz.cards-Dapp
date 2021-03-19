@@ -237,7 +237,7 @@ export default {
   methods : {
     buyCard : function(cardAttributes){
       console.log("Buying card:" ,cardAttributes.id ,cardAttributes);
-      
+
       window.Cryptoz.deployed().then((instance) => {
         return instance.buyCard(cardAttributes.type_id, {from: this.coinbase, value:(cardAttributes.cost*1000000000000000000)});
       }).then((res) => {
@@ -248,7 +248,7 @@ export default {
     },
     getCardForFree : function(type_id){
       console.log("Claiming card:" + type_id);
-      
+
       showPendingToast(this);
       window.Cryptoz.deployed().then((instance) => {
         return instance.getFreeCard(type_id, {from: this.coinbase});
@@ -264,7 +264,7 @@ export default {
       //Change buy button to pending.. or show some pending state
       this.showSpinner = 1;
       this.transactionStatus = 'Pending confirmation...';
-      
+
       window.Cryptoz.deployed()
       .then((instance) => {
         var totalBoostersCost = 2000000000000000 * parseInt(this.totalCreditsToBuy);
@@ -275,7 +275,7 @@ export default {
         console.error('USER REJECTED!!', err);
         this.showSpinner = 0;
       })
-      
+
     },
     handleBuyBooster : function(result) {
         console.log('Handling buy booster', result);
@@ -287,7 +287,7 @@ export default {
     getAllTypes: async function(){
       try {
         let instance = await window.Cryptoz.deployed();
-        let events = await instance.LogCardTypeLoaded({},{fromBlock: 'latest'});    
+        let events = await instance.LogCardTypeLoaded({},{fromBlock: 'latest'});
 
         showPendingToast(this, 'Loading Store Cards...', {
           autoHideDelay: 1000
@@ -299,17 +299,17 @@ export default {
           let typeIdsOnChain = logs.map(e => {
             return e.args.cardTypeId.c[0];
           })
-          
+
         //Dirty hack until we figure this event log shite out
          typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
-          
-        
+
+
           const results = await Promise.all(
             typeIdsOnChain.map(async id => {
-              if (id === 74) return; //keep 74 hidden from shop
+            //  if (id === 74) return; //keep 74 hidden from shop
 
               const cardData = await this.getCard(id);
-        
+
               if (!cardData) {
                   return;
               }
@@ -351,7 +351,7 @@ export default {
       if (res.attributes[3].value !== "Store") {
         return;
       }
-      
+
       //format the attributes to match our JS objects
       res.attributes.forEach(function(element) {
         cardObj[element.trait_type] = element.value;
@@ -377,7 +377,7 @@ export default {
           cardObj.rarity = "card-bg card-bg-1";
           break;
       }
-      
+
       //Get NFTs minted already to inject in our edition totals
       window.Cryptoz.deployed()
         .then((instance) => {
@@ -402,7 +402,7 @@ export default {
           if(cardObj.id == 56){ //shroom ?
             cardObj.edition_total = 112;
           }
-            
+
           // Set soldOut flag first
           if(cardObj.edition_current == cardObj.edition_total) {
             cardObj.soldOut = 1;
@@ -483,11 +483,11 @@ export default {
     border-right: 10px solid transparent;
     border-bottom: 10px solid #007bff;
   }
-  
+
   #owned-button-wrapper::before {
     border-bottom: 10px solid #17a2b8;
   }
-  
+
   #sold-button-wrapper::before {
     content: '';
     position: absolute;
