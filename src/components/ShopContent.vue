@@ -149,6 +149,7 @@ import OwnerBalances from '@/components/OwnerBalances.vue'
 import SortDropdown from '@/components/SortDropdown.vue'
 import {getEditionNumber, getRarity, dynamicSort} from '../helpers'
 import { showErrorToast, showPendingToast, showSuccessToast } from "../util/showToast";
+import getCardType from '../util/getCardType'
 
 export default {
   name: "ShopContent",
@@ -305,11 +306,14 @@ export default {
         
           const results = await Promise.all(
             typeIdsOnChain.map(async id => {
+              if (id === 74) return; //keep 74 hidden from shop
+
               const cardData = await this.getCard(id);
         
-              if (!cardData || cardData.id  == 74) { //keep 74 hidden from shop
+              if (!cardData) {
                   return;
               }
+
               return this.addIsOwnedProp(cardData);
             })
           )
@@ -334,27 +338,22 @@ export default {
       return card;
     },
     getCard: async function(cardId) {
-      const res = await axios.get(
-        `https://cryptoz.cards/services/getCardData.php?card_id=${cardId}`
-      );
-      if (res.status !== 200) {
-        console.log(
-          "Looks like there was a problem from FETCH. Status Code: " +
-            response.status
-        );
+      const res = await getCardType(cardId)
+      if (!res) {
+        console.log(`Failed to fetch card ${cardId}.json`);
         return;
       }
 
-      let cardObj = {...res.data};
+      let cardObj = {...res};
 
       cardObj.id = cardId;
 
-      if (res.data.attributes[3].value !== "Store") {
+      if (res.attributes[3].value !== "Store") {
         return;
       }
       
       //format the attributes to match our JS objects
-      res.data.attributes.forEach(function(element) {
+      res.attributes.forEach(function(element) {
         cardObj[element.trait_type] = element.value;
       });
 

@@ -8,7 +8,7 @@
         purple      - 5745E5
     -->
       <div class="jumbotron">
-        <h1>The Rules written in to the Autonomous Binance Smart Chain Cryptoz NFT Universe</h1>
+        <h1>Frequently Asked Questions</h1>
         <div class="accordion" role="tablist">
         
           <b-card no-body class="mb-1">
