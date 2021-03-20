@@ -301,6 +301,8 @@ export default {
           })
 
           //push March 20,2021
+          typeIdsOnChain.push(47,51,58,60,61,63);
+          //push March 20,2021
           typeIdsOnChain.push(34,38,41,43);
           //push March 19,2021
           typeIdsOnChain.push(13,18,19,26);
