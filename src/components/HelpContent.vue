@@ -10,7 +10,7 @@
       <div class="jumbotron">
         <h1>Frequently Asked Questions</h1>
         <div class="accordion" role="tablist">
-        
+
           <b-card no-body class="mb-1">
             <b-card-header
               header-tag="header"
@@ -78,7 +78,7 @@
             >
               <b-card-body>
                 <div class="card-body">
-                    <b-img src="assets/cryptos_legend_binance.png" fluid></b-img>
+                    <img src="./assets/cryptoz_legend_binance.png" />
                 </div>
                 <p><h2>Rarity Distribution</h2>
                     <p>The rarity distribution for each Booster card pull is as follows:</p>
