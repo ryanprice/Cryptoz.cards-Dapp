@@ -301,7 +301,7 @@ export default {
           })
 
           //push March 19,2021
-          typeIdsOnChain.push(3,13,18,19,26);
+          typeIdsOnChain.push(13,18,19,26);
         //Dirty hack until we figure this event log shite out
          typeIdsOnChain.push(4,5,8,22,29,31,45,56,81,101,102,103);
 
