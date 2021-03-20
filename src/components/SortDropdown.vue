@@ -34,7 +34,7 @@
           rarity: 'Rarity',
           cost: 'Cost',
           card_set: 'Card Set',
-          edition_total: 'Edition Total',
+          edition_number: 'Edition Number',
           card_level: 'Level',
           unlock_czxp: 'Unlock CZXP',
           buy_czxp: 'Buy CZXP',

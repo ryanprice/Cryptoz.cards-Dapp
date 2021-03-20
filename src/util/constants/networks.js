@@ -6,6 +6,7 @@ export const NETWORKS = {
  '0x5': 'Goerli test network',
  '0x2a': 'Kovan test network',
  '0x38': 'Binance Smart Chain',
+ '0x61': 'Binance Smart Chain Test Net',
  '0x507': 'Moonbase Alpha',
  '4447': 'Truffle Develop Network',
  '5777': 'Ganache Blockchain',

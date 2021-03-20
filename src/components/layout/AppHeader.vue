@@ -183,12 +183,14 @@ export default {
   },
   computed: {
     classObject : function () { //Style the link colours
-            //console.log("Hey bg ", this.$store.state.web3.chainId);
-            if (this.$store.state.web3.chainId == 0x38 || this.$store.state.web3.chainId == 0x61) { //BNB 0x38/0x61
-                return 'bsc-link';
-            }else{
-                return 'eth-link'; //ether bg
-            }
+      const chainId = this.$store.state.web3.chainId
+      switch (chainId) {
+        case 0x38:
+        case 0x61:
+          return 'bsc-link';
+        default:
+          return 'eth-link';
+      }
     },
     ethBalance() {
       return parseFloat(web3.fromWei(this.$store.state.web3.balance), "ether");

@@ -438,7 +438,7 @@ export default {
     sortByAttr: function(param, isDescending) {
       switch(param) {
         case "edition_number":
-          this.sortedCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
+          this.sortedCards.sort(dynamicSort('edition_current', isDescending, false));
           break
         case "rarity":
           this.sortedCards.sort(dynamicSort(param, isDescending, true, getRarity))

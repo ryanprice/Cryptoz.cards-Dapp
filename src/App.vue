@@ -24,6 +24,12 @@ const Portis = require("@portis/web3");
 const Fortmatic = require("fortmatic");
 import './main.css'
 
+// import dev_cryptoz_artifacts from './dev/contracts/Cryptoz.json';
+// import dev_cryptoz_token_artifacts from './dev/contracts/CzxpToken.json';
+
+// import bsc_cryptoz_artifacts from'./bsc/contracts/Cryptoz.json';
+// import bsc_cryptoz_token_artifacts from './bsc/contracts/CzxpToken.json';
+
 const testEnv = true
 
 const providerOptions = {
@@ -92,9 +98,26 @@ export default {
     AppHeader,
     AppFooter
   },
-  mounted() {
-  },
-  beforeCreate() {
+  async beforeCreate() {
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' }) 
+
+    this.$store.dispatch('chainChanged', parseInt(chainId))
+
+    // //add 0x1, 0x3, 0x4,  for ethereum main net, ropsten, rinkeby
+    // let cryptoz_artifacts
+    // switch (chainId) {
+    //   // main and test bsc
+    //   case 0x38:
+    //   case 0x61:
+    //     cryptoz_artifacts = bsc_cryptoz_artifacts
+    //     cryptoz_token_artifacts = bsc_cryptoz_token_artifacts
+    //     break
+    //   default:
+    //     cryptoz_artifacts = dev_cryptoz_artifacts
+    //     cryptoz_token_artifacts = dev_cryptoz_token_artifacts
+    //     break
+    // }
+
     window.Cryptoz   = contract(cryptoz_artifacts)
     window.CzxpToken = contract(cryptoz_token_artifacts)
     // tell provider not to refresh page on network change
@@ -128,34 +151,35 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     window.ethereum.autoRefreshOnNetworkChange = false
-    // we have no way of getting chainId here in web3 v0.20.7
     if (window.web3 && window.web3.currentProvider) {
       this.getWalletInfo()
       this.subscribeToProviderEvents(window.web3.currentProvider)
       this.$store.dispatch('web3isConnected', true)
     }
-        // Twitter library - footer follow button uses it
-        window.twttr = (function(d, s, id) {
-          var js, fjs = d.getElementsByTagName(s)[0],
-            t = window.twttr || {};
-          if (d.getElementById(id)) return t;
-          js = d.createElement(s);
-          js.id = id;
-          js.src = "https://platform.twitter.com/widgets.js";
-          fjs.parentNode.insertBefore(js, fjs);
-        
-          t._e = [];
-          t.ready = function(f) {
-            t._e.push(f);
-          };
-        
-          return t;
-        }(document, "script", "twitter-wjs"));
+
+    // Twitter library - footer follow button uses it
+    window.twttr = (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+      if (d.getElementById(id)) return t;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    
+      t._e = [];
+      t.ready = function(f) {
+        t._e.push(f);
+      };
+    
+      return t;
+    }(document, "script", "twitter-wjs"));
   },
   methods: {
     subscribeToProviderEvents: function(provider) {
+      provider.on("message", (message) => console.log(message))
       provider.on("connect", ({chainId}) => {
         this.$store.dispatch('web3isConnected', true)
         this.$store.dispatch('chainChanged', chainId)
@@ -174,11 +198,8 @@ export default {
       });
       provider.on("chainChanged", (chainId) => {
         // without this check it auto-reloads to infinity
-        const currentChainId = localStorage.getItem('ethChainId')
-        if (currentChainId) {
-          this.$store.dispatch('chainChanged', currentChainId)
-        }
-        if (currentChainId !== chainId) {
+        const previousChainId = localStorage.getItem('ethChainId')
+        if (previousChainId !== chainId) {
           localStorage.setItem('ethChainId', chainId)
           window.location.reload()
           return

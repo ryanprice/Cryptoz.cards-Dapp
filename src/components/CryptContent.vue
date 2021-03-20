@@ -80,8 +80,8 @@
                   <template #cell(card_level)="row">
                     <div class="cell">{{ row.item.card_level }}</div>
                   </template>
-                  <template #cell(edition_total)="row">
-                    <div class="cell">{{ row.item.edition_total }}</div>
+                  <template #cell(edition_number)="row">
+                    <div class="cell">{{ row.item.edition_label }}</div>
                   </template>
                   <template #cell(unlock_czxp)="row">
                     <div class="cell">{{ parseInt(row.item.unlock_czxp).toLocaleString() }}</div>
@@ -200,7 +200,7 @@ export default {
       sortType: null,
       isDescending: true,
       isTableView: false,
-      tableFields: ["name", "card_level", "edition_total", "unlock_czxp", "sacrifice_czxp", "transfer_czxp", "sacrifice", "gift"],
+      tableFields: ["name", "card_level", "edition", "unlock_czxp", "sacrifice_czxp", "transfer_czxp", "sacrifice", "gift"],
       confirmTransferBtnDisabled : false,
       cardsBeingSacrificed: {},
       cardsBeingGifted: {},
@@ -509,11 +509,12 @@ export default {
       })
     },
     sortByAttr: function(param, isDescending) {
+      console.log({param, cards: this.orderedCards})
       this.sortType = param
       this.isDescending = isDescending
       switch(param) {
         case "edition_number":
-          this.orderedCards.sort(dynamicSort(param, isDescending, false, getEditionNumber));
+          this.orderedCards.sort(dynamicSort('edition_current', isDescending, false));
           break
         case "rarity":
           this.orderedCards.sort(dynamicSort(param, isDescending, true, getRarity))

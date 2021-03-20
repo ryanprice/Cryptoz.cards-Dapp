@@ -100,23 +100,23 @@ import {NETWORKS} from '../../util/constants/networks'
 export default {
   name: 'AppFooter',
   computed: {
-     classObject : function () { //Style the link colours
-            //console.log("Hey bg ", this.$store.state.web3.chainId);
-            if (this.$store.state.web3.chainId == 0x38 || this.$store.state.web3.chainId == 0x61) { //BNB 0x38/0x61
-                return 'bsc-link';
-            }else{
-                return 'eth-link'; //ether bg
-            }
+    classObject : function () {
+      const chainId = this.$store.state.web3.chainId
+      switch (chainId) {
+        case 0x38:
+        case 0x61:
+          return 'bsc-link';
+        default:
+          return 'eth-link';
+      }
     },
     isConnected() {
       return this.$store.state.web3.isConnected
     },
     network() {
-        //console.log("Chain id:",this.$store.state.web3.chainId);
-      const hexString = this.$store.state.web3.chainId
+      const hexString = `0x${this.$store.state.web3.chainId.toString(16)}`
       if (!hexString) return "Unidentified Network"
-      //return NETWORKS[hexString.split('x')[1]]
-      return NETWORKS[this.$store.state.web3.chainId];
+      return NETWORKS[hexString];
     }
   },
   data () {
