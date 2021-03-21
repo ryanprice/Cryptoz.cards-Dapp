@@ -80,7 +80,7 @@
                   <template #cell(card_level)="row">
                     <div class="cell">{{ row.item.card_level }}</div>
                   </template>
-                  <template #cell(edition_number)="row">
+                  <template #cell(edition)="row">
                     <div class="cell">{{ row.item.edition_label }}</div>
                   </template>
                   <template #cell(unlock_czxp)="row">

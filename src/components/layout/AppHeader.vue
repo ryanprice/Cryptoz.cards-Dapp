@@ -11,133 +11,45 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav id="cryptoz-nav">
-          <b-nav-item>
+          <b-nav-item id="shop">
             <router-link v-bind:class="classObject" to="/shop">Shop</router-link>
           </b-nav-item>
-          <b-nav-item>
+          <b-nav-item id="crypt">
             <router-link v-bind:class="classObject" to="/crypt">Your NFT Crypt</router-link>
           </b-nav-item>
-          <b-nav-item>
+          <b-nav-item id="markets">
             <router-link v-bind:class="classObject" to="/market">Markets</router-link>
           </b-nav-item>
-          <b-nav-item>
+          <b-nav-item id="view">
             <router-link v-bind:class="classObject" to="/view/1">View</router-link>
           </b-nav-item>
-          <b-nav-item>
+          <b-nav-item id="help">
             <router-link v-bind:class="classObject" to="/help">Help</router-link>
           </b-nav-item>
-          <b-nav-item v-if="web3isConnected">
+          <b-nav-item v-if="web3isConnected" id="affiliate">
             <b-link v-bind:class="classObject" href="#" v-b-modal.sponsor-modal>Affiliate</b-link>
           </b-nav-item>
 
-          <b-modal
-            v-if="web3isConnected"
-            id="sponsor-modal"
-            size="lg"
-            title="Sponsor Link"
-            hide-footer
-          >
-
-            <b-jumbotron class="jumbo" lead="Link Your Sponsor">
-              <p>
-                By linking a sponsor with their wallet address, you will receive
-                a
-                <b>Free Platinum Sponsored NFT Card!</b>
-              </p>
-              <p class="sponsor-warning" variant="info">
-                Note: You can only link sponsor once
-              </p>
-              <b-input-group v-if="shouldShowSponsor" size="lg">
-                <b-form-input
-                  v-model="sponsorAddress"
-                  :state="isSponsorValid"
-                  required
-                  type="text"
-                  placeholder="Enter Address"
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    variant="success"
-                    :disabled="!isSponsorValid || sponsorAddress === ''"
-                    v-on:click="linkSponsor"
-                    >Link</b-button
-                  >
-                </b-input-group-append>
-                <div v-if="sponsorAddress !== ''">
-                  <b-form-invalid-feedback v-if="notSameSponsorError">
-                    <div>Please enter a valid address.</div>
-                  </b-form-invalid-feedback>
-                  <b-form-invalid-feedback v-else>
-                    <div>You can't link your own wallet.</div>
-                  </b-form-invalid-feedback>
-                </div>
-              </b-input-group>
-                <b-alert v-else variant="success" show
-                  >You are already linked to sponsor wallet.</b-alert
-                >
-            </b-jumbotron>
-
-            <b-jumbotron
-              id="sponsor-link-wrapper"
-              class="jumbo"
-              lead="Your Affiliate Link"
+          <li id="wallet-nav" class="wallet-nav flex-row">
+            <div
+              id="wallet-id"
+              :title="coinbase"
+              v-b-tooltip.hover="{ customClass: 'tooltip-1' }"
+              v-if="web3isConnected"
             >
-              <p>Copy the link by clicking the button below.</p>
-              <p>
-                Send the link to your friends so they get a
-                <b>Free Platinum Sponsored Card!</b>
-              </p>
-              <input
-                ref="sponsor"
-                id="sponsor-link"
-                hidden
-                :value="getSponsorRoute"
-              />
-
-
-              <a class="twitter-share-button" v-bind:href="getTweet" data-size="large">
-                <b-button variant="primary" style="width:26%"><img style="width:30px" src="https://utilitypeopleuk.com/wp-content/uploads/2017/06/twitter-icon-circle-blue-logo-preview.png"> Tweet your link</b-button>
-              </a>
-              &nbsp;
-              <b-button v-on:click="copySponsorLink">
-                Copy Link To Clipboard
-              </b-button>
-
-            </b-jumbotron>
-
-
-          </b-modal>
-
-          <transition name="fade" mode="out-in">
-            <li class="wallet-nav flex-row" v-if="web3isConnected">
-              <div
-                :title="coinbase"
-                v-b-tooltip.hover="{ customClass: 'tooltip-1' }"
-              >
-                <img src="@/assets/metamask-face.png" class="header-icon" />
-                <span>{{ coinbase.substr(0, 6) + "..." + coinbase.substr(38) }}</span>
-              </div>
-              <div
-                v-b-tooltip.hover="{ customClass: 'tooltip-2' }"
-                :title="ethBalance"
-                class="wallet-balance"
-              >
-                <!--img v-if="this.$store.state.web3.chainId != 0x38 || this.$store.state.web3.chainId != 0x61" src="@/assets/ethereum-symbol.png" /-->
-                <img src="@/assets/binance-coin-logo.webp" class="header-icon" />
-                <span>{{ ethBalance.toFixed(4) }}</span>
-              </div>
-            </li>
-          </transition>
-
-          <li id="connect-button">
-            <b-button
-              v-if="!web3isConnected"
-              variant="primary"
-              v-on:click="$emit('on-connect')"
-              v-b-toggle.nav-collapse
+              <img src="@/assets/metamask-face.png" class="header-icon" />
+              <span>{{ coinbase.substr(0, 6) + "..." + coinbase.substr(38) }}</span>
+            </div>
+            <div
+              id="wallet-balance"
+              v-b-tooltip.hover="{ customClass: 'tooltip-2' }"
+              :title="ethBalance"
+              v-if="web3isConnected"
             >
-              Connect To Blockchain
-            </b-button>
+              <!--img v-if="this.$store.state.web3.chainId != 0x38 || this.$store.state.web3.chainId != 0x61" src="@/assets/ethereum-symbol.png" /-->
+              <img src="@/assets/binance-coin-logo.webp" class="header-icon" />
+              <span>{{ ethBalance.toFixed(4) }}</span>
+            </div>
           </li>
 
           <li id="bonus-boosters">
@@ -161,9 +73,97 @@
               Your Next Bonus:<br /><strong> {{ timeToBonus }}</strong>
             </div>
           </li>
+
+          <li id="connect-button">
+            <b-button
+              v-if="!web3isConnected"
+              variant="primary"
+              v-on:click="$emit('on-connect')"
+              v-b-toggle.nav-collapse
+            >
+              Connect To Blockchain
+            </b-button>
+          </li>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
+    <b-modal
+      v-if="web3isConnected"
+      id="sponsor-modal"
+      size="lg"
+      title="Sponsor Link"
+      hide-footer
+    >
+
+      <b-jumbotron class="jumbo" lead="Link Your Sponsor">
+        <p>
+          By linking a sponsor with their wallet address, you will receive
+          a
+          <b>Free Platinum Sponsored NFT Card!</b>
+        </p>
+        <p class="sponsor-warning" variant="info">
+          Note: You can only link sponsor once
+        </p>
+        <b-input-group v-if="shouldShowSponsor" size="lg">
+          <b-form-input
+            v-model="sponsorAddress"
+            :state="isSponsorValid"
+            required
+            type="text"
+            placeholder="Enter Address"
+          ></b-form-input>
+          <b-input-group-append>
+            <b-button
+              variant="success"
+              :disabled="!isSponsorValid || sponsorAddress === ''"
+              v-on:click="linkSponsor"
+              >Link</b-button
+            >
+          </b-input-group-append>
+          <div v-if="sponsorAddress !== ''">
+            <b-form-invalid-feedback v-if="notSameSponsorError">
+              <div>Please enter a valid address.</div>
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback v-else>
+              <div>You can't link your own wallet.</div>
+            </b-form-invalid-feedback>
+          </div>
+        </b-input-group>
+          <b-alert v-else variant="success" show
+            >You are already linked to sponsor wallet.</b-alert
+          >
+      </b-jumbotron>
+
+      <b-jumbotron
+        id="sponsor-link-wrapper"
+        class="jumbo"
+        lead="Your Affiliate Link"
+      >
+        <p>Copy the link by clicking the button below.</p>
+        <p>
+          Send the link to your friends so they get a
+          <b>Free Platinum Sponsored Card!</b>
+        </p>
+        <input
+          ref="sponsor"
+          id="sponsor-link"
+          hidden
+          :value="getSponsorRoute"
+        />
+
+
+        <a class="twitter-share-button" v-bind:href="getTweet" data-size="large">
+          <b-button variant="primary" style="width:26%"><img style="width:30px" src="https://utilitypeopleuk.com/wp-content/uploads/2017/06/twitter-icon-circle-blue-logo-preview.png"> Tweet your link</b-button>
+        </a>
+        &nbsp;
+        <b-button v-on:click="copySponsorLink">
+          Copy Link To Clipboard
+        </b-button>
+
+      </b-jumbotron>
+
+
+    </b-modal>
     <p></p>
   </div>
 </template>
@@ -428,8 +428,59 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#cryptoz-logo {
-  margin-right: 3rem;
+
+#cryptoz-nav {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+#bonus-boosters {
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  grid-row: 1;
+}
+
+#bonus-boosters:empty {
+  height: 0;
+}
+
+#wallet-nav:empty {
+  height: 0;
+}
+
+#wallet-nav {
+  display: flex;
+  flex: 1;
+  grid-row: 2;
+  justify-content: center;
+  height: 40px;
+  align-items: center;
+}
+
+#wallet-id {
+  color: #d48b15;
+  justify-content: center;
+  margin-right: 20px;
+}
+
+#wallet-balance {
+  color: #90ee90;
+}
+
+.bonusClass {
+  animation: shake 3.82s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  color: #00ff00;
+  margin-right: 0.8em;
+  cursor: pointer;
+  padding: 1px;
+  border: 1px solid transparent;
 }
 
 .tooltip-1 {
@@ -438,6 +489,61 @@ export default {
 
 .tooltip-2 {
   top: 45px!important;
+}
+
+@media screen and (max-width: 600px) {
+  #cryptoz-nav {
+    display: grid;
+    grid-template-rows: repeat(8, auto);
+  }
+
+  .nav-item {
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  #bonus-boosters {
+    height: 50px;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .bonusClass {
+    text-align: center;
+    margin-right: 0;
+  }
+
+  #connect-button {
+    margin: auto;
+  }
+
+  #shop {
+    position: relative;
+    margin-top: 10px;
+  }
+
+  #shop:before {
+    content: '';
+    height: 1px;
+    background: gray;
+    position: absolute;
+    top: -5px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .tooltip-1 {
+    top: 0!important;
+  }
+
+  .tooltip-2 {
+    top: 0!important;
+  }
+}
+
+#cryptoz-logo {
+  margin-right: 3rem;
 }
 
 .router-link-active {
@@ -458,19 +564,6 @@ export default {
 .logo-nav {
   margin-right: 0.5em;
   width: 2em;
-}
-
-.wallet-nav {
-  color: #d48b15;
-  flex: 1;
-  justify-content: center;
-}
-
-.wallet-nav > * {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 li {
@@ -500,17 +593,6 @@ a:hover {
   opacity: 0;
 }
 
-#bonus-boosters {
-  height: 100%;
-  min-width: 140px;
-  display: flex;
-  align-items: center;
-}
-
-#bonus-boosters:empty {
-  display: none;
-}
-
 .bonusClass:hover {
   animation: none;
   color: white;
@@ -534,18 +616,7 @@ a:hover {
 
 .header-icon {
   height: 20px;
-}
-
-.bonusClass {
-  animation: shake 3.82s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-  color: #00ff00;
-  margin-right: 0.8em;
-  cursor: pointer;
-  padding: 1px;
-  border: 1px solid transparent;
+  margin-right: 5px;
 }
 
 .flex-row {
@@ -556,18 +627,11 @@ a:hover {
 #connect-button {
   margin-left: auto;
   min-width: 190px;
+  grid-row: 3;
 }
 
 #connect-button:empty {
   min-width: 0;
-}
-
-#cryptoz-nav {
-  width: calc(100%);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
 }
 
 .eth-link, .bsc-link {
