@@ -14,10 +14,7 @@
       </p>
     </div>
 
-    <cards-container
-      @cryptChanged="handleAddressChanged"
-      v-bind:addressToLoad="addressToLoad"
-    ></cards-container>
+    <cards-container @cryptChanged="handleAddressChanged" v-bind:isOthersCrypt="true" v-bind:addressToLoad="addressToLoad"></cards-container>
   </div>
 </template>
 
