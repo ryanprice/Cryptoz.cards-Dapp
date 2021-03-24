@@ -410,6 +410,12 @@ export default {
           if(cardObj.id == 19){ //guts r us
             cardObj.edition_total = 80;
           }
+          if(cardObj.id == 43){ //medula
+            cardObj.edition_total = 215;
+          }
+          if(cardObj.id == 26){ //zombie egg
+            cardObj.edition_total = 288;
+          }
 
           // Set soldOut flag first
           if(cardObj.edition_current == cardObj.edition_total) {
