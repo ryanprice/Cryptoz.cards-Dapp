@@ -402,7 +402,7 @@ export default {
       }
     },
     navigateToNewCrypt: function() {
-      this.$router.push(`/crypt/${this.addressToSearch}`);
+      this.$router.push(`/my-cryptoz-nfts/${this.addressToSearch}`);
     },
     getAllCards: async function(addressToLoad) {
       this.isLoading = true;
