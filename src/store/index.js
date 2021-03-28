@@ -1,77 +1,77 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
+import { showSuccessToast } from "../util/showToast";
 
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
- strict: true,
- state,
- mutations: {
-   // payload: {coinbase, balance}
-  updateWallet (state, payload) {
-    //make sure to shallow copy the object to ensure new reference
-    //for watchers (oldVal vs newVal)
-    state.web3 = {...state.web3, ...payload}
-  },
-  web3isConnected (state, payload) {
-    state.web3 = {...state.web3, isConnected: payload}
-  },
-  chainChanged (state, payload) {
-    state.web3 = {...state.web3, chainId: payload}
-  },
-  updateBalances (state) {
-    state.ownerBalances += 1;
-  },
-  updateUniverseBalances(state, payload) {
-    console.log('mutate updateUniverseBalances');
-    state.universeBalances += 1;
-    if (payload) {
-      state.lastChainEvent = payload;
+  strict: true,
+  state,
+  mutations: {
+    setContractInstance (state, payload) {
+      state.contractInstance = payload
+    },
+    updateWallet (state, payload) {
+      state.web3 = {...state.web3, ...payload}
+    },
+    web3isConnected (state, payload) {
+      state.web3 = {...state.web3, isConnected: payload}
+    },
+    chainChanged (state, payload) {
+      state.web3 = {...state.web3, chainId: payload}
+    },
+    setLastEvent (state, payload) {
+      state.lastChainEvent = payload
+    },
+    updateCZXPBalance (state, payload) {
+      state.czxpBalance = payload
+    },
+    updateCardsOwned (state, payload) {
+      state.cardsOwned = payload
+    },
+    updateBoostersOwned (state, payload) {
+      state.boostersOwned = payload
+    },
+    updateTypesTotal(state, payload) {
+      state.totalCryptozTypes = payload
+    },
+    updateCZXPTotal(state, payload) {
+      state.totalCzxpSupply = payload
+    },
+    updateCryptozTotal(state, payload) {
+      state.totalCryptozSupply = payload
+    },
+    setStoreCards(state, payload) {
+      state.shop.cards = payload
+    },
+    updateMintedCountForCard(state, payload) {
+      const { cardTypeId, editionNumber } = payload
+
+      const cardIndex = state.shop.cards.findIndex(card => card.type_id === cardTypeId)
+      if (cardIndex > -1) {
+        state.shop.cards[cardIndex].edition_current = editionNumber
+      }
     }
   },
-  updateCZXPBalance (state, payload) {
-    console.log("updateCZXPBalance state.." ,payload);
-    state.czxpBalance = payload
-  },
-  updateCardsOwned (state, payload) {
-    state.cardsOwned = payload
-  },
-  updateBoostersOwned (state, payload) {
-    state.boostersOwned = payload
-  },
-  updateTypesTotal(state, payload) {
-    state.totalCryptozTypes = payload
-  },
-  updateCZXPTotal(state, payload) {
-    state.totalCzxpSupply = payload
-  },
-  updateCryptozTotal(state, payload) {
-    state.totalCryptozSupply = payload
-  },
-  setStoreCards(state, payload) {
-    state.shop.cards = payload
-  },
-  updateMintedCountForCard(state, payload) {
-    const { cardTypeId, editionNumber } = payload
-
-    const cardIndex = state.shop.cards.findIndex(card => card.type_id === cardTypeId)
-    state.shop.cards[cardIndex].edition_current = editionNumber
-  }
- },
- actions: {
-    updateWallet ({commit}) {
-      window.web3.eth.getCoinbase((err, coinbase) => {
-        if (err) {
-          console.error('Error: ', err)
-        }
-        if (coinbase !== null) {
-          window.web3.eth.getBalance(coinbase, (err, balance) => {
-            commit('updateWallet', {coinbase, balance})
-          })
-        }
-      })
-      // commit('updateWallet', payload)
+  actions: {
+    setContractInstance ({commit}, payload) {
+      commit('setContractInstance', payload)
+    },
+    async updateWallet ({commit}) {
+      // Wrapped Promise so we can 'await' this dispatch in App.vue
+      return new Promise((resolve, reject) =>
+        window.web3.eth.getCoinbase((err, coinbase) => {
+          if (err) {
+            console.error('Error: ', err)
+          }
+          if (coinbase !== null) {
+            window.web3.eth.getBalance(coinbase, (err, balance) => {
+              resolve(commit('updateWallet', {coinbase, balance}))
+            })
+          }
+        })
+      )
     },
     disconnnectWallet({commit}) {
       commit('updateWallet', {coinbase: null, balance: null})
@@ -87,13 +87,28 @@ export const store = new Vuex.Store({
     chainChanged({commit}, payload) {
       commit('chainChanged', payload)
     },
-    updateOwnerBalances ({commit}, payload) {
-      //console.log('updateBalances action called')
-      commit('updateBalances', payload)
+    async updateOwnerBalances ({commit}) {
+      const { cryptoz, czxp } = this.state.contractInstance
+      const coinbase = this.state.web3.coinbase
+      const czxpBalancePromise = czxp.balanceOf(coinbase);
+      const cryptozBalancePromise = cryptoz.balanceOf(coinbase);
+      const boosterPacksOwnedPromise = cryptoz.boosterPacksOwned(coinbase);
+
+      const [czxpBalance, cryptozBalance, boosterPacksOwned] = await Promise.all([czxpBalancePromise, cryptozBalancePromise, boosterPacksOwnedPromise])
+      commit('updateCZXPBalance', czxpBalance.toNumber().toLocaleString())
+      commit('updateCardsOwned', cryptozBalance.toNumber().toLocaleString())
+      commit('updateBoostersOwned', boosterPacksOwned.toNumber().toLocaleString())
     },
-    updateUniverseBalances({commit}, payload){
-      //console.log('updateUniverseBalances action called',payload)
-      commit('updateUniverseBalances', payload)
+    async updateUniverseBalances({commit}, payload){
+      const { cryptoz, czxp } = this.state.contractInstance
+      const totalCzxpPromise = czxp.totalSupply();
+      const totalTypesPromise = cryptoz.getTotalTypes();
+      const totalCryptozPromise = cryptoz.totalSupply();
+
+      const [totalCzxp, totalTypes, totalCryptoz] = await Promise.all([totalCzxpPromise, totalTypesPromise, totalCryptozPromise])
+      commit('updateCZXPTotal', parseInt(totalCzxp).toLocaleString())
+      commit('updateTypesTotal', parseInt(totalTypes).toLocaleString())
+      commit('updateCryptozTotal', parseInt(totalCryptoz).toLocaleString())
     },
     updateCZXPBalance ({commit}, payload){
       commit('updateCZXPBalance', payload)
@@ -121,6 +136,9 @@ export const store = new Vuex.Store({
     },
     updateMintedCountForCard({commit}, payload) {
       commit('updateMintedCountForCard', payload)
-    }
- }
+    },
+    setLastEvent ({commit}, payload) {
+      commit('setLastEvent', payload)
+    },
+  }
 })

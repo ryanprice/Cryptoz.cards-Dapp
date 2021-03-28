@@ -130,6 +130,9 @@ export default {
     coinbase() {
       return this.$store.state.web3.coinbase;
     },
+    CryptozInstance() {
+      return this.$store.state.contractInstance.cryptoz;
+    },
     boostersOwned() {
       return this.$store.state.boostersOwned;
     },
@@ -169,34 +172,23 @@ export default {
   },
   methods: {
     buyAndOpenBooster: async function() {
-      try {
-        showPendingToast(this);
-        const instance = await window.Cryptoz.deployed();
-        const res = await instance.buyBoosterCardAndOpen({
-            from: this.coinbase,
-            value: 2000000000000000,
-          });
-        this.$bvModal.hide("open-booster-modal");
-        this.$store.dispatch("updateWallet");
-        showSuccessToast(this, "Booster opened!")
-      } catch (error) {
-        console.error(error.message);
+      showPendingToast(this);
+      this.CryptozInstance.buyBoosterCardAndOpen({
+        from: this.coinbase,
+        value: 2000000000000000,
+      }).catch((error) => {
         showRejectedToast(this);
-      }
+      })
+      this.$bvModal.hide("open-booster-modal");
     },
     openBooster: function() {
-      console.log("Wagering.." + this.wagerAmount);
-
       //Change buy button to pending.. or show some pending state
       showPendingToast(this);
       var self = this;
 
       this.$bvModal.hide("open-booster-modal");
 
-      window.Cryptoz.deployed()
-        .then(function(instance) {
-          return instance.openBoosterCard(0, { from: self.coinbase });
-        })
+      this.CryptozInstance.openBoosterCard(0, { from: self.coinbase })
         .then((res) => {
           if (res === undefined) {
             throw new Error("result is undefined in openBooster");

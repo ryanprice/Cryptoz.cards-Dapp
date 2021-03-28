@@ -51,6 +51,9 @@ export default {
         coinbase() {
             return this.$store.state.web3.coinbase;
         },
+        CzxpInstance() {
+            return this.$store.state.contractInstance.czxp;
+        }
     },
     data () {
         return {
@@ -60,11 +63,10 @@ export default {
     },
     methods: {
         buyCzxp : function() {
-            window.CzxpToken.deployed().then((instance) => {
-                return instance.buy({from: this.coinbase, value:(this.totalCzxpToBuy*1000000000000000000)});
-            }).then((res) => {
-                // console.log(res);
-            })
+            CzxpInstance.buy({from: this.coinbase, value:(this.totalCzxpToBuy*1000000000000000000)})
+                .then((res) => {
+                    // console.log(res);
+                })
         },
         filterCzxpInput : function() {
             this.totalCzxpToBuy = this.totalCzxpToBuy.replace(/[^0-9\.]/g,'');

@@ -15,7 +15,7 @@ export const showPendingToast = (context, message = null, options = {}) => {
             noCloseButton: true,
             appendToast: true,
             toaster: 'b-toaster-bottom-left',
-            autoHideDelay: 7000,
+            autoHideDelay: 5000,
             ...options
         }
     )

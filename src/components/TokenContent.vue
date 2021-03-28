@@ -139,38 +139,47 @@ export default {
       etherscan_token_id: "https://etherscan.com/contract/token/",
     };
   },
+  computed: {
+    CryptozInstance() {
+      return this.$store.state.contractInstance.cryptoz;
+    },
+  },
+  watch: {
+    CryptozInstance(newVal) {
+      if (newVal) {
+        console.log('from watch', { instance: newVal})
+        this.loadCard(this.token_id)
+      }
+    }
+  },
   mounted() {
     //grab the token id from the url
-    this.token_id = this.$route.params.token_id;
-    //console.log('from string..' + this.$route.params.token_id);
-    //setTimeout(this.startSubscriptions, 2000)
-    this.startSubscriptions();
+    this.token_id = parseInt(this.$route.params.token_id);
+
+    if (this.CryptozInstance) {
+      console.log('from mount')
+      this.loadCard(this.token_id)
+    }
   },
   methods: {
-    startSubscriptions: function () {
-      // console.log("subscriptions in tokenContent...");
-
-      var self = this;
-      var contract;
-
-      window.Cryptoz.deployed()
-        .then(function (instance) {
-          contract = instance;
-          return instance.getOwnedCard.call(self.token_id);
-        })
-        .then(function (res) {
+    loadCard: function (token_id) {
+      console.log({load: token_id})
+      this.CryptozInstance.getOwnedCard(token_id)
+        .then((res) => {
+          console.log({res})
           //returns TypeId, Edition, # times transfed
           // console.log("CardOwned results:", res);
-          let cardTypeId = res[0].c[0];
+          let cardTypeId = res[0].toNumber();
 
           //If the tokenId is greater than 0, we have something valid
+          console.log({res, cardTypeId})
           if (cardTypeId > 0) {
-            self.edition_current = res[1].c[0];
-            self.times_transferred = res[2].c[0];
-            self.getCardData(cardTypeId);
-            return contract.ownerOf.call(self.token_id);
+            this.edition_current = res[1].toNumber();
+            this.times_transferred = res[2].toNumber();
+            this.getCardData(cardTypeId);
+            return this.CryptozInstance.ownerOf(token_id);
           } else {
-            self.load_state = 0; //and we stop here
+            this.load_state = 0; //and we stop here
             return 0;
           }
         })
@@ -179,10 +188,11 @@ export default {
           if (res == 0) {
             return 0;
           }
-          self.owner = res;
-          self.owner_url = "https://etherscan.io/address/" + res;
+          this.owner = res;
+          this.owner_url = "https://etherscan.io/address/" + res;
           return;
-        });
+        })
+        .catch(err => console.log({err}));
     },
     getCardData: function (card_id) {
       axios

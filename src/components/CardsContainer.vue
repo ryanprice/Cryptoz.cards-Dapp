@@ -251,15 +251,31 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    this.getAllCards(this.addressToLoad);
+    if (this.CryptozInstance) {
+      this.getAllCards(this.addressToLoad);
+    }
+  },
+  watch: {
+    CryptozInstance(newVal) {
+      if (newVal && this.addressToLoad) {
+        this.getAllCards(this.addressToLoad);
+      }
+    },
+    currentEvent(newVal) {
+      if (newVal) {
+        this.getAllCards(this.addressToLoad);
+      }
+    }
   },
   computed: {
     coinbase() {
-      console.log("coinbase: ", this.$store.state.web3.coinbase);
       return this.$store.state.web3.coinbase;
     },
     web3() {
       return this.$store.state.web3;
+    },
+    CryptozInstance() {
+      return this.$store.state.contractInstance.cryptoz;
     },
     addressToSearchState() {
       return isAddress(this.addressToSearch);
@@ -269,23 +285,26 @@ export default {
         return [
         "name",
         "card_level",
-        "edition",
+        "edition_number",
         "unlock_czxp",
         "sacrifice_czxp",
         "transfer_czxp",
       ]
       } else {
         return [
-                  "name",
-        "card_level",
-        "edition",
-        "unlock_czxp",
-        "sacrifice_czxp",
-        "transfer_czxp",
-                "sacrifice",
-        "gift",
+          "name",
+          "card_level",
+          "edition_number",
+          "unlock_czxp",
+          "sacrifice_czxp",
+          "transfer_czxp",
+          "sacrifice",
+          "gift",
         ]
       }
+    },
+    currentEvent() {
+      return this.$store.state.lastChainEvent;
     },
     getMyCryptLink() {
       const url =
@@ -386,7 +405,7 @@ export default {
       try {
         showPendingToast(this);
         Vue.set(this.cardsBeingGifted, id, true);
-        
+
         const instance = await window.Cryptoz.deployed();
         const giftRes = await instance.transferFrom(this.coinbase, this.receivingWallet, id, { from: this.coinbase })
 
@@ -406,9 +425,8 @@ export default {
     },
     getAllCards: async function(addressToLoad) {
       this.isLoading = true;
-      const instance = await window.Cryptoz.deployed();
-      const tokensOfOwner = await instance.tokensOfOwner(addressToLoad);
-      this.handleGetAllCards(tokensOfOwner, instance);
+      const tokensOfOwner = await this.CryptozInstance.tokensOfOwner(addressToLoad);
+      this.handleGetAllCards(tokensOfOwner, this.CryptozInstance);
       this.isLoading = false;
     },
     sacrificeCard: async function(id) {
@@ -443,7 +461,7 @@ export default {
           try {
             const ownedCard = await instance.getOwnedCard(tokenId);
             tokenIdList[tokenId] = ownedCard;
-            const cardData = await getCardTypes(ownedCard[0].c[0]);
+            const cardData = await getCardTypes(ownedCard[0].toNumber());
 
             cardData.id = tokenId;
             let newAttr = {};
@@ -453,7 +471,7 @@ export default {
             });
 
             cardData.attributes = newAttr;
-            cardData.attributes.edition_current = tokenIdList[tokenId][1].c[0];
+            cardData.attributes.edition_current = tokenIdList[tokenId][1].toNumber();
 
             if (cardData.attributes.edition_total == 0) {
               //unlimited
@@ -498,7 +516,7 @@ export default {
         };
 
         this.orderedCards = await Promise.all(
-          tokensOfOwner.map((token) => getCard(token.c[0]))
+          tokensOfOwner.map((token) => getCard(token.toNumber()))
         ).catch((err) => {
           console.error("Failed to fetch cards.", err);
           this.clearCards();

@@ -114,7 +114,10 @@ export default {
       return this.$store.state.web3.isConnected
     },
     network() {
-      const hexString = `0x${this.$store.state.web3.chainId.toString(16)}`
+      let hexString
+      if (this.$store.state.web3.chainId) {
+        hexString = `0x${this.$store.state.web3.chainId.toString(16)}`
+      }
       if (!hexString) return "Unidentified Network"
       return NETWORKS[hexString];
     }

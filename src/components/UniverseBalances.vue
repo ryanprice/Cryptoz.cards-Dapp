@@ -31,50 +31,6 @@
       coinbase() {
         return this.$store.state.web3.coinbase;
       },
-    },
-    data() {
-      return {}
-    },
-    mounted() {
-      this.setSubscriptions()
-    },
-    watch: {
-      universeBalances(newValue, oldValue) {
-        // console.log(`Updating universeBalances from ${oldValue} to ${newValue}`);
-  
-        // new balances.. reset Universe totals
-        if (newValue !== oldValue) {
-          this.setSubscriptions();
-        }
-      },
-    },
-    methods : {
-      setSubscriptions : function() {
-        // console.log("Set the Universe balances...");
-
-        window.Cryptoz.deployed().then(function(instance) {
-          return instance.getTotalTypes.call();
-        }).then(this.handleTotalTypes)
-        
-        window.CzxpToken.deployed().then(function(instance) {
-          return instance.totalSupply.call();
-        }).then(this.handleSetCZXPSupply) //update boosters owned and total types
-        
-        window.Cryptoz.deployed().then(function(instance) {
-          return instance.totalSupply.call();
-        }).then(this.handleSetCryptozSupply)
-        
-      },
-      handleTotalTypes: function(_total){
-        this.$store.dispatch('updateTypesTotal', parseInt(_total).toLocaleString())
-      },
-      // DONT DELETE !! THESE ARE SUPPLY TOTALS
-      handleSetCZXPSupply :  function(_totalSupply) {
-        this.$store.dispatch('updateCZXPTotal', parseInt(_totalSupply).toLocaleString())
-      },
-      handleSetCryptozSupply :  function(_totalSupply) {
-        this.$store.dispatch('updateCryptozTotal', parseInt(_totalSupply).toLocaleString())
-      },
     }
   }
 </script>
