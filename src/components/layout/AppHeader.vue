@@ -61,9 +61,9 @@
               Claim 2 FREE Boosters!
             </div>
             <div v-else-if="web3isConnected && showSpinner == true">
-              <img src="@/assets/spinner.gif" class="spinner" />
+              <b-spinner style="width: 1.5rem; height: 1.5rem;" type="grow" variant="light"></b-spinner>
               <transition>
-                <span class="spinner-text-style">{{ transactionMessage }}</span>
+                <span class="spinner-text-style"> {{ transactionMessage }}</span>
               </transition>
             </div>
             <div

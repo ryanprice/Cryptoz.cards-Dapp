@@ -164,7 +164,7 @@ export default {
 }
 
 .card-bg-back {
-  background-image: url(assets/cryptoz_card_back.svg);
+  background-image: url(assets/cryptoz_card_back_binance.svg);
   padding: 20px;
 }
 

@@ -37,7 +37,7 @@
 
               <a href="https://exchange.pancakeswap.finance/#/swap?inputCurrency=0x2b974da27c9dd35412d71dd36e3e108486c45444" target="_blank">
                 <div class="market-btn">
-                  <img class="uni-logo" src="@/assets/pancakeswap-cake-logo.png" align="absmiddle" />
+                  <img class="uni-logo" src="@/assets/pancakeswap.webp" align="absmiddle" />
                    <span class="opensea-header">PancakeSwap</span>
                   <br>
                   <p>
