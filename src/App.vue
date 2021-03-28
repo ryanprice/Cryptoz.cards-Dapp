@@ -160,7 +160,12 @@ export default {
   },
   methods: {
     onConnect: async function() {
-      await window.ethereum.enable()
+      const provider = window.ethereum
+
+      await provider.enable()
+      const web3 = new Web3(provider)
+      window.web3 = web3
+      this.setContractProvider(provider)
       // const web3Modal = new Web3Modal({
       //   cacheProvider: true,
       //   providerOptions,
@@ -168,8 +173,6 @@ export default {
 
       // const provider = await web3Modal.connect()
       // await provider.enable()
-      // const web3 = new Web3(provider)
-      // window.web3 = web3
       // this.setContractProvider(provider)
     },
     
@@ -182,9 +185,9 @@ export default {
 
       await this.$store.dispatch('setContractInstance', { cryptoz, czxp })
       this.$store.dispatch('web3isConnected', true)
+      this.$store.dispatch('updateUniverseBalances')
 
       await this.$store.dispatch('updateWallet')
-      this.$store.dispatch('updateUniverseBalances')
       this.$store.dispatch('updateOwnerBalances')
     },
 
