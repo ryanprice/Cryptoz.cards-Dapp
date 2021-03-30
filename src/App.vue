@@ -19,10 +19,12 @@ import AppHeader from './components/layout/AppHeader'
 import AppFooter from './components/layout/AppFooter'
 import _ from 'lodash'
 
-// import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
-import WalletConnectProvider from "@walletconnect/web3-provider";
 const Web3 = require('web3')
-// const Torus = require("@toruslabs/torus-embed");
+import Web3Modal from 'web3modal'
+const Arkane = require("@arkane-network/web3-arkane-provider/dist/web3-arkane-provider");
+// import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
+// import WalletConnectProvider from "@walletconnect/web3-provider";
+const Torus = require("@toruslabs/torus-embed");
 // const Portis = require("@portis/web3");
 // const Fortmatic = require("fortmatic");
 import './main.css'
@@ -35,10 +37,15 @@ import './main.css'
 
 const testEnv = true
 
-// const providerOptions = {
-  // torus: {
-  //   package: Torus,
-  // },
+const providerOptions = {
+  arkane: {
+    package: Arkane,
+    options: {
+      clientId: "Arketype",
+      environment: "staging"
+    }
+  },
+}
   // walletconnect: {
   //   package: WalletConnectProvider,
   //   options: {
@@ -155,20 +162,25 @@ export default {
   },
   methods: {
     onConnect: async function() {
-      const provider = window.ethereum
-
-      await provider.enable()
-      const web3 = new Web3(provider)
-      window.web3 = web3
-      this.setContractProvider(provider)
-      // const web3Modal = new Web3Modal({
-      //   cacheProvider: true,
-      //   providerOptions,
-      // });
-
-      // const provider = await web3Modal.connect()
+      // const provider = window.ethereum
       // await provider.enable()
-      // this.setContractProvider(provider)
+      const web3Modal = new Web3Modal({
+        // cacheProvider: true,
+        providerOptions,
+      });
+
+      try {
+
+        const provider = await web3Modal.connect()
+        await provider.enable()
+        // const provider = await Arkane.createArkaneProviderEngine({clientId: 'Cryptoz'})
+        const web3 = new Web3(provider)
+        window.web3 = web3
+        this.setContractProvider(provider)
+        // web3 = new Web3(provider);
+      } catch (err) {
+        console.log(JSON.stringify({err}))
+      }
     },
     
     async setContractProvider(provider) {
