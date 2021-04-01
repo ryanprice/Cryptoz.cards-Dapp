@@ -41,8 +41,9 @@ const providerOptions = {
   arkane: {
     package: Arkane,
     options: {
-      clientId: "Arketype",
-      environment: "staging"
+      clientId: process.env.NODE_ENV == "development" ? "Arketype" : "Cryptoz",
+      environment: process.env.NODE_ENV == "development" ? "staging" : "production",
+      rpcUrl: 'https://bsc-dataseed.binance.org/'
     }
   },
 }
@@ -93,7 +94,6 @@ export default {
     // debounce prevents this from showing the "Balance Updated" twice
     // when both Cryptoz and Czxp contracts emit an event
     this.onBalanceUpdated = _.debounce(() => {
-      console.log("show toast")
       showSuccessToast(this, 'Balance Updated!')
     }, 1000)
 
@@ -172,9 +172,13 @@ export default {
       try {
 
         const provider = await web3Modal.connect()
-        await provider.enable()
+        console.log({provider})
+        // await provider.enable()
         // const provider = await Arkane.createArkaneProviderEngine({clientId: 'Cryptoz'})
         const web3 = new Web3(provider)
+        console.log({web3})
+        const chain = await web3.eth.getChainId()
+        console.log({chain})
         window.web3 = web3
         this.setContractProvider(provider)
         // web3 = new Web3(provider);
