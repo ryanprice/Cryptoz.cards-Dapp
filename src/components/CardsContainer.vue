@@ -611,7 +611,7 @@ export default {
   align-items: center;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-around;
 }
 
 .wrapper {
@@ -676,7 +676,6 @@ table .cell {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding-left: 1.2rem;
 }
 
 /* Desktop CSS */

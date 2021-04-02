@@ -17,7 +17,7 @@
           </div>
         </div>
         <div v-else class="row">
-          <div>
+          <div id="card-wrapper">
             <OwnedCardContent
               :key="card.id"
               :id="card.id"
@@ -36,6 +36,7 @@
               :card_class="card.attributes.rarity"
               :in_store="card.attributes.in_store"
               :card_owned="true"
+              :is_single_card_view="true"
             ></OwnedCardContent>
           </div>
           <div class="col">
@@ -163,7 +164,6 @@ export default {
   },
   methods: {
     loadCard: function (token_id) {
-      console.log({load: token_id})
       this.CryptozInstance.getOwnedCard(token_id)
         .then((res) => {
           //returns TypeId, Edition, # times transfed
@@ -287,5 +287,11 @@ export default {
 .label {
   max-width: 200px;
   margin-right: 10px;
+}
+
+#card-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 </style>

@@ -30,7 +30,7 @@
             <b-link v-bind:class="classObject" href="#" v-b-modal.sponsor-modal>Affiliate</b-link>
           </b-nav-item>
 
-          <li id="wallet-nav" class="wallet-nav flex-row">
+          <li id="wallet-nav">
             <div
               id="wallet-id"
               :title="coinbase"
@@ -299,7 +299,7 @@ export default {
         this.getDailyBonusTime()
       }
     },
-    coinbase(val) {
+    coinbase() {
       this.getDailyBonusTime()
     },
   },
@@ -441,11 +441,13 @@ export default {
 
 #wallet-id {
   color: #d48b15;
+  display: flex;
   justify-content: center;
   margin-right: 20px;
 }
 
 #wallet-balance {
+  display: flex;
   color: #90ee90;
 }
 

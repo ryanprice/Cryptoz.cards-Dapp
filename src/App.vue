@@ -86,7 +86,6 @@ export default {
     // debounce prevents this from showing the "Balance Updated" twice
     // when both Cryptoz and Czxp contracts emit an event
     this.onBalanceUpdated = _.debounce(() => {
-      console.log("show toast")
       showSuccessToast(this, 'Balance Updated!')
     }, 1000)
 
@@ -107,7 +106,7 @@ export default {
       wallet : '',
       wallet_balance : 0,
       network_name : 'Detecting Ethereum network..Loading',
-      eth_network_name : ''
+      eth_network_name : '',
     }
   },
   computed: {
@@ -244,14 +243,16 @@ export default {
 
 <style>
   #app {
+    min-height: 100vh;
     overflow-x: hidden;
   }
 
   .headerComponent{
     margin-bottom:2em;
   }
+  
   .jumbotron{
-    margin-top:6em;
+    margin-top:4em;
   }
   
   .component-fade-enter-active, .component-fade-leave-active {

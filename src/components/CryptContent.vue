@@ -237,122 +237,17 @@ export default {
   margin: auto;
   width: 95%;
 }
-.spinner {
-  width: 2em;
-}
-
-.spinner-wrapper {
-  display: flex;
-  margin: 0px 8px;
-}
 
 .buy-and-open-booster {
   display: flex;
-}
-
-table .cell {
-  height: 60px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-#button-container {
-  margin-left: 1rem;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-#view-change-button {
-  margin-left: 0.5rem;
-}
-
-.sacrifice-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding-left: 1.2rem;
-}
-
-.emoji {
-  font-size: 18px;
-}
-
-.card-bg {
-  padding: 2px;
-}
-
-.card-bg-6 {
-  background-color: rgba(84, 81, 97, 0.5);
-  border: 2px solid rgb(84, 81, 97);
-}
-
-.card-bg-5 {
-  background-color: rgba(43, 164, 250, 0.5);
-  border: 2px solid rgb(43, 164, 250);
-}
-
-.card-bg-4 {
-  background-color: rgba(202, 60, 44, 0.5);
-  border: 2px solid rgb(202, 60, 44);
-}
-
-.card-bg-3 {
-  background-color: rgba(87, 69, 229, 0.5);
-  border: 2px solid rgb(87, 69, 229);
 }
 
 #open-booster-modal div {
   margin-bottom: 10px;
 }
 
-.crypt-actions {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.primary-actions {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.my-crypt-button {
-  width: 300px;
-  margin-bottom: 16px;
-}
-
 .cards-wrapper {
   margin-top: 24px;
 }
 
-/*plat and diamond borders*/
-/*
-  .card-bg-2{
-  }
-
-  .card-bg-1{
-  }
-  */
-
-@media only screen and (min-width: 1000px) {
-  #button-container {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  .crypt-actions {
-    flex-direction: row;
-    justify-content: initial;
-    align-items: flex-start;
-  }
-
-  .my-crypt-button {
-    width: 300px;
-    margin-bottom: 0;
-    margin-right: 16px;
-  }
-}
 </style>

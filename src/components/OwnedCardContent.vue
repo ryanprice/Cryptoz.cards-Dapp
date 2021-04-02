@@ -1,73 +1,68 @@
 <template>
-  <div id="card-container">
-    <div class="col">
-      <div
-        class="flip-container"
-        ontouchstart="this.classList.toggle('hover');"
-      >
-        <div class="flipper">
-          <div class="front">
-            <!-- front content -->
-            <div id="1" :class="card_class">
-              <!--img class="card-img" :src="'static/assets/' + url" /-->
-              <img class="card-img" :src="image" />
-              <span class="card-edition">{{ edition_label }}</span>
-              <div class="card-item-name text-center">
-                {{ name }}<br />{{ cset }}
-              </div>
-              <div class="card-czxp text-left">
-                {{ parseInt(unlock_czxp).toLocaleString() }}
-              </div>
-              <div class="card-level">{{ level }}</div>
-              <div class="card-booster-shop card-booster-shop-circle"></div>
-              <div
-                class="card-booster-shop-inner"
-                :style="{ backgroundColor: activeColor }"
-              >
-                <b-icon-lightning-fill
-                  v-if="in_store == 'Booster'"
-                  class="card-booster-shop-icon"
-                  scale="1.3"
-                />
-                <b-icon-tag-fill
-                  v-if="in_store == 'Store'"
-                  class="card-booster-shop-icon"
-                  scale="1.3"
-                />
-              </div>
-            </div>
+  <div
+    id="card-container"
+    :class="{ fullsize: isFullSize }"
+    @click="isFlipped = !isFlipped"
+    @mouseleave="isFlipped = false"
+  >
+    <div
+      id="flip-container"
+      :class="{ flipped: isFlipped }"
+    >
+      <!-- front content -->
+      <div :class="[card_class, 'front']">
+        <!--img class="card-img" :src="'static/assets/' + url" /-->
+        <div id="image-container">
+          <img class="card-img" :src="image" />
+        </div>
+        <div id="card-edition">
+          <span>{{ edition_label }}</span>
+        </div>
+        <div id="card-name">
+          {{ name }}<br />{{ cset }}
+        </div>
+        <div id="bottom-text">
+          {{ parseInt(unlock_czxp).toLocaleString() }}
+        </div>
+        <div id="bottom-right-corner">{{ level }}</div>
+        <div class="card-booster-shop card-booster-shop-circle"></div>
+        <div
+          id="top-right-corner"
+          :style="{ backgroundColor: activeColor }"
+        >
+          <b-icon-lightning-fill
+            v-if="in_store == 'Booster'"
+            class="card-booster-shop-icon"
+            scale="1.3"
+          />
+          <b-icon-tag-fill
+            v-if="in_store == 'Store'"
+            class="card-booster-shop-icon"
+            scale="1.3"
+          />
+        </div>
+      </div>
+      <div class="back card-bg card-bg-back-bsc">
+        <div class="back-container">
+          <div class="card-txt-black">
+            <span class="attribute-name font-weight-bold">Cost:</span>
+            <span>{{ cost }}</span>
           </div>
-          <div class="back">
-            <!-- back content -->
-            <div class="card-bg card-bg-back-bsc">
-              <!--div class="card-bg" v-bind:class="classObject"-->
-              <div class="back-container">
-                <div class="card-txt-black">
-                  <span class="font-weight-bold">Cost:</span> {{ cost }}
-                </div>
-                <br />
-                <div class="card-txt-black">
-                  <span class="font-weight-bold">Buy CZXP:</span><br />{{
-                    parseInt(buy_czxp).toLocaleString()
-                  }}
-                </div>
-                <div class="card-txt-black">
-                  <span class="font-weight-bold">Transfer CZXP:</span><br />{{
-                    parseInt(transfer_czxp).toLocaleString()
-                  }}
-                </div>
-                <div class="card-txt-black">
-                  <span class="font-weight-bold">Sacrifice CZXP:</span><br />{{
-                    parseInt(sacrifice_czxp).toLocaleString()
-                  }}
-                </div>
-              </div>
-            </div>
+          <div class="card-txt-black">
+            <span class="attribute-name font-weight-bold">Buy CZXP:</span>
+            <span>{{ parseInt(buy_czxp).toLocaleString() }}</span>
+          </div>
+          <div class="card-txt-black">
+            <span class="attribute-name font-weight-bold">Transfer CZXP:</span>
+            <span>{{ parseInt(transfer_czxp).toLocaleString() }}</span>
+          </div>
+          <div class="card-txt-black">
+            <span class="attribute-name font-weight-bold">Sacrifice CZXP:</span>
+            <span>{{ parseInt(sacrifice_czxp).toLocaleString() }}</span>
           </div>
         </div>
       </div>
     </div>
-    <br />
   </div>
 </template>
 
@@ -91,8 +86,14 @@ export default {
     "sacrifice_czxp",
     "card_class",
     "in_store",
-    "card_owned"
+    "card_owned",
+    "is_single_card_view",
   ],
+  data() {
+    return {
+      isFlipped: false,
+    }
+  },
   computed: {
     activeColor() {
       if (this.in_store == "Store") {
@@ -112,6 +113,15 @@ export default {
           return '#'+this.edition_current +' of '+this.edition_total;
         }
       }
+    },
+    isFullSize() {
+      console.log(this.is_single_card_view)
+      return this.is_single_card_view
+    }
+  },
+  methods: {
+    toggleFlipped() {
+      this.isFlipped = !this.isFlipped
     }
   },
 };
@@ -123,14 +133,13 @@ export default {
 
 .card-bg {
   display: inline-block;
-  width: 260px;
-  height: 400px;
+  width: 100%;
+  height: 100%;
   text-align: center;
   margin-bottom: 3px;
   padding-bottom: 4px;
-  margin-right: 10px;
   background-repeat: no-repeat;
-  background-size: 260px 420px;
+  background-size: 100%;
   background-position: 0px;
 }
 
@@ -168,76 +177,77 @@ export default {
   padding: 20px;
 }
 
+#image-container {
+  position: absolute;
+  top: 15%;
+  left: 10%;
+  right: 10%;
+  height: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .card-img {
-  display: block;
-  position: relative;
-  top: 45px;
-  right: -2px;
-  max-width: 80%;
-  margin: 0 auto;
+  width: 80%;
 }
 
-.card-item-name {
-  width: 100%;
-  position: relative;
-  top: 66px;
+#top-right-corner {
+  position: absolute;
+  top: 4%;
+  right: 0;
+  width: 19%;
+  height: 12%;
+  border-radius: 50%;
+  border: 3px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#bottom-right-corner {
+  position: absolute;
+  bottom: 2%;
+  right: 0;
+  width: 19%;
+  height: 12%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   font-weight: bold;
+  color: #fff;
 }
 
-.card-edition {
-  position: relative;
-  width: 100%;
-  top: 49px;
+#card-edition {
+  position: absolute;
+  top: 62%;
+  bottom: 32%;
+  left: 10%;
+  right: 10%;
   color: #ddd;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-.card-level {
-  position: relative;
-  width: 50px;
-  top: 65px;
-  right: -209px;
+#card-name {
   font-weight: bold;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 15%;
+}
+
+#bottom-text {
+  position: absolute;
   color: #fff;
-}
-
-.card-czxp {
-  position: relative;
-  color: #fff;
   font-weight: bold;
-  width: 100px;
-  top: 89px;
-  left: 55px;
-}
-
-.card-booster-shop-icon {
-  position: relative;
-  top: 11px;
-  left: 1px;
-}
-
-.card-booster-shop-inner {
-  height: 42px;
-  width: 42px;
-  border-radius: 50%;
-  display: inline-block;
-  position: relative;
-  top: -338px;
-  left: 83px;
-}
-
-.card-booster-shop-circle {
-  height: 48px;
-  width: 48px;
-  background-color: #000;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.card-booster-shop {
-  position: relative;
-  top: -310px;
-  left: 128px;
+  left: 21%;
+  right: 21%;
+  bottom: 4%;
+  height: 7%;
+  text-align: left;
+  display: flex;
+  align-items: center;
 }
 
 .card-txt-black {
@@ -250,56 +260,70 @@ export default {
 }
 
 .back-container {
-  position: relative;
-  top: 100px;
+  position: absolute;
+  top: 29%;
+  bottom: 14%;
+  left: 8%;
+  right: 7%;
   background-color: rgba(200, 200, 200, 0.7);
-  padding: 20px;
-}
+  padding: 5%;
 
-/**  animation   **/
-
-@keyframes float {
-  0% {
-    transform: translatey(0px);
-  }
-  50% {
-    transform: translatey(-20px);
-  }
-  100% {
-    transform: translatey(0px);
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 /** Card **/
 
 /* entire container, keeps perspective */
-.flip-container {
-  perspective: 1000px;
+
+
+#card-container {
+  margin: 0;
+  height: 410px;
+  width: 260px;
+
+  font-size: 16px;
+
+  perspective: 600px;
 }
+
+@media screen and (max-width: 800px) {
+  #card-container {
+    height: calc(0.55 * 410px);
+    width: calc(0.55 * 260px);
+    font-size: 10px;
+  }
+
+  .fullsize {
+    height: 410px!important;
+    width: 260px!important;
+    font-size: 16px!important;
+  }
+}
+
 /* flip the pane when hovered */
-.flip-container:hover .flipper,
-.flip-container.hover .flipper {
+#flip-container.flipped {
   transform: rotateY(180deg);
 }
 
-.flip-container,
-.front,
-.back {
-  width: 240px;
-  height: 410px;
-}
-
-#card-container {
-  height: 410px;
-  min-width: 260px;
-}
-
-/* flip speed goes here */
-.flipper {
-  transition: 0.6s;
+#flip-container {
+  transition: transform 0.6s;
   transform-style: preserve-3d;
 
   position: relative;
+}
+#flip-container,
+.front,
+.back {
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #card-container:hover #flip-container {
+    transform: rotateY(180deg);
+  }
 }
 
 /* hide back of pane during swap */
@@ -324,14 +348,7 @@ export default {
   transform: rotateY(180deg);
 }
 
-.alert {
-  position: fixed;
-  z-index: 1000;
-  top: 28em;
-  left: 36em;
-}
-
-.btn-gift {
-  color: #fff;
+.attribute-name {
+  padding-right: 5px;
 }
 </style>

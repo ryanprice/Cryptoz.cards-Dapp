@@ -6,7 +6,6 @@ import { showSuccessToast } from "../util/showToast";
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
-  strict: true,
   state,
   mutations: {
     setContractInstance (state, payload) {

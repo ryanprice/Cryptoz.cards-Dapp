@@ -73,8 +73,8 @@
           </div>
         </div>
       <br>
-      <div class="row">
-        <div v-for="card in sortedCards" :key="card.type_id">
+      <div class="flex-row">
+        <div v-for="card in sortedCards" :key="card.type_id" class="shop-card-item">
           <OwnedCardContent
             :type_id="card.type_id"
             :name="card.name"
@@ -92,44 +92,44 @@
             :card_class="card.rarity"
             :card_owned="false"
           ></OwnedCardContent>
-          <div
-            v-if="card.soldOut == 1"
-            id="sold-button-wrapper"
-            v-b-tooltip.hover="getSoldCardToolTipText"
-            class="disabled-btn"
-          >
-            <button id="owned-button" disabled class="btn btn-danger">
-            SOLD OUT !
-            </button>
-          </div>
-          <div v-else>
-              <div
-                v-if="!card.isOwned"
-                id="buy-get-button-wrapper"
-                :class="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''"
-              >
-                <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip.hover="buyBtnTooltipText(card.cost, card.unlock_czxp)">
-                  <b-button id="buy-button" :disabled="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)" variant="primary" v-on:click="buyCard(card)">
-                    <b-icon-lock-fill v-if="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint NFT for {{card.cost}} BNB
-                  </b-button>
-                </div>
-                <div v-else id="getBtnwrapper" v-b-tooltip.hover="getBtnTooltipText(card.unlock_czxp)">
-                  <button id="get-button"  class="btn btn-primary" :disabled="czxpBalance < parseInt(card.unlock_czxp)" v-on:click="getCardForFree(card.type_id)">
-                    <b-icon-lock-fill v-if="czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint for FREE
-                  </button>
-                </div>
+          <div class="card-button-container">
+            <div
+              v-if="card.soldOut == 1"
+              id="sold-button-wrapper"
+              v-b-tooltip.hover="getSoldCardToolTipText"
+              class="disabled-btn"
+            >
+              <button id="owned-button" disabled class="btn btn-danger">
+              SOLD OUT!
+              </button>
+            </div>
+            <div
+              v-else-if="!card.isOwned"
+              id="buy-get-button-wrapper"
+              :class="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''"
+            >
+              <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip.hover="buyBtnTooltipText(card.cost, card.unlock_czxp)">
+                <b-button id="buy-button" :disabled="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)" variant="primary" v-on:click="buyCard(card)">
+                  <b-icon-lock-fill v-if="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint NFT for {{card.cost}} BNB
+                </b-button>
               </div>
-              <div
-                v-if="card.isOwned"
-                id="owned-button-wrapper"
-                v-b-tooltip.hover="getOwnedCardToolTipText"
-                class="disabled-btn"
-              >
-                <button id="owned-button" disabled class="btn btn-info">
-                 You already minted one
+              <div v-else id="getBtnwrapper" v-b-tooltip.hover="getBtnTooltipText(card.unlock_czxp)">
+                <button id="get-button"  class="btn btn-primary" :disabled="czxpBalance < parseInt(card.unlock_czxp)" v-on:click="getCardForFree(card.type_id)">
+                  <b-icon-lock-fill v-if="czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint for FREE
                 </button>
               </div>
-        </div>
+            </div>
+            <div
+              v-else-if="card.isOwned"
+              id="owned-button-wrapper"
+              v-b-tooltip.hover="getOwnedCardToolTipText"
+              class="disabled-btn"
+            >
+              <button id="owned-button" disabled class="btn btn-info">
+                You already minted one
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -206,11 +206,11 @@ export default {
         this.getAllTypes();
       }
     },
-    // totalCyptozTypes(newValue, oldValue) {
-    //   if (newValue !== oldValue && newValue > 0) {
-    //     this.getAllTypes();
-    //   }
-    // },
+    totalCyptozTypes(newValue, oldValue) {
+      if (newValue !== oldValue && newValue > 0) {
+        this.getAllTypes();
+      }
+    },
     storeCards(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.sortedCards = [...newVal]
@@ -452,7 +452,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
   .jumbotron {
     margin: auto;
     width: 95%;
@@ -473,7 +473,6 @@ export default {
   #sold-button-wrapper {
     position: relative;
     text-align: center;
-    height: 45px;
   }
   /* add a little arrow for users to be sure which they're purchasing */
   #buy-get-button-wrapper::before,
@@ -505,5 +504,42 @@ export default {
 
   .disabled-btn::before {
     opacity: .65;
+  }
+
+  .flex-row {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+  }
+
+  .shop-card-item {
+    display: flex;
+    flex-direction: column;
+    width: 260px;
+  }
+
+  .card-button-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .card-button-container button {
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 800px) {
+    .shop-card-item {
+      width: calc(0.55 * 260px);
+    }
+
+    .card-button-container {
+      margin-top: 5px;
+    }
+
+    .card-button-container button {
+      padding: 3%;
+      font-size: 12px;
+      width: 80%;
+    }
   }
 </style>
