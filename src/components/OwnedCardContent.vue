@@ -49,6 +49,10 @@
             <span>{{ cost }}</span>
           </div>
           <div class="card-txt-black">
+            <span class="attribute-name font-weight-bold">Required CZXP:</span>
+            <span>{{ parseInt(unlock_czxp).toLocaleString() }}</span>
+          </div>
+          <div class="card-txt-black">
             <span class="attribute-name font-weight-bold">Buy CZXP:</span>
             <span>{{ parseInt(buy_czxp).toLocaleString() }}</span>
           </div>
@@ -207,7 +211,7 @@ export default {
 
 #bottom-right-corner {
   position: absolute;
-  bottom: 2%;
+  bottom: 1.5%;
   right: 0;
   width: 19%;
   height: 12%;
