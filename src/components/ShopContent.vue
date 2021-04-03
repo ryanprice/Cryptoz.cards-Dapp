@@ -310,7 +310,7 @@ export default {
     },
     getCardForFree : function(type_id){
       showPendingToast(this)
-      const cardToGet = this.sortedCards.findIndex(card => card.id === type_id)
+      const cardToGet = this.sortedCards.findIndex(card => card.id === parseInt(type_id, 10))
       this.sortedCards[cardToGet].isOwned = true;
 
       this.CryptozInstance.getFreeCard(type_id, {from: this.coinbase})
@@ -320,7 +320,6 @@ export default {
         })
     },
     buyBoosters : function() {
-      //Hide the modal
       this.$bvModal.hide("buy-boosters-modal");
 
       showPendingToast(this)
