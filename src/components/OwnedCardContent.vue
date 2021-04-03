@@ -49,10 +49,6 @@
             <span>{{ cost }}</span>
           </div>
           <div class="card-txt-black">
-            <span class="attribute-name font-weight-bold">Required CZXP:</span>
-            <span>{{ parseInt(unlock_czxp).toLocaleString() }}</span>
-          </div>
-          <div class="card-txt-black">
             <span class="attribute-name font-weight-bold">Buy CZXP:</span>
             <span>{{ parseInt(buy_czxp).toLocaleString() }}</span>
           </div>
