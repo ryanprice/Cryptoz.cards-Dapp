@@ -425,7 +425,9 @@ export default {
           if(cardObj.id == 133){ //blue brain coral
             cardObj.edition_total = 309;
           }
-
+          if(cardObj.id == 137){ //bat
+            cardObj.edition_total = 3;
+          }
 
           // Set soldOut flag first
           if(cardObj.edition_current == cardObj.edition_total) {
