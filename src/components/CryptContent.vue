@@ -1,95 +1,97 @@
 <template>
   <div>
-    <!-- Open Booster Modal -->
-    <b-modal
-      id="open-booster-modal"
-      title="Enter a CZXP burn wager amount to increase the odds of pulling a rare or epic card ( czxp gone forever ):"
-      ok-variant="danger"
-      ok-title="Open Booster"
-      hide-footer
-    >
-      <div>Enter 0 for no wager</div>
-      <div>
-        <b>To wager:</b> Minimum = 2,000,000,000, Maximum =
-        1,649,267,441,667,000
-      </div>
-      <router-link to="/help?read-cards">Random odds explained</router-link>
-      <b-form-input
-        class="form-control"
-        :state="isWagerValid"
-        required
-        type="number"
-        v-model="wagerAmount"
-      ></b-form-input>
-      <b-form-invalid-feedback v-if="!notEnoughWager">
+    <div>
+      <!-- Open Booster Modal -->
+      <b-modal
+        id="open-booster-modal"
+        title="Enter a CZXP burn wager amount to increase the odds of pulling a rare or epic card ( czxp gone forever ):"
+        ok-variant="danger"
+        ok-title="Open Booster"
+        hide-footer
+      >
+        <div>Enter 0 for no wager</div>
         <div>
-          You need to enter a number between 2,000,000,000 and
-          1,649,267,441,667,000 to wager.
+          <b>To wager:</b> Minimum = 2,000,000,000, Maximum =
+          1,649,267,441,667,000
         </div>
-      </b-form-invalid-feedback>
-      <b-form-invalid-feedback v-if="notEnoughWager">
-        <div>You do not have enough CZXP tokens</div>
-      </b-form-invalid-feedback>
-      <b-row>
-        <b-col>
-          <b-button
-            class="mt-3"
-            variant="danger"
-            v-b-tooltip.hover="'Open Booster'"
-            block
-            @click="openBooster"
-            :disabled="!isWagerValid"
-            >Mint random NFT</b-button
-          >
-        </b-col>
-        <b-col>
-          <b-button
-            class="mt-3"
-            block
-            @click="$bvModal.hide('open-booster-modal')"
-            >Cancel</b-button
-          >
-        </b-col>
-      </b-row>
-    </b-modal>
+        <router-link to="/help?read-cards">Random odds explained</router-link>
+        <b-form-input
+          class="form-control"
+          :state="isWagerValid"
+          required
+          type="number"
+          v-model="wagerAmount"
+        ></b-form-input>
+        <b-form-invalid-feedback v-if="!notEnoughWager">
+          <div>
+            You need to enter a number between 2,000,000,000 and
+            1,649,267,441,667,000 to wager.
+          </div>
+        </b-form-invalid-feedback>
+        <b-form-invalid-feedback v-if="notEnoughWager">
+          <div>You do not have enough CZXP tokens</div>
+        </b-form-invalid-feedback>
+        <b-row>
+          <b-col>
+            <b-button
+              class="mt-3"
+              variant="danger"
+              v-b-tooltip.hover="'Open Booster'"
+              block
+              @click="openBooster"
+              :disabled="!isWagerValid"
+              >Mint random NFT</b-button
+            >
+          </b-col>
+          <b-col>
+            <b-button
+              class="mt-3"
+              block
+              @click="$bvModal.hide('open-booster-modal')"
+              >Cancel</b-button
+            >
+          </b-col>
+        </b-row>
+      </b-modal>
 
-    <div class="jumbotron">
-      <UniverseBalances></UniverseBalances>
+      <div class="jumbotron">
+        <UniverseBalances></UniverseBalances>
 
-      <h1>Your NFT Wallet</h1>
-      <p>
-        This is where all your NFT Cryptoz tokens can be accessed. Sort, search,
-        gift and sacrifice. Sacrificing is permanent, not only in your wallet
-        but across the entire Cryptoz Universe. That unique NFT is burned
-        forever.
-      </p>
+        <h1>Your NFT Wallet</h1>
+        <p>
+          This is where all your NFT Cryptoz tokens can be accessed. Sort, search,
+          gift and sacrifice. Sacrificing is permanent, not only in your wallet
+          but across the entire Cryptoz Universe. That unique NFT is burned
+          forever.
+        </p>
 
-      <!-- Loads cards here -->
-      <div class="row">
-        <div class="col">
-          <b-button
-            v-b-tooltip.hover="'Mint 1 random booster NFT'"
-            class="btn btn-danger"
-            v-bind:disabled="boostersOwned < 1"
-            v-on:click="openBooster"
-            >Open <b-icon-lightning-fill /> Booster Card
-          </b-button>
+        <!-- Loads cards here -->
+        <div class="row">
+          <div class="col">
+            <b-button
+              v-b-tooltip.hover="'Mint 1 random booster NFT'"
+              class="btn btn-danger"
+              v-bind:disabled="boostersOwned < 1"
+              v-on:click="openBooster"
+              >Open <b-icon-lightning-fill /> Booster Card
+            </b-button>
+          </div>
+          <div class="col buy-and-open-booster">
+            <b-button
+              v-b-tooltip.hover="'Mint 1 random booster NFT +120 CZXP'"
+              class="btn btn-danger"
+              v-bind:disabled="web3.balance < 2000000000000000"
+              v-on:click="buyAndOpenBooster"
+              >Buy and Open <b-icon-lightning-fill /> Booster 0.002 BNB
+            </b-button>
+          </div>
         </div>
-        <div class="col buy-and-open-booster">
-          <b-button
-            v-b-tooltip.hover="'Mint 1 random booster NFT +120 CZXP'"
-            class="btn btn-danger"
-            v-bind:disabled="web3.balance < 2000000000000000"
-            v-on:click="buyAndOpenBooster"
-            >Buy and Open <b-icon-lightning-fill /> Booster 0.002 BNB
-          </b-button>
-        </div>
-      </div>
-      <br />
+        <br />
 
-      <OwnerBalances></OwnerBalances>
-      <div class="cards-wrapper">
-        <cards-container :isOthersCrypt="false" :addressToLoad="coinbase"></cards-container>
+        <OwnerBalances></OwnerBalances>
+        <div class="cards-wrapper">
+          <cards-container :isOthersCrypt="false" :addressToLoad="coinbase"></cards-container>
+        </div>
       </div>
     </div>
   </div>
@@ -100,10 +102,6 @@ import OwnedCardContent from "@/components/OwnedCardContent.vue";
 import UniverseBalances from "@/components/UniverseBalances.vue";
 import OwnerBalances from "@/components/OwnerBalances.vue";
 import SortDropdown from "@/components/SortDropdown.vue";
-import {
-  showPendingToast,
-  showRejectedToast,
-} from "../util/showToast";
 import CardsContainer from './CardsContainer.vue';
 import {
   BFormInput,
@@ -183,20 +181,24 @@ export default {
   },
   methods: {
     buyAndOpenBooster: async function() {
-      showPendingToast(this);
+      this.showTransactionModal()
       this.CryptozInstance.buyBoosterCardAndOpen({
         from: this.coinbase,
         value: 2000000000000000,
-      }).catch((error) => {
-        showRejectedToast(this);
-      }).finally(() => {
-        this.$store.dispatch("updateWallet");
       })
+        .then((res) => console.log({res}))
+        .catch((error) => {
+          console.log({error})
+        })
+        .finally(() => {
+          this.hideTransactionModal();
+          this.$store.dispatch("updateWallet");
+        })
       this.$bvModal.hide("open-booster-modal");
     },
     openBooster: function() {
       //Change buy button to pending.. or show some pending state
-      showPendingToast(this);
+      this.showTransactionModal()
       var self = this;
 
       this.$bvModal.hide("open-booster-modal");
@@ -208,14 +210,20 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
-          if (err.code === 4001) {
-            showRejectedToast(self);
+          if (err.code !== 4001) {
+            console.log(err);
           }
         })
         .finally(() => {
+          this.hideTransactionModal();
           this.$store.dispatch("updateWallet");
         });
+    },
+    showTransactionModal() {
+      this.$store.dispatch('setIsTransactionPending', true)
+    },
+    hideTransactionModal() {
+      this.$store.dispatch('setIsTransactionPending', false)
     },
   },
 };

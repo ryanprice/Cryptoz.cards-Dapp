@@ -144,7 +144,7 @@ import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
 import SortDropdown from '@/components/SortDropdown.vue'
 import { getRarity, dynamicSort} from '../helpers'
-import { showErrorToast, showPendingToast, showRejectedToast, showSuccessToast } from "../util/showToast";
+import { showErrorToast, showRejectedToast, showSuccessToast, showPendingToast } from "../util/showToast";
 import getCardType from '../util/getCardType'
 import {
   BRow,
@@ -300,34 +300,34 @@ export default {
       this.sortedCards[cardToBuyIndex].isOwned = true;
       console.log("Buying card:", cardAttributes.id);
 
-      showPendingToast(this)
+      this.showTransactionModal()
 
       this.CryptozInstance.buyCard(cardAttributes.type_id, {from: this.coinbase, value:(cardAttributes.cost*1000000000000000000)})
         .catch(err => {
-          showRejectedToast(this)
+          this.hideTransactionModal()
           this.sortedCards[cardToBuyIndex].isOwned = false;
         })
     },
     getCardForFree : function(type_id){
-      showPendingToast(this)
+      this.showTransactionModal()
       const cardToGet = this.sortedCards.findIndex(card => card.id === parseInt(type_id, 10))
       this.sortedCards[cardToGet].isOwned = true;
 
       this.CryptozInstance.getFreeCard(type_id, {from: this.coinbase})
         .catch(err => {
-          showRejectedToast(this)
+          this.hideTransactionModal()
           this.sortedCards[cardToGet].isOwned = false;
         })
     },
     buyBoosters : function() {
       this.$bvModal.hide("buy-boosters-modal");
 
-      showPendingToast(this)
+      this.showTransactionModal()
 
       var totalBoostersCost = 2000000000000000 * parseInt(this.totalCreditsToBuy);
       this.CryptozInstance.buyBoosterCard(parseInt(this.totalCreditsToBuy), {from: this.coinbase, value:totalBoostersCost})
         .catch(err => {
-          showRejectedToast(this)
+          this.hideTransactionModal()
         })
     },
     addIsOwnedProp: async function (card) {
@@ -438,6 +438,12 @@ export default {
 
       this.allCards[cardObj.type_id] = cardObj;
       return cardObj;
+    },
+    showTransactionModal() {
+      this.$store.dispatch('setIsTransactionPending', true)
+    },
+    hideTransactionModal() {
+      this.$store.dispatch('setIsTransactionPending', false)
     },
     buyBtnTooltipText(cost, unlock_czxp) {
       if (this.balance <= cost || this.czxpBalance < parseInt(unlock_czxp)) {

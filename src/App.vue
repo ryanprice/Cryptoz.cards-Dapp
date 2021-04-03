@@ -5,6 +5,7 @@
       <router-view></router-view>
     </transition>
     <AppFooter />
+    <transaction-modal />
   </div>
 </template>
 
@@ -18,6 +19,7 @@ import BodyContent from './components/BodyContent'
 import AppHeader from './components/layout/AppHeader'
 import AppFooter from './components/layout/AppFooter'
 import _ from 'lodash'
+import TransactionModal from './components/TransactionModal.vue'
 
 // import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
 import WalletConnectProvider from "@walletconnect/web3-provider";
@@ -79,7 +81,8 @@ export default {
   components: {
     BodyContent,
     AppHeader,
-    AppFooter
+    AppFooter,
+    TransactionModal,
   },
   async created() {
     // set this here to be able to debounce it..

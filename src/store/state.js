@@ -11,6 +11,7 @@ let state = {
     cryptoz: null,
     czxp: null,
   },
+  isTransactionPending: false,
 
   //Component states
   ownerBalances:0,

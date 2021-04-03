@@ -11,6 +11,9 @@ export const store = new Vuex.Store({
     setContractInstance (state, payload) {
       state.contractInstance = payload
     },
+    setIsTransactionPending (state, payload) {
+      state.isTransactionPending = payload
+    },
     updateWallet (state, payload) {
       state.web3 = {...state.web3, ...payload}
     },
@@ -56,6 +59,9 @@ export const store = new Vuex.Store({
   actions: {
     setContractInstance ({commit}, payload) {
       commit('setContractInstance', payload)
+    },
+    setIsTransactionPending({commit}, payload) {
+      commit('setIsTransactionPending', payload)
     },
     async updateWallet ({commit}) {
       // Wrapped Promise so we can 'await' this dispatch in App.vue
