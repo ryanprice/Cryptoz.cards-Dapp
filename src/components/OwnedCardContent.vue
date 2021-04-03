@@ -185,7 +185,7 @@ export default {
   height: 45%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .card-img {
