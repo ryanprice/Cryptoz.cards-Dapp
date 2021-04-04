@@ -1,11 +1,12 @@
-import axios from 'axios';
-
-const cardTypeBaseUrl = `https://cryptoz.cards/services/card_types`
-
 const getCardType = async (cardId) => {
-    const result = await axios.get(`${cardTypeBaseUrl}/${cardId}.json`);
-    
-    return result.data
+    try {
+        const cardType = await import("../card_types/" + cardId + ".json")
+        return {
+            ...cardType.default
+        }
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export default getCardType

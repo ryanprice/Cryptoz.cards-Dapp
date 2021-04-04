@@ -1,27 +1,36 @@
 <template>
-  <div>
-    <b-dropdown
-      :disabled="disabled"
-      id="dropdown"
-      :text="'Sort by ' + (sortType ? types[sortType] : '')"
-    >
-      <b-dropdown-item
-        v-for="(name, type) in types"
-        :key="type"
-        @click="callSort(type)"
+  <div class="dropdown-wrapper">
+    <div>
+      <b-dropdown
+        :disabled="disabled"
+        id="dropdown"
+        :text="'Sort by ' + (sortType ? types[sortType] : '')"
       >
-        {{ name }}
-      </b-dropdown-item>
-    </b-dropdown>
+        <b-dropdown-item
+          v-for="(name, type) in types"
+          :key="type"
+          @click="callSort(type)"
+        >
+          {{ name }}
+        </b-dropdown-item>
+      </b-dropdown>
 
+      <b-button
+        v-if="sortType"
+        id="toggle-order-button"
+        @click="toggleOrder"
+        v-b-tooltip.hover="'Toggle sort order'"
+      >
+        {{ isDescending ? "🡦" : "🡥" }}
+      </b-button>
+    </div>
     <b-button
-      v-if="sortType"
-      id="toggle-order-button"
-      @click="toggleOrder"
-      v-b-tooltip.hover="'Toggle sort order'"
+      class="clear-sorting"
+      variant="outline-warning"
+      @click="clearSortFilter"
+      v-if="isSorting"
+      >Clear Sort Filter</b-button
     >
-      {{ isDescending ? "🡦" : "🡥" }}
-    </b-button>
   </div>
 </template>
 
@@ -44,6 +53,7 @@ export default {
     return {
       isDescending: false,
       sortType: null,
+      isSorting: false,
       types: {
         name: "Name",
         rarity: "Rarity",
@@ -61,11 +71,17 @@ export default {
   methods: {
     callSort(param) {
       this.sortType = param;
+      this.isSorting = true;
       this.$emit("sort-by-attr", param, this.isDescending);
     },
     toggleOrder() {
       this.isDescending = !this.isDescending;
       this.callSort(this.sortType);
+    },
+    clearSortFilter() {
+      this.isSorting = false;
+      this.sortType = null;
+      this.$emit("sort-by-attr", null, this.isDescending);
     },
   },
 };
@@ -75,5 +91,27 @@ export default {
 <style scoped>
 #toggle-order-button {
   margin-left: 0.5rem;
+}
+
+.clear-sorting {
+  margin-top: 10px;
+}
+
+.dropdown-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Desktop CSS */
+@media only screen and (min-width: 500px) {
+  .clear-sorting {
+    margin-top: 0px;
+    margin-left: 16px;
+    max-width: 250px;
+  }
+
+  .dropdown-wrapper {
+    flex-direction: row;
+  }
 }
 </style>
