@@ -177,7 +177,7 @@ const cardStore = {
      *
      */
     [CARD_MUTATIONS.SET_SHOP_CARDS](state, payload) {
-      state.allShopCards = [...state.allShopCards, ...payload];
+      state.allShopCards = [...payload];
       state.shopLoaded = true;
       state.isLoadingShop = false;
       state.failedToLoadShop = false;
