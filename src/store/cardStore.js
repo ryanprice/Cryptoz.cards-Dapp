@@ -220,6 +220,19 @@ const cardStore = {
 
       state.sortedCards = shopCards;
     },
+    updateMintedCountForCard(state, payload) {
+      const { cardTypeId, editionNumber } = payload
+
+      const cardIndex = state.allShopCards.findIndex(card => card.type_id === cardTypeId);
+      if (cardIndex > -1) {
+        state.allShopCards[cardIndex].edition_current = editionNumber
+      }
+
+      if (state.sortedCards.length > 0) {
+        const sortedIndex = state.sortedCards.findIndex(card => card.type_id === cardTypeId);
+        state.sortedCards[sortedIndex].edition_current = editionNumber
+      }
+    }
   },
   actions: {
     async setCurrentEdition({commit, rootState}, payload) {
@@ -281,6 +294,9 @@ const cardStore = {
     },
     setCardAsNotBought({ commit }, payload) {
       commit(CARD_MUTATIONS.SET_CARD_NOT_BOUGHT, payload);
+    },
+    updateMintedCountForCard({commit}, payload) {
+      commit('updateMintedCountForCard', payload)
     },
   },
   getters: {
