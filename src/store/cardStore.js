@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import getCardType from "../util/getCardType";
 import state from "./state";
-import { dynamicSort, getRarity } from "../helpers";
+import { dynamicSort, getRarity, soldOutSort } from "../helpers";
 
 const typeIdsOnChain = [];
 
@@ -114,6 +114,8 @@ const getCard = async (cardId, CryptozInstance) => {
   // Set soldOut flag first
   if (cardObj.edition_current == cardObj.edition_total) {
     cardObj.soldOut = 1;
+  } else {
+    cardObj.soldOut = 0;
   }
 
   return cardObj;
@@ -178,7 +180,7 @@ const cardStore = {
      *
      */
     [CARD_MUTATIONS.SET_SHOP_CARDS](state, payload) {
-      state.allShopCards = [...payload];
+      state.allShopCards = [...payload].sort(soldOutSort);
       state.shopLoaded = true;
       state.isLoadingShop = false;
       state.failedToLoadShop = false;

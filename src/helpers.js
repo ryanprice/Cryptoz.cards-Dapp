@@ -23,6 +23,21 @@ export function dynamicSort(property, descending=true, isOpposite=false, modifyV
       return 0;
   }
 }
+
+export function soldOutSort(a, b) {
+    if (a.soldOut && b.soldOut) {
+      return 0;
+    }
+
+    if (!a.soldOut && b.soldOut) {
+      return -1;
+    }
+
+    if (a.soldOut && !b.soldOut) {
+      return 1;
+    }
+}
+
 export function getEditionNumber(val) {
   //lmao
   return val.split('#').slice(-1)[0].split(' ')[0]
