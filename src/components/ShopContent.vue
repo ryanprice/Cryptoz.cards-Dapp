@@ -305,8 +305,8 @@ export default {
     },
   },
   mounted() {
-    if (this.isShopLoadingFinished) {
-      console.log("Shop finished after!");
+    if (this.CryptozInstance) {
+      this.fetchStoreCards();
     }
   },
   methods: {
