@@ -66,12 +66,11 @@
         </p>
 
         <!-- Loads cards here -->
-        <div class="row">
+        <div class="row" v-if="isWalletConnected">
           <div class="col">
             <b-button
               v-b-tooltip.hover="'Mint 1 random booster NFT'"
               class="btn btn-danger"
-              v-bind:disabled="boostersOwned < 1"
               v-on:click="openBooster"
               >Open <b-icon-lightning-fill /> Booster Card
             </b-button>
@@ -80,7 +79,7 @@
             <b-button
               v-b-tooltip.hover="'Mint 1 random booster NFT +120 CZXP'"
               class="btn btn-danger"
-              v-bind:disabled="web3.balance < 2000000000000000"
+              v-bind:disabled="parseInt(balance) < 2000000000000000"
               v-on:click="buyAndOpenBooster"
               >Buy and Open <b-icon-lightning-fill /> Booster 0.002 BNB
             </b-button>
@@ -110,6 +109,8 @@ import {
   BCol,
   BButton,
 } from 'bootstrap-vue'
+import { showErrorToast } from '../util/showToast';
+import dAppStates from '@/dAppStates';
 
 export default {
   name: "CryptContent",
@@ -133,14 +134,17 @@ export default {
     };
   },
   computed: {
-    web3() {
-      return this.$store.state.web3;
+    balance() {
+      return this.$store.state.web3.balance;
     },
     coinbase() {
       return this.$store.state.web3.coinbase;
     },
     CryptozInstance() {
       return this.$store.state.contractInstance.cryptoz;
+    },
+    isWalletConnected() {
+      return this.$store.state.dAppState === dAppStates.WALLET_CONNECTED;
     },
     boostersOwned() {
       return this.$store.state.boostersOwned;
@@ -169,61 +173,46 @@ export default {
     },
   },
   watch: {
-    web3: {
-      handler(val, oldVal) {
-        if (val.coinbase !== oldVal.coinbase) {
-          this.$bvModal.hide("gift-modal");
-          this.$bvModal.hide("open-booster-modal");
-        }
-      },
-      deep: true,
-    },
+    coinbase(val, oldVal) {
+      if (val !== oldVal) {
+        this.$bvModal.hide("gift-modal");
+        this.$bvModal.hide("open-booster-modal");
+      }
+    }
   },
   methods: {
     buyAndOpenBooster: async function() {
-      this.showTransactionModal()
-      this.CryptozInstance.buyBoosterCardAndOpen({
-        from: this.coinbase,
-        value: 2000000000000000,
-      })
-        .then((res) => console.log({res}))
-        .catch((error) => {
-          console.log({error})
+      this.$store.dispatch('setIsTransactionPending', true)
+      const res = await this.CryptozInstance.methods
+        .buyBoosterCardAndOpen()
+        .send({
+          from: this.coinbase,
+          value: 2000000000000000,
+        }, (err, txHash) => {
+          this.$store.dispatch('setIsTransactionPending', false);
         })
-        .finally(() => {
-          this.hideTransactionModal();
-          this.$store.dispatch("updateWallet");
+        .catch((err) => {
+          if (err.code !== 4001) {
+            showErrorToast(this, 'Failed to buy/open booster')
+          }
         })
+        
       this.$bvModal.hide("open-booster-modal");
     },
     openBooster: function() {
       //Change buy button to pending.. or show some pending state
-      this.showTransactionModal()
-      var self = this;
-
+      this.$store.dispatch('setIsTransactionPending', true)
       this.$bvModal.hide("open-booster-modal");
-
-      this.CryptozInstance.openBoosterCard(0, { from: self.coinbase })
-        .then((res) => {
-          if (res === undefined) {
-            throw new Error("result is undefined in openBooster");
-          }
+      this.CryptozInstance.methods
+        .openBoosterCard(0)
+        .send({from: this.coinbase}, (err, transactionHash) => {
+          this.$store.dispatch('setIsTransactionPending', false)
         })
         .catch((err) => {
           if (err.code !== 4001) {
-            console.log(err);
+            showErrorToast(this, 'Failed to open booster')
           }
         })
-        .finally(() => {
-          this.hideTransactionModal();
-          this.$store.dispatch("updateWallet");
-        });
-    },
-    showTransactionModal() {
-      this.$store.dispatch('setIsTransactionPending', true)
-    },
-    hideTransactionModal() {
-      this.$store.dispatch('setIsTransactionPending', false)
     },
   },
 };
@@ -239,7 +228,6 @@ export default {
 */
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .jumbotron {
   margin: auto;

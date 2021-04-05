@@ -26,16 +26,18 @@
           <b-nav-item id="help">
             <router-link v-bind:class="classObject" to="/help">Help</router-link>
           </b-nav-item>
-          <b-nav-item v-if="web3isConnected" id="affiliate">
+          <b-nav-item v-if="isWalletConnected" id="affiliate">
             <b-link v-bind:class="classObject" href="#" v-b-modal.sponsor-modal>Affiliate</b-link>
           </b-nav-item>
 
-          <li id="wallet-nav">
+          <li
+            id="wallet-nav"
+            v-if="isWalletConnected"
+          >
             <div
               id="wallet-id"
               :title="coinbase"
               v-b-tooltip.hover="{ customClass: 'tooltip-1' }"
-              v-if="web3isConnected"
             >
               <img src="@/assets/metamask-face.png" class="header-icon" />
               <span>{{ coinbase.substr(0, 6) + "..." + coinbase.substr(38) }}</span>
@@ -44,7 +46,6 @@
               id="wallet-balance"
               v-b-tooltip.hover="{ customClass: 'tooltip-2' }"
               :title="ethBalance"
-              v-if="web3isConnected"
             >
               <!--img v-if="this.$store.state.web3.chainId != 0x38 || this.$store.state.web3.chainId != 0x61" src="@/assets/ethereum-symbol.png" /-->
               <img src="@/assets/binance-coin-logo.webp" class="header-icon" />
@@ -55,12 +56,12 @@
           <li id="bonus-boosters">
             <div
               class="bonusClass"
-              v-if="web3isConnected && bonusReady && showSpinner == false"
+              v-if="isWalletConnected && bonusReady && showSpinner == false"
               v-on:click="GetBonus"
             >
               Claim 2 FREE Boosters!
             </div>
-            <div v-else-if="web3isConnected && showSpinner == true">
+            <div v-else-if="isWalletConnected && showSpinner == true">
               <b-spinner style="width: 1.5rem; height: 1.5rem;" type="grow" variant="light"></b-spinner>
               <transition>
                 <span class="spinner-text-style"> {{ transactionMessage }}</span>
@@ -68,7 +69,7 @@
             </div>
             <div
               class="bonusClassNo"
-              v-else-if="web3isConnected && !bonusReady && timeToBonus && showSpinner == false"
+              v-else-if="isWalletConnected && !bonusReady && timeToBonus && showSpinner == false"
             >
               Your Next Bonus:<br /><strong> {{ timeToBonus }}</strong>
             </div>
@@ -76,9 +77,9 @@
 
           <li id="connect-button">
             <b-button
-              v-if="!web3isConnected"
+              v-if="!isWalletConnected"
               variant="primary"
-              v-on:click="$emit('on-connect')"
+              v-on:click="$emit('connect')"
               v-b-toggle.nav-collapse
             >
               Connect To Blockchain
@@ -88,7 +89,7 @@
       </b-collapse>
     </b-navbar>
     <b-modal
-      v-if="web3isConnected"
+      v-if="isWalletConnected"
       id="sponsor-modal"
       size="lg"
       title="Sponsor Link"
@@ -170,6 +171,7 @@
 import { showSuccessToast, showErrorToast } from "../../util/showToast";
 import { isAddress } from "../../util/addressUtil";
 import moment from 'moment'
+import dAppStates from '@/dAppStates'
 import {
   BNavbar,
   BNavbarToggle,
@@ -223,25 +225,21 @@ export default {
     CryptozInstance() {
       return this.$store.state.contractInstance.cryptoz;
     },
+    dAppState() {
+      return this.$store.state.dAppState;
+    },
+    isWalletConnected() {
+      return this.$store.state.dAppState === dAppStates.WALLET_CONNECTED;
+    },
     ethBalance() {
       const balance = this.$store.state.web3.balance
       if (balance !== null) {
-        return parseFloat(web3.utils.fromWei(balance.toString()), "ether");
+        return parseFloat(web3.utils.fromWei(balance));
       }
       return null
     },
     coinbase() {
       return this.$store.state.web3.coinbase;
-    },
-    isConnected() {
-      return this.$store.state.web3.isConnected;
-    },
-    web3isConnected() {
-      return (
-        this.$store.state.web3.isConnected &&
-        this.ethBalance !== null &&
-        this.coinbase !== null
-      );
     },
     currentEvent() {
       return this.$store.state.lastChainEvent;
@@ -285,8 +283,8 @@ export default {
     };
   },
   watch: {
-    web3isConnected(newValue) {
-      if (newValue) {
+    isWalletConnected(value) {
+      if (value) {
         this.checkSponsor(this.coinbase);
       }
     },
@@ -306,13 +304,12 @@ export default {
   methods: {
     checkSponsor: async function(address) {
 
-      const sponsors = await this.CryptozInstance.sponsors.call(address);
-      // console.log("checking sponsor..", sponsors);
-      if (sponsors && sponsors !== baseAddress) {
-        // console.log("hey",this.$route.query.sponsor);
+      const sponsor = await this.CryptozInstance.methods.sponsors(address)
+        .call();
+      if (sponsor && sponsor !== baseAddress) {
         this.shouldShowSponsor = false;
-      } else {
-      // console.log("hey1",this.$route.query.sponsor);
+      }
+      else {
         if (this.$route.query.sponsor) {
           this.sponsorAddress = this.$route.query.sponsor;
           this.$bvModal.show("sponsor-modal");
@@ -320,17 +317,22 @@ export default {
       }
     },
     linkSponsor: async function() {
-      try {
-        const result = await this.CryptozInstance.linkMySponsor(
-          this.sponsorAddress,
-          { from: this.coinbase }
-        );
-        // console.log(result);
+      this.$store.dispatch('setIsTransactionPending', true)
+      const result = await this.CryptozInstance.methods
+        .linkMySponsor(this.sponsorAddress)
+        .send({from: this.coinbase}, (err, transactionHash) => {
+          this.$store.dispatch('setIsTransactionPending', false)
+        })
+        .catch((err) => {
+          if (err.code !== 4001) {
+            console.log(err)
+            showErrorToast(this, "Failed to link sponsor.");
+          }
+        })
+      
+      if (result) {
         showSuccessToast(this, "Sponsor linked!");
         this.$emit("LogSponsorLinked", [this.sponsorAddress, this.coinbase]);
-      } catch (err) {
-        // console.log(err);
-        showErrorToast(this, "Failed to link sponsor.");
       }
     },
     copySponsorLink: function() {
@@ -344,51 +346,48 @@ export default {
           console.log("Copy Failed: ", error);
         });
     },
-    getDailyBonusTime: function() {
+    getDailyBonusTime: async function() {
       if (this.CryptozInstance && this.coinbase) {
-        console.log({CryptozInstance: this.CryptozInstance})
-        this.CryptozInstance.getTimeToDailyBonus(this.coinbase)
-          .then((res) => {
-            console.log({res})
-            var timeOfNextBonusInMilli = res.toNumber() * 1000;
-            var now = new Date();
+        const res = await this.CryptozInstance.methods.getTimeToDailyBonus(this.coinbase).call()
 
-            console.log(timeOfNextBonusInMilli)
+        var timeOfNextBonusInMilli = parseInt(res) * 1000;
+        var now = new Date();
 
-            if (now.getTime() >= timeOfNextBonusInMilli) {
-              this.bonusReady = true; //Claim bonus state
-            } else {
-              this.bonusReady = false
-              this.timeToBonus = this.GetTimeString(timeOfNextBonusInMilli);
-            }
-          });
+        if (now.getTime() >= timeOfNextBonusInMilli) {
+          this.bonusReady = true; //Claim bonus state
+        } else {
+          this.bonusReady = false
+          this.timeToBonus = this.GetTimeString(timeOfNextBonusInMilli);
+        }
       }
     },
-    GetBonus: function() {
-      console.log("GetBonus called...");
-
-      //change state to pending
+    GetBonus: async function() {
       this.showSpinner = true;
       this.transactionMessage = "Pending confirmation...";
+      this.$store.dispatch('setIsTransactionPending', true)
 
-      this.CryptozInstance.getBonusBoosters({
-        from: this.coinbase,
-        gas: 362000,
-      })
-        .then((result) => {
-          //change from pending to ready
-          this.pendingTransaction = result.receipt.blockHash;
-          this.transactionMessage = "Broadcast to chain...";
-        })
+      const result = await this.CryptozInstance.methods
+        .getBonusBoosters()
+        .send({from: this.coinbase}, (err, transactionHash) => {
+          this.pendingTransaction = transactionHash;
+          if (err) {
+            this.showSpinner = false;
+            this.transactionMessage = "Claim 2 FREE Boosters!";
+          }
+          else {
+            this.transactionMessage = "Broadcast to chain...";
+          }
+          this.$store.dispatch('setIsTransactionPending', false)
+        })  
         .catch((e) => {
-          // Transaction rejected or failed
-          //reset the claim tokens message
           this.showSpinner = false;
           this.transactionMessage = "Claim 2 FREE Boosters!";
         })
-        .finally(() => {
-          this.showSpinner = false;
-        });
+
+      this.showSpinner = false;
+      if (result) {
+        this.getDailyBonusTime()
+      }
     },
     GetTimeString: function(_timeStamp) {
       return moment(_timeStamp).format("MMM D, h:mm a")

@@ -6,12 +6,13 @@ let watchEvents = function (CzxpInstance, CryptozInstance, {
 }) {
   // console.log('watch events', {CzxpInstance, CryptozInstance, onCardMinted, onBalanceUpdated})
 
-  CzxpInstance.contract.events.allEvents({fromBlock: 'latest'}, function(error, event){
+  CzxpInstance.events.allEvents({fromBlock: 'latest'}, function(error, event){
     if (!error) {
       //IF event affects our wallet, dispatch
       const { to, from, player } = event.returnValues
       const { coinbase } = store.state.web3
       if (
+        coinbase &&
         [to, from, player]
           .filter(val => val !== undefined)
           .find(val => val.toLowerCase() === coinbase.toLowerCase())
@@ -27,7 +28,7 @@ let watchEvents = function (CzxpInstance, CryptozInstance, {
     }
   });
   
-  CryptozInstance.contract.events.allEvents({fromBlock: 'latest'}, function(error, event){
+  CryptozInstance.events.allEvents({fromBlock: 'latest'}, function(error, event){
     switch (event.event) {
       case 'LogCardCreated':
         onCardMinted({
@@ -42,6 +43,7 @@ let watchEvents = function (CzxpInstance, CryptozInstance, {
       const { to, from, player } = event.returnValues
       const { coinbase } = store.state.web3
       if (
+        coinbase &&
         [to, from, player]
           .filter(val => val !== undefined)
           .find(val => val.toLowerCase() === coinbase.toLowerCase())

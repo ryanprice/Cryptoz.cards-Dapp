@@ -96,6 +96,7 @@
 
 <script>
 import {NETWORKS} from '../../util/constants/networks'
+import dAppStates from '@/dAppStates'
 
 export default {
   name: 'AppFooter',
@@ -111,7 +112,8 @@ export default {
       }
     },
     isConnected() {
-      return this.$store.state.web3.isConnected
+      return this.$store.state.dAppState === dAppStates.CONNECTED
+        || this.$store.state.dAppState === dAppStates.WALLET_CONNECTED
     },
     network() {
       let hexString

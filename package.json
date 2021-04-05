@@ -26,7 +26,6 @@
     "openzeppelin-solidity": "^2.0.0",
     "sass": "^1.32.8",
     "sass-loader": "10.1.1",
-    "truffle-contract": "^4.0.31",
     "truffle-hdwallet-provider": "^1.0.17",
     "vue": "^2.6.10",
     "vue-gtm": "3.0.0-vue2",

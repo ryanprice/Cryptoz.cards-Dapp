@@ -39,9 +39,7 @@
 
     <!--main role="main" class="container"-->
     <div class="jumbotron">
-      <p>
-        <UniverseBalances></UniverseBalances>
-      </p>
+      <UniverseBalances />
       <h1><b-icon-tag-fill /> Minting Shop</h1>
       <p>
         The Shop is a place to mint limited edition Cryptoz Cards NFT tokens. Some cards
@@ -52,20 +50,35 @@
         To mint a FREE NFT Or buy a Limited edition NFT, you will need the
         required minimum balance of CZXP tokens displayed on the botton of the card to unlock the minting button. The newly minted NFT will appear in <router-link to="/my-cryptoz-nfts"> Your NFT Crypt</router-link> once the transaction is confirmed. CZXP is NOT burned when minting
       </p>
-      <div class="row">
-        <div class="col">
-          <b-button
-            v-b-tooltip.hover="'Earn +120 CZXP per credit'"
-            class="btn btn-danger"
-            v-bind:disabled="balance < 2000000000000000"
-            v-b-modal.buy-boosters-modal
-            >Buy <b-icon-lightning-fill />  Booster Credits @ 0.002 BNB</b-button>
+
+      <div v-if="isWalletConnected">
+        <div class="row">
+          <div class="col">
+            <b-button
+              v-b-tooltip.hover="'Earn +120 CZXP per credit'"
+              class="btn btn-danger"
+              v-bind:disabled="balance < 2000000000000000"
+              v-b-modal.buy-boosters-modal
+              >Buy <b-icon-lightning-fill />  Booster Credits @ 0.002 BNB</b-button>
+          </div>
         </div>
+        <OwnerBalances />
       </div>
 
-      <br />
-      <OwnerBalances></OwnerBalances>
-      <br />
+      <div v-else>
+        <h2 class="centered">
+          <b-button
+            id="connect-button"
+            v-if="!isWalletConnected"
+            variant="primary"
+            v-on:click="onConnect"
+            v-b-toggle.nav-collapse
+          >
+            Connect
+          </b-button>
+          your wallet to mint NFTs.
+        </h2>
+      </div>
 
       <div class="row">
           <div class="col text-left">
@@ -73,8 +86,8 @@
           </div>
         </div>
       <br>
-      <div class="flex-row">
-        <div v-for="card in sortedCards" :key="card.type_id" class="shop-card-item">
+      <div class="cards-wrapper">
+        <div v-for="card in sortedCards" :key="card.type_id" class="card-wrapper">
           <OwnedCardContent
             :type_id="card.type_id"
             :name="card.name"
@@ -92,7 +105,7 @@
             :card_class="card.rarity"
             :card_owned="false"
           ></OwnedCardContent>
-          <div class="card-button-container">
+          <div class="card-button-container" v-if="isWalletConnected">
             <div
               v-if="card.soldOut == 1"
               id="sold-button-wrapper"
@@ -143,6 +156,7 @@ import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
 import SortDropdown from '@/components/SortDropdown.vue'
+import dAppStates from '@/dAppStates'
 import { getRarity, dynamicSort} from '../helpers'
 import { showErrorToast, showRejectedToast, showSuccessToast, showPendingToast } from "../util/showToast";
 import getCardType from '../util/getCardType'
@@ -152,6 +166,7 @@ import {
   BButton,
   BSpinner,
 } from 'bootstrap-vue'
+import { MessageBus } from '@/messageBus';
 
 export default {
   name: "ShopContent",
@@ -166,14 +181,14 @@ export default {
     BSpinner,
   },
   computed: {
-    web3() {
-      return this.$store.state.web3;
+    dAppState() {
+      return this.$store.state.dAppState;
+    },
+    isWalletConnected() {
+      return this.$store.state.dAppState === dAppStates.WALLET_CONNECTED;
     },
     CryptozInstance() {
       return this.$store.state.contractInstance.cryptoz;
-    },
-    wallet() {
-      return parseFloat(web3.utils.fromWei(this.$store.state.web3.balance.toString()), "ether");
     },
     balance() {
       return this.$store.state.web3.balance;
@@ -290,7 +305,7 @@ export default {
     }, 500)
   },
   async mounted() {
-    if (this.web3.isConnected && this.CryptozInstance) {
+    if (this.CryptozInstance) {
       await this.getAllTypes();
     }
   },
@@ -302,10 +317,17 @@ export default {
 
       this.showTransactionModal()
 
-      this.CryptozInstance.buyCard(cardAttributes.type_id, {from: this.coinbase, value:(cardAttributes.cost*1000000000000000000)})
+      this.CryptozInstance.methods
+        .buyCard(cardAttributes.type_id)
+        .send({from: this.coinbase, value:(cardAttributes.cost*1000000000000000000)}, (err, transactionHash) => {
+          this.hideTransactionModal();
+        })
         .catch(err => {
-          this.hideTransactionModal()
           this.sortedCards[cardToBuyIndex].isOwned = false;
+          if (err.code !== 4001) {
+            console.log(err)
+            showErrorToast(this, 'Failed to mint card')
+          }
         })
     },
     getCardForFree : function(type_id){
@@ -313,10 +335,17 @@ export default {
       const cardToGet = this.sortedCards.findIndex(card => card.id === parseInt(type_id, 10))
       this.sortedCards[cardToGet].isOwned = true;
 
-      this.CryptozInstance.getFreeCard(type_id, {from: this.coinbase})
+      this.CryptozInstance.methods
+        .getFreeCard(type_id)
+        .send({from: this.coinbase}, (err, txHash) => {
+          this.hideTransactionModal();
+        })
         .catch(err => {
-          this.hideTransactionModal()
           this.sortedCards[cardToGet].isOwned = false;
+          if (err.code !== 4001) {
+            console.log(err)
+            showErrorToast(this, 'Failed to mint card')
+          }
         })
     },
     buyBoosters : function() {
@@ -325,13 +354,21 @@ export default {
       this.showTransactionModal()
 
       var totalBoostersCost = 2000000000000000 * parseInt(this.totalCreditsToBuy);
-      this.CryptozInstance.buyBoosterCard(parseInt(this.totalCreditsToBuy), {from: this.coinbase, value:totalBoostersCost})
+      this.CryptozInstance.methods
+        .buyBoosterCard(parseInt(this.totalCreditsToBuy))
+        .send({from: this.coinbase, value:totalBoostersCost}, (err, txHash) => {
+          this.hideTransactionModal();
+        })
         .catch(err => {
-          this.hideTransactionModal()
+          if (err.code !== 4001) {
+            showErrorToast(this, 'Failed to mint card')
+          }
         })
     },
     addIsOwnedProp: async function (card) {
-      const isOwned = await this.CryptozInstance.cardTypesOwned(this.coinbase, card.id);
+      const isOwned = await this.CryptozInstance.methods
+        .cardTypesOwned(this.coinbase, card.id)
+        .call();
       card.isOwned  = isOwned;
 
       return card;
@@ -378,7 +415,9 @@ export default {
       }
 
       //Get NFTs minted already to inject in our edition totals
-      this.CryptozInstance.cardTypeToEdition(cardObj.id)
+      this.CryptozInstance.methods
+        .cardTypeToEdition(cardObj.id)
+        .call()
         .then((result) => {
           cardObj.edition_current = parseInt(result)
 
@@ -471,13 +510,16 @@ export default {
           this.sortedCards.sort(dynamicSort(param, isDescending))
           break
       }
+    },
+    onConnect: function() {
+      MessageBus.$emit('connect')
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped lang="scss">
   .jumbotron {
     margin: auto;
     width: 95%;
@@ -531,14 +573,15 @@ export default {
     opacity: .65;
   }
 
-  .flex-row {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-around;
+  .cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    place-items: center;
   }
 
-  .shop-card-item {
+  .card-wrapper {
     display: flex;
+    min-width: 0;
     flex-direction: column;
     width: 260px;
   }
@@ -552,8 +595,12 @@ export default {
     font-size: 16px;
   }
 
-  @media screen and (max-width: 800px) {
-    .shop-card-item {
+  @media screen and (max-width: 1000px) {
+    .cards-wrapper {
+      grid-template-columns: repeat(auto-fit, minmax(calc(0.55 * 260px), 1fr));
+    }
+
+    .card-wrapper {
       width: calc(0.55 * 260px);
     }
 
@@ -566,5 +613,16 @@ export default {
       font-size: 12px;
       width: 80%;
     }
+  }
+
+  .centered {
+    display: flex;
+    justify-content: center;
+  }
+
+  #connect-button {
+    font-size: 20px;
+    padding: 5px 10px;
+    margin-right: 10px;
   }
 </style>

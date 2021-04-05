@@ -16,7 +16,7 @@
             </button>
           </div>
         </div>
-        <div v-else class="row">
+        <div v-else id="container" class="row">
           <div id="card-wrapper">
             <OwnedCardContent
               :key="card.id"
@@ -39,7 +39,7 @@
               :is_single_card_view="true"
             ></OwnedCardContent>
           </div>
-          <div class="col">
+          <div id="stats-container" class="col">
             <div class="flex-row">
               <div class="text-right font-weight-bold label">Owner:</div>
               <div><a class="wrap-text" v-bind:href="owner_url" target="_blank">{{ owner }}</a></div>
@@ -106,6 +106,7 @@
 <script>
 import axios from "axios";
 import OwnedCardContent from "@/components/OwnedCardContent.vue";
+import dAppStates from '@/dAppStates'
 
 export default {
   name: "TokenContent",
@@ -144,54 +145,56 @@ export default {
     CryptozInstance() {
       return this.$store.state.contractInstance.cryptoz;
     },
+    isDAppConnected() {
+      return this.$store.state.dAppState === dAppStates.CONNECTED
+        || this.$store.state.dAppState === dAppStates.WALLET_CONNECTED
+    },
+    coinbase() {
+      return this.$store.state.web3.coinbase;
+    }
   },
   watch: {
-    CryptozInstance(newVal) {
-      if (newVal) {
-        console.log('from watch', { instance: newVal})
+    isDAppConnected(value) {
+      if (value) {
         this.loadCard(this.token_id)
       }
-    }
+    },
   },
   mounted() {
     //grab the token id from the url
     this.token_id = parseInt(this.$route.params.token_id);
 
-    if (this.CryptozInstance) {
+    if (this.isDAppConnected) {
       console.log('from mount')
       this.loadCard(this.token_id)
     }
   },
   methods: {
-    loadCard: function (token_id) {
-      this.CryptozInstance.getOwnedCard(token_id)
-        .then((res) => {
-          //returns TypeId, Edition, # times transfed
-          // console.log("CardOwned results:", res);
-          let cardTypeId = res[0].toNumber();
-
-          //If the tokenId is greater than 0, we have something valid
-          console.log({res, cardTypeId})
-          if (cardTypeId > 0) {
-            this.edition_current = res[1].toNumber();
-            this.times_transferred = res[2].toNumber();
-            this.getCardData(cardTypeId);
-            return this.CryptozInstance.ownerOf(token_id);
-          } else {
-            this.load_state = 0; //and we stop here
-            return 0;
-          }
-        })
-        .then((res) => {
-          // owners wallet address
-          if (res == 0) {
-            return 0;
-          }
-          this.owner = res;
-          this.owner_url = "https://etherscan.io/address/" + res;
-          return;
-        })
+    loadCard: async function (token_id) {
+      console.log({token_id, inst: this.CryptozInstance, dAppState: this.dAppState})
+      const res = await this.CryptozInstance.methods
+        .getOwnedCard(token_id)
+        .call()
         .catch(err => console.log({err}));
+
+      //returns TypeId, Edition, # times transfed
+      // console.log("CardOwned results:", res);
+      let cardTypeId = parseInt(res[0]);
+
+      //If the tokenId is greater than 0, we have something valid
+      if (cardTypeId === 0) {
+        this.load_state = 0
+        return
+      }
+
+      this.edition_current = parseInt(res[1]);
+      this.times_transferred = parseInt(res[2]);
+      this.getCardData(cardTypeId);
+      const owner = await this.CryptozInstance.methods
+        .ownerOf(token_id)
+        .call()
+      this.owner = owner;
+      this.owner_url = "https://etherscan.io/addowners/" + owner;
     },
     getCardData: function (card_id) {
       axios
@@ -266,6 +269,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+
+#stats-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .flex-row {
   display: flex;
 }
@@ -292,6 +307,5 @@ export default {
 #card-wrapper {
   display: flex;
   justify-content: center;
-  width: 100%;
 }
 </style>

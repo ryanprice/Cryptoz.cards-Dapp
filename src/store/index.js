@@ -11,6 +11,9 @@ export const store = new Vuex.Store({
     setContractInstance (state, payload) {
       state.contractInstance = payload
     },
+    setDAppState (state, payload) {
+      state.dAppState = payload
+    },
     setIsTransactionPending (state, payload) {
       state.isTransactionPending = payload
     },
@@ -60,55 +63,44 @@ export const store = new Vuex.Store({
     setContractInstance ({commit}, payload) {
       commit('setContractInstance', payload)
     },
+    setDAppState ({commit}, payload) {
+      commit('setDAppState', payload)
+    },
     setIsTransactionPending({commit}, payload) {
       commit('setIsTransactionPending', payload)
     },
-    async updateWallet ({commit}) {
-      // Wrapped Promise so we can 'await' this dispatch in App.vue
-      return new Promise((resolve, reject) =>
-        window.web3.eth.getCoinbase((err, coinbase) => {
-          if (err) {
-            console.error('Error: ', err)
-          }
-          if (coinbase !== null) {
-            window.web3.eth.getBalance(coinbase, (err, balance) => {
-              resolve(commit('updateWallet', {coinbase, balance}))
-            })
-          }
-        })
-      )
-    },
-    disconnnectWallet({commit}) {
+    disconnectWallet({commit}) {
       commit('updateWallet', {coinbase: null, balance: null})
-    },
-    web3isConnected({commit}, payload) {
-      commit('web3isConnected', payload)
-      if (payload === false) {
-        commit('updateCardsOwned', 0)
-        commit('updateBoostersOwned', 0)
-        commit('updateCZXPBalance', 0)
-      }
     },
     chainChanged({commit}, payload) {
       commit('chainChanged', payload)
     },
     async updateOwnerBalances ({commit}) {
+      const coinbase = await window.web3.eth.getCoinbase()
+      if (!coinbase) {
+        return
+      }
+      const balance = await window.web3.eth.getBalance(coinbase)
+
+      commit('updateWallet', {coinbase, balance})
+
       const { cryptoz, czxp } = this.state.contractInstance
-      const coinbase = this.state.web3.coinbase
-      const czxpBalancePromise = czxp.balanceOf(coinbase);
-      const cryptozBalancePromise = cryptoz.balanceOf(coinbase);
-      const boosterPacksOwnedPromise = cryptoz.boosterPacksOwned(coinbase);
+      const czxpBalancePromise = czxp.methods.balanceOf(coinbase).call();
+      const cryptozBalancePromise = cryptoz.methods.balanceOf(coinbase).call();
+      const boosterPacksOwnedPromise = cryptoz.methods.boosterPacksOwned(coinbase).call();
 
       const [czxpBalance, cryptozBalance, boosterPacksOwned] = await Promise.all([czxpBalancePromise, cryptozBalancePromise, boosterPacksOwnedPromise])
-      commit('updateCZXPBalance', czxpBalance.toNumber().toLocaleString())
-      commit('updateCardsOwned', cryptozBalance.toNumber().toLocaleString())
-      commit('updateBoostersOwned', boosterPacksOwned.toNumber().toLocaleString())
+
+      commit('updateCZXPBalance', parseInt(czxpBalance).toLocaleString())
+      commit('updateCardsOwned', parseInt(cryptozBalance).toLocaleString())
+      commit('updateBoostersOwned', parseInt(boosterPacksOwned).toLocaleString())
     },
     async updateUniverseBalances({commit}, payload){
       const { cryptoz, czxp } = this.state.contractInstance
-      const totalCzxpPromise = czxp.totalSupply();
-      const totalTypesPromise = cryptoz.getTotalTypes();
-      const totalCryptozPromise = cryptoz.totalSupply();
+
+      const totalCzxpPromise = czxp.methods.totalSupply().call();
+      const totalTypesPromise = cryptoz.methods.getTotalTypes().call();
+      const totalCryptozPromise = cryptoz.methods.totalSupply().call();
 
       const [totalCzxp, totalTypes, totalCryptoz] = await Promise.all([totalCzxpPromise, totalTypesPromise, totalCryptozPromise])
       commit('updateCZXPTotal', parseInt(totalCzxp).toLocaleString())

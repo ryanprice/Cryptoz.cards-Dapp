@@ -128,7 +128,7 @@
               responsive
             >
               <template #cell(name)="row">
-                <div class="cell card-name-cell">
+                <div class="cell">
                   <img
                     :src="row.item.image"
                     :class="`cell mr-4 ${row.item.rarity}`"
@@ -192,7 +192,7 @@
             </b-table>
           </div>
         </div>
-        <div v-else>
+        <div v-else-if="isWalletConnected">
           <h2 v-if="!isOthersCrypt">
             You do not own any Cryptoz<br /><router-link to="/shop"
               >To get Free Cryptoz NFTs or Buy one, visit the Minting
@@ -200,6 +200,20 @@
             >
           </h2>
           <h2 v-else>No Avaliable NFTs</h2>
+        </div>
+        <div v-else>
+          <h2 class="centered">
+            <b-button
+              id="connect-button"
+              v-if="!isWalletConnected"
+              variant="primary"
+              v-on:click="onConnect"
+              v-b-toggle.nav-collapse
+            >
+              Connect
+            </b-button>
+            your wallet.
+          </h2>
         </div>
       </div>
     </div>
@@ -226,6 +240,8 @@ import {
   BSpinner,
   BTable,
 } from 'bootstrap-vue'
+import dAppStates from '@/dAppStates';
+import { MessageBus } from '@/messageBus';
 
 export default {
   name: "CardsContainer",
@@ -264,7 +280,6 @@ export default {
     };
   },
   mounted() {
-    this.isLoading = true;
     if (this.CryptozInstance) {
       this.getAllCards(this.addressToLoad);
     }
@@ -280,13 +295,10 @@ export default {
         this.getAllCards(this.addressToLoad);
       }
     },
-    web3: {
-      handler(val, oldVal) {
-        if (val.isConnected) {
-          this.getAllCards(this.addressToLoad);
-        }
-      },
-      deep: true,
+    isWalletConnected(val) {
+      if (val) {
+        this.getAllCards(this.addressToLoad);
+      }
     },
     addressToSearch: function(newVal, oldVal) {
       const isSearchAddressValid = isAddress(newVal.toLowerCase());
@@ -296,13 +308,21 @@ export default {
         this.disableSearch = true;
       }
     },
+    addressToLoad: function(newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.getAllCards(newVal);
+      }
+    },
   },
   computed: {
     coinbase() {
       return this.$store.state.web3.coinbase;
     },
-    web3() {
-      return this.$store.state.web3;
+    dAppState() {
+      return this.$store.state.dAppState;
+    },
+    isWalletConnected() {
+      return this.$store.state.dAppState === dAppStates.WALLET_CONNECTED;
     },
     CryptozInstance() {
       return this.$store.state.contractInstance.cryptoz;
@@ -343,15 +363,11 @@ export default {
           : "https://bsc.cryptoz.cards";
       return `${url}/my-cryptoz-nfts/${this.coinbase}`;
     },
-    CryptozInstance() {
-      return this.$store.state.contractInstance.cryptoz;
-    },
   },
   methods: {
     addHashToLocation(params) {
       const currentPath = this.$route.path;
       const newPath = currentPath.substring(0, currentPath.indexOf("my-cryptoz-nfts"));
-      console.log(newPath);
       history.pushState({}, null, newPath + `${params}`);
     },
     clearCards: function() {
@@ -416,50 +432,67 @@ export default {
           console.error(err);
         });
     },
-    transferCard: async function(id) {
-      try {
-        showPendingToast(this);
-        Vue.set(this.cardsBeingGifted, id, true);
-
-        const giftRes = await this.CryptozInstance.transferFrom(this.coinbase, this.receivingWallet, id, { from: this.coinbase })
-
-        if (giftRes) {
-          this.orderedCards = this.orderedCards.filter(card => card.id !== id)
-          showSuccessToast(this, "Card Gifted.");
-        }
-      } catch (err) {
-        console.error("Failed to gift card. ",err)
-      } finally {
-          Vue.set(this.cardsBeingGifted, id, false);
-          this.$store.dispatch("updateWallet");
-      }
-    },
     navigateToNewCrypt: function() {
       this.$router.push(`/my-cryptoz-nfts/${this.addressToSearch}`);
     },
     getAllCards: async function(addressToLoad) {
+      if (!this.isWalletConnected) {
+        return
+      }
       this.isLoading = true;
-      const tokensOfOwner = await this.CryptozInstance.tokensOfOwner(addressToLoad);
+      const tokensOfOwner = await this.CryptozInstance.methods
+        .tokensOfOwner(addressToLoad)
+        .call();
+
       this.handleGetAllCards(tokensOfOwner, this.CryptozInstance);
       this.isLoading = false;
     },
     sacrificeCard: async function(id) {
-      try {
-        showPendingToast(this);
-        Vue.set(this.cardsBeingSacrificed, id, true);
-        const sacrificeRes = await this.CryptozInstance.sacrifice(id, { from: this.coinbase });
+      this.$store.dispatch('setIsTransactionPending', true);
+      Vue.set(this.cardsBeingSacrificed, id, true);
+      const sacrificeRes = await this.CryptozInstance.methods
+        .sacrifice(id)
+        .send({ from: this.coinbase }, (err, txHash) => {
+          this.$store.dispatch('setIsTransactionPending', false);
 
-        if (sacrificeRes) {
-          this.$store.dispatch("updateOwnerBalances");
-          this.orderedCards = this.orderedCards.filter(card => card.id !== id)
-          showSuccessToast(this, "Card sacrificed.");
-        }
-      } catch (err) {
-        console.log(err);
-        showRejectedToast(this)
-      } finally {
-        Vue.set(this.cardsBeingSacrificed, id, false);
-        this.$store.dispatch("updateWallet");
+          if (err) {
+            Vue.set(this.cardsBeingSacrificed, id, false);
+          }
+        })
+        .catch((err) => {
+          if (err.code !== 4001) {
+            console.log(err);
+            Vue.set(this.cardsBeingSacrificed, id, false);
+            showErrorToast(this, 'Failed to sacrifice card')
+          }
+        })
+
+      if (sacrificeRes) {
+        this.orderedCards = this.orderedCards.filter(card => card.id !== id)
+        showSuccessToast(this, "Card sacrificed.");
+      }
+    },
+    transferCard: async function(id) {
+      Vue.set(this.cardsBeingGifted, id, true);
+      this.$store.dispatch('setIsTransactionPending', true);
+
+      const giftRes = await this.CryptozInstance.methods
+        .transferFrom(this.coinbase, this.receivingWallet, id)
+        .send({ from: this.coinbase }, (err, txHash) => {
+          this.$store.dispatch('setIsTransactionPending', false);
+        })
+        .catch((err) => {
+          if (err.code !== 4001) {
+            console.log('Error: ', err)
+          }
+        })
+        .finally(() => {
+          Vue.set(this.cardsBeingGifted, id, false);
+        })
+
+      if (giftRes) {
+        this.orderedCards = this.orderedCards.filter(card => card.id !== id)
+        showSuccessToast(this, "Card Gifted.");
       }
     },
     handleGetAllCards: async function(tokensOfOwner, instance) {
@@ -471,9 +504,12 @@ export default {
 
         const getCard = async (tokenId) => {
           try {
-            const ownedCard = await instance.getOwnedCard(tokenId);
+            const ownedCard = await instance.methods
+              .getOwnedCard(tokenId)
+              .call();
+
             tokenIdList[tokenId] = ownedCard;
-            const cardData = await getCardTypes(ownedCard[0].toNumber());
+            const cardData = await getCardTypes(parseInt(ownedCard[0]));
 
             cardData.id = tokenId;
             let newAttr = {};
@@ -483,7 +519,7 @@ export default {
             });
 
             cardData.attributes = newAttr;
-            cardData.attributes.edition_current = tokenIdList[tokenId][1].toNumber();
+            cardData.attributes.edition_current = parseInt(tokenIdList[tokenId][1]);
 
             if (cardData.attributes.edition_total == 0) {
               //unlimited
@@ -528,7 +564,7 @@ export default {
         };
 
         this.orderedCards = await Promise.all(
-          tokensOfOwner.map((token) => getCard(token.toNumber()))
+          tokensOfOwner.map((token) => getCard(parseInt(token)))
         ).catch((err) => {
           console.error("Failed to fetch cards.", err);
           this.clearCards();
@@ -540,8 +576,6 @@ export default {
         if (this.sortType) {
           this.sortByAttr(this.sortType, this.isDescending);
         }
-
-        this.$store.dispatch("updateCardsOwned", this.orderedCards.length);
       } else {
         console.log("no cards returned from handleGetAllCards()");
         this.ownsCards = false;
@@ -581,11 +615,14 @@ export default {
           console.log("Copy Failed: ", error);
         });
     },
+    onConnect: function() {
+      MessageBus.$emit('connect')
+    }
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 #button-container {
   display: flex;
   margin-bottom: 2rem;
@@ -602,14 +639,6 @@ export default {
   align-items: center;
   justify-content: center;
   margin-top: 36px;
-}
-
-.cards-wrapper {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-around;
 }
 
 .wrapper {
@@ -663,17 +692,31 @@ export default {
   border: 2px solid rgb(87, 69, 229);
 }
 
-table .cell {
-  height: 60px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+table {
+  .cell {
+    min-height: 60px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    img {
+      height: 60px;
+    }
+  }
+
 }
 
 .sacrifice-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-around;
+}
+
+.cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(0.55 * 260px), 1fr));
+  place-items: center;
 }
 
 /* Desktop CSS */
@@ -694,5 +737,21 @@ table .cell {
     margin-bottom: 0;
     margin-right: 16px;
   }
+
+  .cards-wrapper {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
 }
+
+.centered {
+  display: flex;
+  justify-content: center;
+}
+
+#connect-button {
+  font-size: 20px;
+  padding: 5px 10px;
+  margin-right: 10px;
+}
+
 </style>

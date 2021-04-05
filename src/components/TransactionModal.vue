@@ -11,7 +11,7 @@
       <img src="../../public/cryptokeeper_logo_binance.b2d477e6.png" />
       <b-spinner id="spinnyboi" />
     </span>
-    <span>Processing the transaction.</span>
+    <span>Please confirm the transaction.</span>
   </b-modal>
 </template>
 

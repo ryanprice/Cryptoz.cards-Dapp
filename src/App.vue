@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <AppHeader v-on:on-connect="onConnect" />
+    <AppHeader v-on:connect="handleConnect" />
     <transition name="component-fade" mode="out-in">
       <router-view></router-view>
     </transition>
@@ -12,7 +12,6 @@
 <script>
 
 import axios from 'axios';
-var contract = require("truffle-contract");
 import watchEvents from './util/watchEvents';
 import { showSuccessToast } from './util/showToast'
 import BodyContent from './components/BodyContent'
@@ -20,9 +19,11 @@ import AppHeader from './components/layout/AppHeader'
 import AppFooter from './components/layout/AppFooter'
 import _ from 'lodash'
 import TransactionModal from './components/TransactionModal.vue'
+import dAppStates from '@/dAppStates'
+import { MessageBus } from '@/messageBus';
 
 // import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+// import WalletConnectProvider from "@walletconnect/web3-provider";
 const Web3 = require('web3')
 // const Torus = require("@toruslabs/torus-embed");
 // const Portis = require("@portis/web3");
@@ -98,11 +99,15 @@ export default {
     if (window.ethereum) {
       const web3 = new Web3(window.ethereum)
       window.web3 = web3
-      this.setContractProvider(web3.currentProvider)
+      this.initializeApp()
     }
     else {
       console.log('non web3 browser detected')
     }
+    MessageBus.$on('connect', () => {
+      this.handleConnect()
+    })
+
   },
   data() {
     return {
@@ -156,13 +161,45 @@ export default {
     }(document, "script", "twitter-wjs"));
   },
   methods: {
-    onConnect: async function() {
+    initializeApp: async function() {
+      const [accounts, networkId] = await Promise.all([web3.eth.getAccounts(), web3.eth.net.getId()]);
+      this.$store.dispatch('chainChanged', networkId)
+
+      await this.loadContracts(accounts, networkId)
+
+      this.$store.dispatch('setDAppState', dAppStates.CONNECTED)
+
+      this.subscribeToProviderEvents(web3.currentProvider)
+      this.$store.dispatch('updateUniverseBalances')
+
+      if (accounts.length > 0) {
+        await this.$store.dispatch('updateOwnerBalances')
+        this.$store.dispatch('setDAppState', dAppStates.WALLET_CONNECTED)
+      }
+    },
+    loadContracts: async function(accounts, networkId) {
+      const cryptozContractResp = await axios.get(`${contractBaseUrl}/Cryptoz.json`);
+      const czxpContractResp = await axios.get(`${contractBaseUrl}/CzxpToken.json`);
+
+      const cryptozArtifact = cryptozContractResp.data
+      const czxpArtifact = czxpContractResp.data
+
+      const cryptozContractAddress = cryptozArtifact.networks[networkId].address;
+      const czxpContractAddress = czxpArtifact.networks[networkId].address;
+
+      const cryptozContract = new web3.eth.Contract(cryptozArtifact.abi, cryptozContractAddress)
+      const czxpContract = new web3.eth.Contract(czxpArtifact.abi, czxpContractAddress)
+
+      console.log({ cryptozContract, czxpContract })
+      return this.$store.dispatch('setContractInstance', { cryptoz: cryptozContract, czxp: czxpContract })
+    },
+    handleConnect: async function() {
       const provider = window.ethereum
 
-      await provider.enable()
+      await provider.request({ method: 'eth_requestAccounts' })
       const web3 = new Web3(provider)
       window.web3 = web3
-      this.setContractProvider(provider)
+      this.initializeApp()
       // const web3Modal = new Web3Modal({
       //   cacheProvider: true,
       //   providerOptions,
@@ -172,28 +209,6 @@ export default {
       // await provider.enable()
       // this.setContractProvider(provider)
     },
-    
-    async setContractProvider(provider) {
-      this.subscribeToProviderEvents(provider)
-
-      const cryptozContractResp = await axios.get(`${contractBaseUrl}/Cryptoz.json`);
-      const czxpContractResp = await axios.get(`${contractBaseUrl}/CzxpToken.json`)
-
-      const CryptozContract = contract(cryptozContractResp.data);
-      const CzxpContract = contract(czxpContractResp.data);
-
-      CryptozContract.setProvider(provider)
-      CzxpContract.setProvider(provider)
-      const [cryptoz, czxp] = await Promise.all([CryptozContract.deployed(), CzxpContract.deployed()])
-
-      await this.$store.dispatch('setContractInstance', { cryptoz, czxp })
-      this.$store.dispatch('web3isConnected', true)
-      this.$store.dispatch('updateUniverseBalances')
-
-      await this.$store.dispatch('updateWallet')
-      this.$store.dispatch('updateOwnerBalances')
-    },
-
     onCardMinted({
       cardTypeId,
       editionNumber,
@@ -203,19 +218,22 @@ export default {
 
     subscribeToProviderEvents(provider) {
       provider.on("connect", ({chainId}) => {
-        this.$store.dispatch('web3isConnected', true)
         this.$store.dispatch('chainChanged', chainId)
+        this.$store.dispatch('setDAppState', dAppStates.CONNECTED)
       });
-      provider.on("accountsChanged", (accounts) => {
+      provider.on("accountsChanged", async (accounts) => {
         if (accounts.length > 0) {
-          this.$store.dispatch('web3isConnected', true)
+          await this.$store.dispatch('updateOwnerBalances')
+          this.$store.dispatch('setDAppState', dAppStates.WALLET_CONNECTED)
         }
         //user "locks" their wallet via provider
         else {
           this.disconnectWallet()
+          this.$store.dispatch('setDAppState', dAppStates.CONNECTED)
         }
       });
       provider.on("chainChanged", (chainId) => {
+        this.$store.dispatch('chainChanged', chainId)
         // without this check it auto-reloads to infinity
         const previousChainId = localStorage.getItem('ethChainId')
         if (previousChainId !== chainId) {
@@ -226,16 +244,10 @@ export default {
       });
       provider.on("disconnect", () => {
         this.disconnectWallet()
+        this.$store.dispatch('setDAppState', dAppStates.NOT_CONNECTED)
       });
     },
-
-    getWalletInfo() {
-      this.$store.dispatch('updateWallet')
-      this.$store.dispatch('updateOwnerBalances')
-    },
-
     disconnectWallet() {
-      this.$store.dispatch('web3isConnected', false)
       this.$store.dispatch('disconnectWallet')
       this.$store.dispatch('chainChanged', null)
     }

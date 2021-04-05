@@ -1,5 +1,5 @@
 <template>
-  <div class="row-col">
+  <div id="container" class="row-col" v-if="isWalletConnected">
     <p>
       <strong>Your <b-icon-lightning-fill /> Booster credits :</strong> {{boosters_owned}}
     </p>
@@ -8,10 +8,14 @@
   </div>
 </template>
 <script>
+  import dAppStates from '@/dAppStates'
 
   export default {
     name: 'OwnerBalances',
     computed: {
+      isWalletConnected() {
+        return this.$store.state.dAppState === dAppStates.WALLET_CONNECTED;
+      },
       ownerBalances() {
         return this.$store.state.ownerBalances;
       },
@@ -28,17 +32,14 @@
         return this.$store.state.web3.coinbase;
       },
     },
-    watch: {
-      coinbase(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          this.$store.dispatch('updateOwnerBalances')
-        }
-      }
-    },
   }
 
 </script>
 <style scoped>
+  #container {
+    margin: 20px 0;
+  }
+
   p {
     padding-left: 10px;
     margin-bottom: 0;
