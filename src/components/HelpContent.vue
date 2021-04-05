@@ -72,7 +72,6 @@
             </b-card-header>
             <b-collapse
               id="accordion-1-5"
-              v-model="visible"
               accordion="my-accordion"
               role="tabpanel"
             >
