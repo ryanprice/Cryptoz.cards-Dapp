@@ -63,7 +63,7 @@
         <div v-if="ownsCards">
           <div v-if="!isTableView" class="cards-wrapper">
             <div
-              v-for="card in orderedCards"
+              v-for="(card, i) in orderedCards"
               :key="card.id"
               class="card-wrapper"
             >
@@ -84,6 +84,7 @@
                 :card_class="card.rarity"
                 :in_store="card.in_store"
                 :card_owned="true"
+                :index="i"
               ></OwnedCardContent>
               <div class="sacrifice-wrapper" v-if="!isOthersCrypt">
                 <div>

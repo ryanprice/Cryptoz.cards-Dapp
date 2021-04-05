@@ -4,6 +4,7 @@
     :class="{ fullsize: isFullSize }"
     @click="isFlipped = !isFlipped"
     @mouseleave="isFlipped = false"
+    :data-index="index"
   >
     <div
       id="flip-container"
@@ -88,10 +89,17 @@ export default {
     "in_store",
     "card_owned",
     "is_single_card_view",
+    "index",
+    "observer",
   ],
   data() {
     return {
       isFlipped: false,
+    }
+  },
+  mounted() {
+    if (this.observer) {
+      this.observer.observe(this.$el);
     }
   },
   computed: {

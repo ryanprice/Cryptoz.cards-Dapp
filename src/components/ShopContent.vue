@@ -93,8 +93,8 @@
         </div>
       </div>
       <br>
-      <div class="cards-wrapper">
-        <div v-for="card in displayCards" :key="card.type_id" class="card-wrapper">
+      <div id="cards-wrapper">
+        <div v-for="(card, i) in displayCards" :key="card.type_id" class="card-wrapper">
           <OwnedCardContent
             :type_id="card.type_id"
             :name="card.name"
@@ -111,6 +111,8 @@
             :image="card.image"
             :card_class="card.rarity"
             :card_owned="false"
+            :index="i"
+            :observer="observer"
           ></OwnedCardContent>
           <div class="card-button-container" v-if="isWalletConnected">
             <div
@@ -126,11 +128,11 @@
             <div
               v-else-if="!card.isOwned"
               id="buy-get-button-wrapper"
-              :class="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''"
+              :class="balance <= card.cost || parseInt(czxpBalance) < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''"
             >
               <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip.hover="buyBtnTooltipText(card.cost, card.unlock_czxp)">
-                <b-button id="buy-button" :disabled="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)" variant="primary" v-on:click="buyCard(card)">
-                  <b-icon-lock-fill v-if="balance <= card.cost || czxpBalance < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint NFT for {{card.cost}} BNB
+                <b-button id="buy-button" :disabled="balance <= card.cost || parseInt(czxpBalance) < parseInt(card.unlock_czxp)" variant="primary" v-on:click="buyCard(card)">
+                  <b-icon-lock-fill v-if="balance <= card.cost || parseInt(czxpBalance) < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint NFT for {{card.cost}} BNB
                 </b-button>
               </div>
               <div
@@ -200,17 +202,16 @@
             </div>
           </div>
         </div>
-        <!--div class="load-more" v-if="shouldRenderLoadMore">
-          <b-button variant="outline-success" @click="loadMoreCards">Load more</b-button>
-        </div-->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import axios from 'axios'
 import { BRow, BCol, BButton, BSpinner } from "bootstrap-vue";
+
 import OwnedCardContent from '@/components/OwnedCardContent.vue'
 import UniverseBalances from '@/components/UniverseBalances.vue'
 import OwnerBalances from '@/components/OwnerBalances.vue'
@@ -220,7 +221,6 @@ import { getRarity, dynamicSort} from '../helpers'
 import { showRejectedToast, showSuccessToast, showPendingToast } from "../util/showToast";
 import getCardType from '../util/getCardType'
 import { MessageBus } from '@/messageBus';
-import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -247,12 +247,52 @@ export default {
       totalCreditsToBuy: 1,
       isBuyingBooster: false,
       isCardSorted: false,
-      pageSize: 10,
+      pageSize: 15,
       paginatedCards: [],
       sortedPaginatedCards: [],
       pageNext: 0,
       sortedPageNext: 0,
+      observer: null,
     };
+  },
+  beforeDestroy() {
+    this.observer.disconnect();
+  },
+  created() {
+    this.observer = new IntersectionObserver(
+      this.onElementObserved, 
+      {
+        root: this.$el,
+        threshold: 1.0,
+      }
+    );
+    this.loadMoreCards = _.debounce(() => {
+      if (this.isCardSorted) {
+        const newCards = this.$store.getters.getPaginatedShopCards(
+          this.pageSize,
+          this.sortedPageNext,
+          this.isCardSorted
+        );
+        this.sortedPaginatedCards = [
+          ...this.sortedPaginatedCards,
+          ...newCards.cards,
+        ];
+        this.sortedPageNext = newCards.next;
+      } else {
+        const newCards = this.$store.getters.getPaginatedShopCards(
+          this.pageSize,
+          this.pageNext,
+          this.isCardSorted
+        );
+        this.paginatedCards = [...this.paginatedCards, ...newCards.cards];
+        this.pageNext = newCards.next;
+      }
+    }, 500, {leading: true})
+  },
+  mounted() {
+    if (this.CryptozInstance) {
+      this.fetchStoreCards();
+    }
   },
   computed: {
     dAppState() {
@@ -303,7 +343,7 @@ export default {
         ? this.sortedPaginatedCards
         : this.paginatedCards;
     },
-    shouldRenderLoadMore() {
+    canLoadMore() {
       if (this.isCardSorted) {
         return this.sortedPageNext !== null;
       } else {
@@ -325,12 +365,24 @@ export default {
       }
     },
   },
-  mounted() {
-    if (this.CryptozInstance) {
-      this.fetchStoreCards();
-    }
-  },
   methods: {
+    onElementObserved(entries) {
+      entries.forEach(({ target, isIntersecting}) => {
+          if (!isIntersecting) {
+            return;
+          }
+          
+          this.observer.unobserve(target);
+        
+          const index = parseInt(target.getAttribute("data-index"));
+          // if the 10th last card scrolls into view, load more
+          if (index === this.displayCards.length - 10) {
+            if (this.canLoadMore) {
+              this.loadMoreCards()
+            }
+          }
+      });
+    },
     fetchStoreCards: async function () {
       await this.$store.dispatch("fetchStoreCards");
 
@@ -348,30 +400,6 @@ export default {
         ];
         this.sortedPageNext = newCards.next;
       } else {
-        this.paginatedCards = [...this.paginatedCards, ...newCards.cards];
-        this.pageNext = newCards.next;
-      }
-    },
-    loadMoreCards: function () {
-      if (this.isCardSorted) {
-        const newCards = this.$store.getters.getPaginatedShopCards(
-          this.pageSize,
-          this.sortedPageNext,
-          this.isCardSorted
-        );
-
-        this.sortedPaginatedCards = [
-          ...this.sortedPaginatedCards,
-          ...newCards.cards,
-        ];
-        this.sortedPageNext = newCards.next;
-      } else {
-        const newCards = this.$store.getters.getPaginatedShopCards(
-          this.pageSize,
-          this.pageNext,
-          this.isCardSorted
-        );
-
         this.paginatedCards = [...this.paginatedCards, ...newCards.cards];
         this.pageNext = newCards.next;
       }
@@ -598,7 +626,7 @@ export default {
   font-size: 16px;
 }
 
-.cards-wrapper {
+#cards-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   place-items: center;
@@ -620,7 +648,7 @@ export default {
 }
 
 @media screen and (max-width: 1000px) {
-  .cards-wrapper {
+  #cards-wrapper {
     grid-template-columns: repeat(auto-fit, minmax(calc(0.55 * 260px), 1fr));
 
     .card-wrapper {
