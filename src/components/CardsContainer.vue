@@ -547,7 +547,15 @@ export default {
         this.ownsCards = false;
       }
     },
-    sortByAttr: function(param, isDescending) {
+    sortByAttr: function (param, isDescending) {
+      if (!param) {
+        // clear sort
+        this.orderedCards.sort((a, b) => b.id - a.id);
+        this.sortType = null;
+        this.isDescending = true;
+        return;
+      }
+
       this.sortType = param;
       this.isDescending = isDescending;
 
