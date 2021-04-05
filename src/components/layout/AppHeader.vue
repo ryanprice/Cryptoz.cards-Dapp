@@ -234,7 +234,7 @@ export default {
     ethBalance() {
       const balance = this.$store.state.web3.balance
       if (balance !== null) {
-        return parseFloat(web3.utils.fromWei(balance));
+        return parseFloat(web3.utils.fromWei(balance.toString()));
       }
       return null
     },

@@ -74,8 +74,7 @@ export const store = new Vuex.Store({
         return
       }
       const balance = await window.web3.eth.getBalance(coinbase)
-
-      commit('updateWallet', {coinbase, balance})
+      commit('updateWallet', {coinbase, balance: parseInt(balance)})
 
       const { cryptoz, czxp } = this.state.contractInstance
       const czxpBalancePromise = czxp.methods.balanceOf(coinbase).call();

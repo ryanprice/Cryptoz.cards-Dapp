@@ -122,83 +122,71 @@
               class="disabled-btn"
             >
               <button id="owned-button" disabled class="btn btn-danger">
-              SOLD OUT!
+                SOLD OUT!
               </button>
             </div>
             <div
               v-else-if="!card.isOwned"
               id="buy-get-button-wrapper"
-              :class="balance <= card.cost || parseInt(czxpBalance) < parseInt(card.unlock_czxp) ? 'disabled-btn' : ''"
+              :class="
+                balance <= card.cost ||
+                czxpBalance < parseInt(card.unlock_czxp)
+                  ? 'disabled-btn'
+                  : ''
+              "
             >
-              <div v-if="card.cost > 0" id="buyBtnwrapper" v-b-tooltip.hover="buyBtnTooltipText(card.cost, card.unlock_czxp)">
-                <b-button id="buy-button" :disabled="balance <= card.cost || parseInt(czxpBalance) < parseInt(card.unlock_czxp)" variant="primary" v-on:click="buyCard(card)">
-                  <b-icon-lock-fill v-if="balance <= card.cost || parseInt(czxpBalance) < parseInt(card.unlock_czxp)"></b-icon-lock-fill> Mint NFT for {{card.cost}} BNB
-                </b-button>
-              </div>
               <div
-                v-else-if="!card.isOwned"
-                id="buy-get-button-wrapper"
-                :class="
-                  balance <= card.cost ||
-                  czxpBalance < parseInt(card.unlock_czxp)
-                    ? 'disabled-btn'
-                    : ''
+                v-if="card.cost > 0"
+                id="buyBtnwrapper"
+                v-b-tooltip.hover="
+                  buyBtnTooltipText(card.cost, card.unlock_czxp)
                 "
               >
-                <div
-                  v-if="card.cost > 0"
-                  id="buyBtnwrapper"
-                  v-b-tooltip.hover="
-                    buyBtnTooltipText(card.cost, card.unlock_czxp)
+                <b-button
+                  id="buy-button"
+                  :disabled="
+                    balance <= card.cost ||
+                    czxpBalance < parseInt(card.unlock_czxp)
                   "
+                  variant="primary"
+                  v-on:click="buyCard(card)"
                 >
-                  <b-button
-                    id="buy-button"
-                    :disabled="
+                  <b-icon-lock-fill
+                    v-if="
                       balance <= card.cost ||
                       czxpBalance < parseInt(card.unlock_czxp)
                     "
-                    variant="primary"
-                    v-on:click="buyCard(card)"
-                  >
-                    <b-icon-lock-fill
-                      v-if="
-                        balance <= card.cost ||
-                        czxpBalance < parseInt(card.unlock_czxp)
-                      "
-                    ></b-icon-lock-fill>
-                    Mint NFT for {{ card.cost }} BNB
-                  </b-button>
-                </div>
-                <div
-                  v-else
-                  id="getBtnwrapper"
-                  v-b-tooltip.hover="getBtnTooltipText(card.unlock_czxp)"
-                >
-                  <button
-                    id="get-button"
-                    class="btn btn-primary"
-                    :disabled="czxpBalance < parseInt(card.unlock_czxp)"
-                    v-on:click="getCardForFree(card.type_id)"
-                  >
-                    <b-icon-lock-fill
-                      v-if="czxpBalance < parseInt(card.unlock_czxp)"
-                    ></b-icon-lock-fill>
-                    Mint for FREE
-                  </button>
-                </div>
+                  ></b-icon-lock-fill>
+                  Mint NFT for {{ card.cost }} BNB
+                </b-button>
               </div>
-
               <div
-                v-else-if="card.isOwned"
-                id="owned-button-wrapper"
-                v-b-tooltip.hover="getOwnedCardToolTipText"
-                class="disabled-btn"
+                v-else
+                id="getBtnwrapper"
+                v-b-tooltip.hover="getBtnTooltipText(card.unlock_czxp)"
               >
-                <button id="owned-button" disabled class="btn btn-info">
-                  You already minted one
+                <button
+                  id="get-button"
+                  class="btn btn-primary"
+                  :disabled="czxpBalance < parseInt(card.unlock_czxp)"
+                  v-on:click="getCardForFree(card.type_id)"
+                >
+                  <b-icon-lock-fill
+                    v-if="czxpBalance < parseInt(card.unlock_czxp)"
+                  ></b-icon-lock-fill>
+                  Mint for FREE
                 </button>
               </div>
+            </div>
+            <div
+              v-else
+              id="owned-button-wrapper"
+              v-b-tooltip.hover="getOwnedCardToolTipText"
+              class="disabled-btn"
+            >
+              <button id="owned-button" disabled class="btn btn-info">
+                You already minted one
+              </button>
             </div>
           </div>
         </div>
@@ -353,36 +341,13 @@ export default {
     ...mapGetters(["isLoadingShopCards", "isShopLoadingFinished"]),
   },
   watch: {
-    // currentEvent(newValue, oldValue) {
-    //   // we only update events in the store when it concerns our wallet
-    //   if (newValue !== oldValue && typeof newValue !== "undefined") {
-    //     this.$store.dispatch("fetchStoreCards");
-    //   }
-    // },
-    CryptozInstance(newVal) {
-      if (newVal) {
+    dAppState(newVal) {
+      if (newVal === dAppStates.CONNECTED || newVal === dAppStates.WALLET_CONNECTED) {
         this.fetchStoreCards();
       }
     },
   },
   methods: {
-    onElementObserved(entries) {
-      entries.forEach(({ target, isIntersecting}) => {
-          if (!isIntersecting) {
-            return;
-          }
-          
-          this.observer.unobserve(target);
-        
-          const index = parseInt(target.getAttribute("data-index"));
-          // if the 10th last card scrolls into view, load more
-          if (index === this.displayCards.length - 10) {
-            if (this.canLoadMore) {
-              this.loadMoreCards()
-            }
-          }
-      });
-    },
     fetchStoreCards: async function () {
       await this.$store.dispatch("fetchStoreCards");
 
@@ -536,7 +501,24 @@ export default {
     },
     onConnect: function() {
       MessageBus.$emit('connect')
-    }
+    },
+    onElementObserved(entries) {
+      entries.forEach(({ target, isIntersecting}) => {
+          if (!isIntersecting) {
+            return;
+          }
+          
+          this.observer.unobserve(target);
+        
+          const index = parseInt(target.getAttribute("data-index"));
+          // if the 10th last card scrolls into view, load more
+          if (index === this.displayCards.length - 10) {
+            if (this.canLoadMore) {
+              this.loadMoreCards()
+            }
+          }
+      });
+    },
   },
 };
 </script>
@@ -603,6 +585,10 @@ export default {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid #007bff;
+}
+
+#owned-button-wrapper::before {
+  border-bottom: 10px solid #17a2b8;
 }
 
 .shop-card-item {

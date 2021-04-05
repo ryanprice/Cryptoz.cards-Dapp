@@ -79,7 +79,7 @@
             <b-button
               v-b-tooltip.hover="'Mint 1 random booster NFT +120 CZXP'"
               class="btn btn-danger"
-              v-bind:disabled="parseInt(balance) < 2000000000000000"
+              v-bind:disabled="balance < 2000000000000000"
               v-on:click="buyAndOpenBooster"
               >Buy and Open <b-icon-lightning-fill /> Booster 0.002 BNB
             </b-button>
