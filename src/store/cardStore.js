@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import getCardType from "../util/getCardType";
 import state from "./state";
-import { dynamicSort, getRarity } from "../helpers";
+import { dynamicSort, getRarity, soldOutSort } from "../helpers";
 
 const typeIdsOnChain = [];
 
@@ -120,6 +120,8 @@ const getCard = async (cardId, CryptozInstance) => {
   // Set soldOut flag first
   if (cardObj.edition_current == cardObj.edition_total) {
     cardObj.soldOut = 1;
+  } else {
+    cardObj.soldOut = 0;
   }
 
   return cardObj;
@@ -184,7 +186,7 @@ const cardStore = {
      *
      */
     [CARD_MUTATIONS.SET_SHOP_CARDS](state, payload) {
-      state.allShopCards = [...payload];
+      state.allShopCards = [...payload].sort(soldOutSort);
       state.shopLoaded = true;
       state.isLoadingShop = false;
       state.failedToLoadShop = false;
@@ -224,6 +226,19 @@ const cardStore = {
 
       state.sortedCards = shopCards;
     },
+    updateMintedCountForCard(state, payload) {
+      const { cardTypeId, editionNumber } = payload
+
+      const cardIndex = state.allShopCards.findIndex(card => card.type_id === cardTypeId);
+      if (cardIndex > -1) {
+        state.allShopCards[cardIndex].edition_current = editionNumber
+      }
+
+      if (state.sortedCards.length > 0) {
+        const sortedIndex = state.sortedCards.findIndex(card => card.type_id === cardTypeId);
+        state.sortedCards[sortedIndex].edition_current = editionNumber
+      }
+    }
   },
   actions: {
     async setCurrentEdition({commit, rootState}, payload) {
@@ -285,6 +300,9 @@ const cardStore = {
     },
     setCardAsNotBought({ commit }, payload) {
       commit(CARD_MUTATIONS.SET_CARD_NOT_BOUGHT, payload);
+    },
+    updateMintedCountForCard({commit}, payload) {
+      commit('updateMintedCountForCard', payload)
     },
   },
   getters: {
