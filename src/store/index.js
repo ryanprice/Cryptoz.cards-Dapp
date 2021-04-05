@@ -83,9 +83,9 @@ export const store = new Vuex.Store({
       const boosterPacksOwnedPromise = cryptoz.methods.boosterPacksOwned(coinbase).call();
 
       const [czxpBalance, cryptozBalance, boosterPacksOwned] = await Promise.all([czxpBalancePromise, cryptozBalancePromise, boosterPacksOwnedPromise])
-      commit('updateCZXPBalance', czxpBalance.toNumber())
-      commit('updateCardsOwned', cryptozBalance.toNumber())
-      commit('updateBoostersOwned', boosterPacksOwned.toNumber())
+      commit('updateCZXPBalance', parseInt(czxpBalance))
+      commit('updateCardsOwned', parseInt(cryptozBalance))
+      commit('updateBoostersOwned', parseInt(boosterPacksOwned))
     },
     async updateUniverseBalances({commit}, payload){
       const { cryptoz, czxp } = this.state.contractInstance
