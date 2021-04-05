@@ -20,13 +20,13 @@
         return this.$store.state.ownerBalances;
       },
       boosters_owned(){
-        return this.$store.state.boostersOwned;
+        return this.$store.state.boostersOwned.toLocaleString();
       },
       cards_owned(){
-        return this.$store.state.cardsOwned;
+        return this.$store.state.cardsOwned.toLocaleString();
       },
       czxp_balance(){
-        return this.$store.state.czxpBalance;
+        return this.$store.state.czxpBalance.toLocaleString();
       },
       coinbase() {
         return this.$store.state.web3.coinbase;

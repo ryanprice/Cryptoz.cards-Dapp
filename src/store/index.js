@@ -83,10 +83,9 @@ export const store = new Vuex.Store({
       const boosterPacksOwnedPromise = cryptoz.methods.boosterPacksOwned(coinbase).call();
 
       const [czxpBalance, cryptozBalance, boosterPacksOwned] = await Promise.all([czxpBalancePromise, cryptozBalancePromise, boosterPacksOwnedPromise])
-
-      commit('updateCZXPBalance', parseInt(czxpBalance).toLocaleString())
-      commit('updateCardsOwned', parseInt(cryptozBalance).toLocaleString())
-      commit('updateBoostersOwned', parseInt(boosterPacksOwned).toLocaleString())
+      commit('updateCZXPBalance', czxpBalance.toNumber())
+      commit('updateCardsOwned', cryptozBalance.toNumber())
+      commit('updateBoostersOwned', boosterPacksOwned.toNumber())
     },
     async updateUniverseBalances({commit}, payload){
       const { cryptoz, czxp } = this.state.contractInstance
@@ -96,9 +95,9 @@ export const store = new Vuex.Store({
       const totalCryptozPromise = cryptoz.methods.totalSupply().call();
 
       const [totalCzxp, totalTypes, totalCryptoz] = await Promise.all([totalCzxpPromise, totalTypesPromise, totalCryptozPromise])
-      commit('updateCZXPTotal', parseInt(totalCzxp).toLocaleString())
-      commit('updateTypesTotal', parseInt(totalTypes).toLocaleString())
-      commit('updateCryptozTotal', parseInt(totalCryptoz).toLocaleString())
+      commit('updateCZXPTotal', parseInt(totalCzxp))
+      commit('updateTypesTotal', parseInt(totalTypes))
+      commit('updateCryptozTotal', parseInt(totalCryptoz))
     },
     updateCZXPBalance ({commit}, payload){
       commit('updateCZXPBalance', payload)

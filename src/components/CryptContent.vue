@@ -86,7 +86,7 @@
           </div>
         </div>
         <br />
-
+        
         <OwnerBalances></OwnerBalances>
         <div class="cards-wrapper">
           <cards-container :isOthersCrypt="false" :addressToLoad="coinbase"></cards-container>

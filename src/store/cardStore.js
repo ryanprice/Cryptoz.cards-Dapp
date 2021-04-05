@@ -6,7 +6,7 @@ import { dynamicSort, getRarity, soldOutSort } from "../helpers";
 
 const typeIdsOnChain = [];
 
-//push Apr 1,2021
+//push Apr 4,2021
 typeIdsOnChain.push(138,140);
 //push Apr 1,2021
 typeIdsOnChain.push(135, 136, 137);
@@ -75,10 +75,11 @@ const EDITION_HACK = {
   104: 7,
   93: 49,
   74: 189,
+  79: 299,
   96: 109,
   60: 384,
   133: 309,
-  135: 204,
+  135:204,
   137: 3,
   138: 159,
   165: 12,

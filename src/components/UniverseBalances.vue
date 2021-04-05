@@ -20,13 +20,13 @@
         return this.$store.state.universeBalances;
       },
       totalCzxpSupply(){
-        return this.$store.state.totalCzxpSupply;
+        return this.$store.state.totalCzxpSupply.toLocaleString();
       },
       totalCryptozSupply(){
-        return this.$store.state.totalCryptozSupply;
+        return this.$store.state.totalCryptozSupply.toLocaleString();
       },
       totalCryptozTypes(){
-        return this.$store.state.totalCryptozTypes;
+        return this.$store.state.totalCryptozTypes.toLocaleString();
       },
       coinbase() {
         return this.$store.state.web3.coinbase;

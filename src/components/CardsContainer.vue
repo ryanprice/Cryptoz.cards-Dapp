@@ -60,7 +60,7 @@
         <b-spinner style="width: 3rem; height: 3rem;" type="grow"></b-spinner>
       </div>
       <div v-else>
-        <div v-if="ownsCards">
+        <div v-if="isOthersCrypt || isWalletConnected">
           <div v-if="!isTableView" class="cards-wrapper">
             <div
               v-for="(card, i) in orderedCards"
@@ -159,7 +159,7 @@
                 </div>
               </template>
               <template #cell(sacrifice)="row">
-                <div  v-if="!isOthersCrypt" class="cell">
+                <div v-if="!isOthersCrypt" class="cell">
                   <b-button
                     size="md"
                     @click="sacrificeCard(row.item.id)"
@@ -193,15 +193,6 @@
             </b-table>
           </div>
         </div>
-        <div v-else-if="isWalletConnected">
-          <h2 v-if="!isOthersCrypt">
-            You do not own any Cryptoz<br /><router-link to="/shop"
-              >To get Free Cryptoz NFTs or Buy one, visit the Minting
-              Shop</router-link
-            >
-          </h2>
-          <h2 v-else>No Avaliable NFTs</h2>
-        </div>
         <div v-else>
           <h2 class="centered">
             <b-button
@@ -215,6 +206,15 @@
             </b-button>
             your wallet.
           </h2>
+        </div>
+        <div v-if="(isWalletConnected || isOthersCrypt) && !ownsCards">
+          <h2 v-if="!isOthersCrypt">
+            You do not own any Cryptoz<br /><router-link to="/shop"
+              >To get Free Cryptoz NFTs or Buy one, visit the Minting
+              Shop</router-link
+            >
+          </h2>
+          <h2 v-else>No Avaliable NFTs</h2>
         </div>
       </div>
     </div>
@@ -437,7 +437,7 @@ export default {
       this.$router.push(`/my-cryptoz-nfts/${this.addressToSearch}`);
     },
     getAllCards: async function(addressToLoad) {
-      if (!this.isWalletConnected) {
+      if (!this.isOthersCrypt && !this.isWalletConnected) {
         return
       }
       this.isLoading = true;
@@ -445,6 +445,7 @@ export default {
         .tokensOfOwner(addressToLoad)
         .call();
 
+      console.log({tokensOfOwner})
       this.handleGetAllCards(tokensOfOwner, this.CryptozInstance);
       this.isLoading = false;
     },
