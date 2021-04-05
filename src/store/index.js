@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
 import { showSuccessToast } from "../util/showToast";
+import cardStore from './cardStore';
 
 Vue.use(Vuex)
 
@@ -50,14 +51,6 @@ export const store = new Vuex.Store({
     setStoreCards(state, payload) {
       state.shop.cards = payload
     },
-    updateMintedCountForCard(state, payload) {
-      const { cardTypeId, editionNumber } = payload
-
-      const cardIndex = state.shop.cards.findIndex(card => card.type_id === cardTypeId)
-      if (cardIndex > -1) {
-        state.shop.cards[cardIndex].edition_current = editionNumber
-      }
-    }
   },
   actions: {
     setContractInstance ({commit}, payload) {
@@ -131,11 +124,11 @@ export const store = new Vuex.Store({
     setStoreCards({commit}, payload) {
       commit('setStoreCards', payload)
     },
-    updateMintedCountForCard({commit}, payload) {
-      commit('updateMintedCountForCard', payload)
-    },
     setLastEvent ({commit}, payload) {
       commit('setLastEvent', payload)
     },
+  },
+  modules: {
+    cards: cardStore
   }
 })

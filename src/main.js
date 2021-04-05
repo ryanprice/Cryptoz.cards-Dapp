@@ -10,9 +10,9 @@ import { store } from './store/'
 import LogRocket from 'logrocket';
 
 if (process.env.NODE_ENV == "development") {
-  LogRocket.init('hkkfms/cryptoztest');
+  LogRocket.init('jf4zzm/cryptoz-testbsc');
 } else {
-  LogRocket.init('hkkfms/cryptozbsc');
+  LogRocket.init('jf4zzm/the-cryptoz-nft-universe');
 }
 
 // Vue.use(BootstrapVue)
