@@ -5,16 +5,19 @@
       <br />
 
       <div class="row">
-        <div class="col-6">
+        <div class="col">
           <h3>
-            Cryptoz Cards<br />BEP-721 NFT tokens are supported on the following
-            auction marketplaces
+            Cryptoz Cards
           </h3>
+          <h5> 
+            BEP-721 NFT tokens are supported on the following
+            auction marketplaces
+          </h5>
 
           <a href="https://whalecrate.com/browse/cryptoz" target="_blank">
             <div class="market-btn">
               <img
-                class="opensea-logo"
+                class="logo"
                 src="https://whalecrate.com/logo-wide.svg"
                 align="absmiddle"
               />
@@ -27,7 +30,7 @@
           <a href="https://www.aotoy.club/" target="_blank">
             <div class="market-btn">
               <img
-                class="opensea-logo"
+                class="logo"
                 src="https://www.aotoy.club/img/logo.4e931c7f.svg"
                 align="absmiddle"
               />
@@ -46,7 +49,7 @@
           >
             <div class="market-btn">
               <img
-                class="opensea-logo"
+                id="treasureland-logo"
                 src="https://treasureland.market/static/media/logo.849b6817.svg"
                 align="absmiddle"
               />
@@ -58,16 +61,18 @@
         </div>
         <!-- End nft column -->
 
-        <div class="col-6">
+        <div class="col">
 
           <h3>
             CryptoZ eXPerience (CZXP
             <img
               class="czxp-logo"
               src="./assets/cryptokeeper_coin_binance.svg"
-            />) <br />BEP-20 tokens are supported on the following token
-            exchanges
+            />)
           </h3>
+          <h5>
+            BEP-20 tokens are supported on the following token exchanges
+          </h5>
 
           <a
             href="https://info.julswap.com/pair/0x0f4b077f27E687b1e77E4a1b9ce0B4eceE100EB6#/"
@@ -129,52 +134,55 @@ export default {
   },
 };
 </script>
-        <style scoped>
-          .opensea-header {
-            font-size: 2rem !important;
-            margin-left: 10px;
-          }
-          .opensea-logo {
-            width: 16%;
-            margin-bottom: 10px;
-          }
-          .rb-logo {
-            width: 39%;
-            margin-bottom: 10px;
-          }
-          .uni-logo {
-            width: 16%;
-            margin-bottom: 10px;
-          }
-          .czxp-logo {
-            width: 7%;
-            margin-right: 0.2em;
-          }
-          .market-btn:hover {
-            color: #000;
-            background-color: #ccc;
-            padding: 10px;
-            max-height: fit-content;
-            text-decoration: none;
-            border: 1px solid black;
-          }
-          a:hover {
-            text-decoration: none;
-          }
-          .market-btn {
-            color: #000;
-            padding: 10px;
-            text-decoration: none;
-            max-height: fit-content;
-            border: 1px solid white;
-            margin-bottom: 5px;
-          }
-          h3 {
-            margin-bottom: 1em;
-          }
+<style scoped>
+  .col {
+    min-width: 320px;
+  }
 
-          .jumbotron {
-            margin: auto;
-            width: 95%;
-          }
-        </style>
+  .opensea-header {
+    font-size: 2rem !important;
+    margin-left: 10px;
+  }
+
+  #treasureland-logo {
+    height: 45px;
+  }
+
+  .logo {
+    height: 25px;
+  }
+  .uni-logo {
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  .czxp-logo {
+    height: 30px;
+  }
+  .market-btn:hover {
+    color: #000;
+    background-color: #ccc;
+    padding: 10px;
+    max-height: fit-content;
+    text-decoration: none;
+    border: 1px solid black;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+  .market-btn {
+    color: #000;
+    padding: 10px;
+    text-decoration: none;
+    max-height: fit-content;
+    border: 1px solid white;
+    margin-bottom: 5px;
+  }
+  h3 {
+    margin-bottom: 1em;
+  }
+
+  .jumbotron {
+    margin: auto;
+    width: 95%;
+  }
+</style>
