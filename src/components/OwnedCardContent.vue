@@ -166,13 +166,8 @@ export default {
   background-image: url("https://cryptoz.cards/assets/cryptoz_card_diamond.svg");
 }
 
-.card-bg-back {
-  background-image: url(assets/cryptoz_card_back_binance.svg);
-  padding: 20px;
-}
-
 .card-bg-back-bsc {
-  background-image: url(assets/cryptoz_card_back_binance.svg);
+  background-image: url("https://cryptoz.cards/assets/cryptoz_card_back_binance.svg");
   padding: 20px;
 }
 
