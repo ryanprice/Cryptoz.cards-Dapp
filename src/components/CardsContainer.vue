@@ -556,10 +556,10 @@ export default {
               case "Epic":
                 cardData.attributes.rarity = "card-bg card-bg-3";
                 break;
-              case "Diamond":
+              case "Platinum":
                 cardData.attributes.rarity = "card-bg card-bg-2";
                 break;
-              case "Platinum":
+              case "Diamond":
                 cardData.attributes.rarity = "card-bg card-bg-1";
                 break;
             }
