@@ -1,7 +1,4 @@
-import Vue from "vue";
-import Vuex from "vuex";
 import getCardType from "../util/getCardType";
-import state from "./state";
 import { dynamicSort, getRarity, soldOutSort } from "../helpers";
 
 const typeIdsOnChain = [];
@@ -33,12 +30,6 @@ const DEFAULT_CARD_STATE = {
   isLoadingShop: false,
   failedToLoadShop: false,
   shopLoaded: false,
-  ownedCards: {},
-  isLoadingOwnedCards: false,
-  failedToLoadOwnedCards: false,
-  othersCards: {},
-  isLoadingOthersCards: false,
-  failedToLoadOthersCards: false,
 };
 
 export const CARD_MUTATIONS = {
@@ -51,7 +42,7 @@ export const CARD_MUTATIONS = {
   SET_CARD_EDITION: "SET_CARD_EDITION",
 };
 
-const RARITY = {
+export const RARITY = {
   Common: "card-bg card-bg-6",
   Uncommon: "card-bg card-bg-5",
   Rare: "card-bg card-bg-4",

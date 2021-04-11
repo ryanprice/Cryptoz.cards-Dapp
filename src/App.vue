@@ -12,11 +12,11 @@
 
 <script>
 import axios from "axios";
+import debounce from "lodash/debounce";
 import watchEvents from "./util/watchEvents";
 import { showSuccessToast } from "./util/showToast";
 import AppHeader from "./components/layout/AppHeader";
 import AppFooter from "./components/layout/AppFooter";
-import _ from "lodash";
 import TransactionModal from "./components/TransactionModal.vue";
 import dAppStates from "@/dAppStates";
 import { MessageBus } from "@/messageBus";
@@ -114,7 +114,7 @@ export default {
     // set this here to be able to debounce it..
     // debounce prevents this from showing the "Balance Updated" twice
     // when both Cryptoz and Czxp contracts emit an event
-    this.onBalanceUpdated = _.debounce(() => {
+    this.onBalanceUpdated = debounce(() => {
       showSuccessToast(this, "Balance Updated!");
     }, 1000);
 
