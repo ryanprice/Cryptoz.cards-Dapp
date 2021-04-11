@@ -3,17 +3,16 @@ import { store } from "../store/";
 let watchEvents = function (
   CzxpInstance,
   CryptozInstance,
-  { onCardMinted, onBalanceUpdated }
+  { onCardMinted, onBalanceUpdated, onSponsorEvent }
 ) {
-  // console.log('watch events', {CzxpInstance, CryptozInstance, onCardMinted, onBalanceUpdated})
-
   CzxpInstance.events.allEvents(
     { fromBlock: "latest" },
     function (error, event) {
+      const { coinbase } = store.state.web3;
+
       if (!error) {
         //IF event affects our wallet, dispatch
         const { to, from, player } = event.returnValues;
-        const { coinbase } = store.state.web3;
         if (
           coinbase &&
           [to, from, player]
@@ -35,6 +34,8 @@ let watchEvents = function (
   CryptozInstance.events.allEvents(
     { fromBlock: "latest" },
     function (error, event) {
+      const { coinbase } = store.state.web3;
+
       switch (event.event) {
         case "LogCardCreated":
           onCardMinted({
@@ -44,12 +45,16 @@ let watchEvents = function (
             ).toString(),
           });
           break;
+        case 'LogSponsorReward':
+          if (coinbase.toLowerCase() === event.returnValues.sponsor.toLowerCase()) {
+            onSponsorEvent(parseInt(event.returnValues.CzxpReward))
+          }
+          break;
         default:
           break;
       }
       if (!error) {
         const { to, from, player } = event.returnValues;
-        const { coinbase } = store.state.web3;
         if (
           coinbase &&
           [to, from, player]
@@ -69,4 +74,4 @@ let watchEvents = function (
   );
 };
 
-export default watchEvents;
+export default watchEvents

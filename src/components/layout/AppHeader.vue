@@ -111,7 +111,7 @@
       title="Sponsor Link"
       hide-footer
     >
-      <b-jumbotron class="jumbo" lead="Link Your Sponsor">
+      <b-jumbotron class="jumbo" :lead="sponsorTitle">
         <p>
           By linking your sponsor's wallet address, you will mint a
           <b>Free Platinum Sponsored NFT Card!</b>
@@ -234,7 +234,7 @@ export default {
     BFormInvalidFeedback,
     BAlert,
   },
-  emits: ["connect", "LogSponsorLinked"],
+  emits: ["connect"],
   data() {
     return {
       pendingTransaction: 0,
@@ -246,6 +246,7 @@ export default {
       timeToBonus: 0,
       sponsorAddress: "",
       shouldShowSponsor: true,
+      mySponsor: null,
     };
   },
   computed: {
@@ -290,6 +291,11 @@ export default {
           : "https://bsc.cryptoz.cards";
       return `${siteURL}?sponsor=${this.coinbase}`;
     },
+    sponsorTitle() {
+      return this.mySponsor
+        ? `My Sponsor is ${this.mySponsor}`
+        : "Link Your Sponsor";
+    },
     getTweet() {
       return `https://twitter.com/intent/tweet?text=Click%20my%20sponsor%20link%20to%20claim%20Your%20Free%20Platinum%20%23Cryptoz%20NFT%20Now!%0D%0A%0D%0A&hashtags=bsc,nft,cryptozfam,NFTCommunity,nftcollectors,nftart,cryptoart&url=${this.getSponsorRoute}%0D%0A%0D%0A&related=CryptozNFT&via=CryptozNFT`;
     },
@@ -323,8 +329,11 @@ export default {
         this.getDailyBonusTime();
       }
     },
-    coinbase() {
+    coinbase(value) {
       this.getDailyBonusTime();
+      if (value) {
+        this.checkSponsor(value);
+      }
     },
   },
   mounted() {
@@ -332,15 +341,18 @@ export default {
   },
   methods: {
     checkSponsor: async function (address) {
-      const sponsor = await this.CryptozInstance.methods
-        .sponsors(address)
-        .call();
-      if (sponsor && sponsor !== baseAddress) {
-        this.shouldShowSponsor = false;
-      } else {
-        if (this.$route.query.sponsor) {
-          this.sponsorAddress = this.$route.query.sponsor;
-          this.$bvModal.show("sponsor-modal");
+      if (this.CryptozInstance && address) {
+        const sponsor = await this.CryptozInstance.methods
+          .sponsors(address)
+          .call();
+        this.mySponsor = parseInt(sponsor, 16) ? sponsor : null;
+        if (sponsor && sponsor !== baseAddress) {
+          this.shouldShowSponsor = false;
+        } else {
+          if (this.$route.query.sponsor) {
+            this.sponsorAddress = this.$route.query.sponsor;
+            this.$bvModal.show("sponsor-modal");
+          }
         }
       }
     },
@@ -360,7 +372,6 @@ export default {
 
       if (result) {
         showSuccessToast(this, "Sponsor linked!");
-        this.$emit("LogSponsorLinked", [this.sponsorAddress, this.coinbase]);
       }
     },
     copySponsorLink: function () {
@@ -683,6 +694,7 @@ a:hover {
 .lead {
   font-size: 1.5rem !important;
   font-weight: 600 !important;
+  word-break: break-all;
 }
 
 .sponsor-warning {

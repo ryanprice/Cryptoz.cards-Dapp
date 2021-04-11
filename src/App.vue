@@ -4,6 +4,7 @@
     <transition name="component-fade" mode="out-in">
       <router-view />
     </transition>
+    <CzxpRewardEffect />
     <AppFooter />
     <transaction-modal />
   </div>
@@ -19,6 +20,7 @@ import _ from "lodash";
 import TransactionModal from "./components/TransactionModal.vue";
 import dAppStates from "@/dAppStates";
 import { MessageBus } from "@/messageBus";
+import CzxpRewardEffect from "./components/layout/CzxpRewardEffect";
 
 // import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
 // import WalletConnectProvider from "@walletconnect/web3-provider";
@@ -80,6 +82,7 @@ export default {
     AppHeader,
     AppFooter,
     TransactionModal,
+    CzxpRewardEffect,
   },
   data() {
     return {
@@ -104,12 +107,6 @@ export default {
     coinbase(val, oldVal) {
       if (val && oldVal && val !== oldVal) {
         showSuccessToast(this, "Successfully changed wallets.");
-      }
-      if (val) {
-        watchEvents(this.CzxpInstance, this.CryptozInstance, {
-          onCardMinted: this.onCardMinted,
-          onBalanceUpdated: this.onBalanceUpdated,
-        });
       }
     },
   },
@@ -162,17 +159,21 @@ export default {
         web3.eth.net.getId(),
       ]);
       this.$store.dispatch("chainChanged", networkId);
-
       await this.loadContracts(accounts, networkId);
-
       this.$store.dispatch("setDAppState", dAppStates.CONNECTED);
-
       this.subscribeToProviderEvents(web3.currentProvider);
       this.$store.dispatch("updateUniverseBalances");
-
       if (accounts.length > 0) {
         await this.$store.dispatch("updateOwnerBalances");
         this.$store.dispatch("setDAppState", dAppStates.WALLET_CONNECTED);
+
+        watchEvents(this.CzxpInstance, this.CryptozInstance, {
+          onCardMinted: this.onCardMinted,
+          onBalanceUpdated: this.onBalanceUpdated,
+          onSponsorEvent: (czxpReward) => {
+            MessageBus.$emit("czxpReward", czxpReward);
+          },
+        });
       }
     },
     loadContracts: async function (accounts, networkId) {
@@ -182,14 +183,11 @@ export default {
       const czxpContractResp = await axios.get(
         `${contractBaseUrl}/CzxpToken.json`
       );
-
       const cryptozArtifact = cryptozContractResp.data;
       const czxpArtifact = czxpContractResp.data;
-
       const cryptozContractAddress =
         cryptozArtifact.networks[networkId].address;
       const czxpContractAddress = czxpArtifact.networks[networkId].address;
-
       const cryptozContract = new web3.eth.Contract(
         cryptozArtifact.abi,
         cryptozContractAddress
@@ -198,7 +196,6 @@ export default {
         czxpArtifact.abi,
         czxpContractAddress
       );
-
       console.log({ cryptozContract, czxpContract });
       return this.$store.dispatch("setContractInstance", {
         cryptoz: cryptozContract,
@@ -272,15 +269,9 @@ export default {
   min-height: 100vh;
   overflow-x: hidden;
 }
-
-.headerComponent {
-  margin-bottom: 2em;
-}
-
 .jumbotron {
   margin-top: 4em;
 }
-
 .component-fade-enter-active,
 .component-fade-leave-active {
   transition: opacity 0.3s ease;
@@ -289,21 +280,17 @@ export default {
     /* .component-fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
-
 .toast-wrapper {
   display: flex;
   align-items: center;
 }
-
 .toast-message {
   margin-left: 10px;
   font-size: 20px;
 }
-
 .web3modal-modal-card {
   margin-top: 150px;
 }
-
 /* BINANCE color #F0B90B */
 a {
   padding: 2px;

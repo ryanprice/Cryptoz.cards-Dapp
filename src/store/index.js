@@ -21,6 +21,19 @@ export const store = new Vuex.Store({
     updateWallet(state, payload) {
       state.web3 = { ...state.web3, ...payload };
     },
+    updateOwnerBalances(state, payload) {
+      const {
+        coinbase,
+        balance,
+        czxpBalance,
+        cryptozBalance,
+        boosterPacksOwned,
+      } = payload
+      state.web3 = { ...state.web3, coinbase, balance };
+      state.czxpBalance = czxpBalance
+      state.cardsOwned = cryptozBalance
+      state.boostersOwned = boosterPacksOwned
+    },
     web3isConnected(state, payload) {
       state.web3 = { ...state.web3, isConnected: payload };
     },
@@ -74,7 +87,6 @@ export const store = new Vuex.Store({
         return;
       }
       const balance = await window.web3.eth.getBalance(coinbase);
-      commit("updateWallet", { coinbase, balance: parseInt(balance) });
 
       const { cryptoz, czxp } = this.state.contractInstance;
       const czxpBalancePromise = czxp.methods.balanceOf(coinbase).call();
@@ -92,9 +104,13 @@ export const store = new Vuex.Store({
         cryptozBalancePromise,
         boosterPacksOwnedPromise,
       ]);
-      commit("updateCZXPBalance", parseInt(czxpBalance));
-      commit("updateCardsOwned", parseInt(cryptozBalance));
-      commit("updateBoostersOwned", parseInt(boosterPacksOwned));
+      commit("updateOwnerBalances", {
+        coinbase,
+        balance,
+        czxpBalance: parseInt(czxpBalance),
+        cryptozBalance: parseInt(cryptozBalance),
+        boosterPacksOwned: parseInt(boosterPacksOwned),
+      });
     },
     async updateUniverseBalances({ commit }, payload) {
       const { cryptoz, czxp } = this.state.contractInstance;

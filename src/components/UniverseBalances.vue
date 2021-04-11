@@ -25,9 +25,6 @@ import { UniverseBalances } from "vuex";
 export default {
   name: "UniverseBalances",
   computed: {
-    universeBalances() {
-      return this.$store.state.universeBalances;
-    },
     totalCzxpSupply() {
       return this.$store.state.totalCzxpSupply.toLocaleString();
     },
