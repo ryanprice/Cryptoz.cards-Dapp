@@ -56,8 +56,8 @@ const RARITY = {
   Uncommon: "card-bg card-bg-5",
   Rare: "card-bg card-bg-4",
   Epic: "card-bg card-bg-3",
-  Diamond: "card-bg card-bg-2",
-  Platinum: "card-bg card-bg-1",
+  Platinum: "card-bg card-bg-2",
+  Diamond: "card-bg card-bg-1"
 };
 
 /**
