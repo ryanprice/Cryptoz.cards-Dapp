@@ -360,6 +360,11 @@ export default {
         this.fetchCryptCards();
       }
     },
+    coinbase: function (val, oldVal) {
+      if (val && oldVal && val !== oldVal) {
+        this.fetchCryptCards();
+      }
+    },
   },
   methods: {
     addHashToLocation(params) {
