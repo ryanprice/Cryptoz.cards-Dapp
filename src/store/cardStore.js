@@ -42,7 +42,7 @@ export const CARD_MUTATIONS = {
   SET_CARD_EDITION: "SET_CARD_EDITION",
 };
 
-export const RARITY = {
+export const RARITY_CLASSES = {
   Common: "card-bg card-bg-6",
   Uncommon: "card-bg card-bg-5",
   Rare: "card-bg card-bg-4",
@@ -98,7 +98,7 @@ const getCard = async (cardId, CryptozInstance) => {
   // using for..of here so I can use continue
   for (const attribute of res.attributes) {
     if (attribute.trait_type === "rarity") {
-      cardObj["rarity"] = RARITY[attribute.value];
+      cardObj["rarity"] = RARITY_CLASSES[attribute.value];
       continue;
     }
     cardObj[attribute.trait_type] = attribute.value;

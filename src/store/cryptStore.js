@@ -1,6 +1,6 @@
 import getCardType from "../util/getCardType";
 import { dynamicSort, getRarity } from "../helpers";
-import { RARITY } from "./cardStore";
+import { RARITY_CLASSES } from "./cardStore";
 
 const DEFAULT_CRYPT_STATE = {
   allCryptCards: [],
@@ -46,7 +46,7 @@ const getCryptCard = async (tokenId, instance) => {
       cardData.attributes.edition_total;
   }
 
-  cardData.attributes.rarity = RARITY[cardData.attributes.rarity];
+  cardData.attributes.rarity = RARITY_CLASSES[cardData.attributes.rarity];
 
   newAttr = { ...newAttr, ...cardData };
   delete newAttr.attributes;
