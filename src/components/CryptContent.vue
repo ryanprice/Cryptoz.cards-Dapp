@@ -116,6 +116,7 @@ import {
 } from "bootstrap-vue";
 import { showErrorToast } from "../util/showToast";
 import dAppStates from "@/dAppStates";
+import { MessageBus } from "@/messageBus";
 
 export default {
   name: "CryptContent",
@@ -193,40 +194,50 @@ export default {
   },
   methods: {
     buyAndOpenBooster: async function () {
-      this.$store.dispatch("setIsTransactionPending", true);
-      const res = await this.CryptozInstance.methods
-        .buyBoosterCardAndOpen()
-        .send(
-          {
-            from: this.coinbase,
-            value: 2000000000000000,
-          },
-          (err, txHash) => {
-            this.$store.dispatch("setIsTransactionPending", false);
-          }
-        )
-        .catch((err) => {
-          if (err.code !== 4001) {
-            showErrorToast(this, "Failed to buy/open booster");
-          }
-        });
+      try {
+        this.$store.dispatch("setIsTransactionPending", true);
+        const res = await this.CryptozInstance.methods
+          .buyBoosterCardAndOpen()
+          .send(
+            {
+              from: this.coinbase,
+              value: 2000000000000000,
+            },
+            (err, txHash) => {
+              this.$store.dispatch("setIsTransactionPending", false);
+            }
+          );
 
-      this.$bvModal.hide("open-booster-modal");
-    },
-    openBooster: function () {
-      //Change buy button to pending.. or show some pending state
-      this.$store.dispatch("setIsTransactionPending", true);
-      this.$bvModal.hide("open-booster-modal");
-      this.CryptozInstance.methods
-        .openBoosterCard(0)
-        .send({ from: this.coinbase }, (err, transactionHash) => {
-          this.$store.dispatch("setIsTransactionPending", false);
-        })
-        .catch((err) => {
-          if (err.code !== 4001) {
-            showErrorToast(this, "Failed to open booster");
-          }
+        const newCard = await this.$store.dispatch("crypt/addBoosterCard", {
+          cardId: res.events.LogCardCreated.returnValues.cardTokenId,
         });
+        MessageBus.$emit("boosterOpened", newCard);
+      } catch (err) {
+        console.error(err);
+        showErrorToast(this, "Failed to buy/open booster");
+      } finally {
+        this.$bvModal.hide("open-booster-modal");
+      }
+    },
+    openBooster: async function () {
+      try {
+        this.$store.dispatch("setIsTransactionPending", true);
+        this.$bvModal.hide("open-booster-modal");
+
+        const res = await this.CryptozInstance.methods
+          .openBoosterCard(0)
+          .send({ from: this.coinbase }, (err, transactionHash) => {
+            this.$store.dispatch("setIsTransactionPending", false);
+          });
+
+        const newCard = await this.$store.dispatch("crypt/addBoosterCard", {
+          cardId: res.events.LogCardCreated.returnValues.cardTokenId,
+        });
+        MessageBus.$emit("boosterOpened", newCard);
+      } catch (err) {
+        console.error(err);
+        showErrorToast(this, "Failed to open booster");
+      }
     },
   },
 };

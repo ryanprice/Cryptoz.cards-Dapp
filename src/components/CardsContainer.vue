@@ -56,6 +56,7 @@
           </b-input-group>
         </div>
       </div>
+
       <div v-if="isLoading" class="loading">
         <b-spinner style="width: 3rem; height: 3rem" type="grow" />
       </div>
@@ -63,7 +64,7 @@
         <div v-if="isOthersCrypt || isWalletConnected">
           <div v-if="!isTableView" class="cards-wrapper">
             <div
-              v-for="(card, i) in orderedCards"
+              v-for="(card, i) in displayCards"
               :key="card.id"
               class="card-wrapper"
             >
@@ -85,6 +86,7 @@
                 :in_store="card.in_store"
                 :card_owned="true"
                 :index="i"
+                :observer="observer"
               />
               <div v-if="!isOthersCrypt" class="sacrifice-wrapper">
                 <div>
@@ -121,79 +123,18 @@
             </div>
           </div>
           <div v-else>
-            <b-table
-              :items="orderedCards"
-              :fields="tableFields"
-              small
-              striped
-              responsive
-            >
-              <template #cell(name)="row">
-                <div class="cell">
-                  <img
-                    :src="row.item.image"
-                    :class="`cell mr-4 ${row.item.rarity}`"
-                  />
-                  {{ row.item.name }}
-                </div>
-              </template>
-              <template #cell(card_level)="row">
-                <div class="cell">
-                  {{ row.item.card_level }}
-                </div>
-              </template>
-              <template #cell(edition_number)="row">
-                <div class="cell">
-                  {{ row.item.edition_label }}
-                </div>
-              </template>
-              <template #cell(unlock_czxp)="row">
-                <div class="cell">
-                  {{ parseInt(row.item.unlock_czxp).toLocaleString() }}
-                </div>
-              </template>
-              <template #cell(sacrifice_czxp)="row">
-                <div class="cell">
-                  {{ parseInt(row.item.sacrifice_czxp).toLocaleString() }}
-                </div>
-              </template>
-              <template #cell(transfer_czxp)="row">
-                <div class="cell">
-                  {{ parseInt(row.item.transfer_czxp).toLocaleString() }}
-                </div>
-              </template>
-              <template #cell(sacrifice)="row">
-                <div v-if="!isOthersCrypt" class="cell">
-                  <b-button
-                    size="md"
-                    variant="danger"
-                    :disabled="
-                      cardsBeingGifted[row.item.id] ||
-                      cardsBeingSacrificed[row.item.id]
-                    "
-                    @click="sacrificeCard(row.item.id)"
-                  >
-                    <span class="emoji">☠️</span>
-                  </b-button>
-                </div>
-              </template>
-              <template #cell(gift)="row">
-                <div v-if="!isOthersCrypt" class="cell">
-                  <b-button
-                    size="md"
-                    variant="danger"
-                    :disabled="
-                      cardsBeingGifted[row.item.id] ||
-                      cardsBeingSacrificed[row.item.id]
-                    "
-                    @click="openGiftModal(row.item.id)"
-                  >
-                    <!--img src="@/assets/baseline_card_giftcard_white_24dp.png" /-->
-                    <b-icon-gift-fill />
-                  </b-button>
-                </div>
-              </template>
-            </b-table>
+            <crypt-table
+              :displayCards="displayCards"
+              :tableFields="tableFields"
+              :isOthersCrypt="isOthersCrypt"
+              :observer="observer"
+              :canLoadMore="canLoadMore"
+              :cardsBeingSacrificed="cardsBeingSacrificed"
+              :cardsBeingGifted="cardsBeingGifted"
+              @giftCard="openGiftModal"
+              @sacrificeCard="sacrificeCard"
+              @loadMore="loadMoreCards"
+            ></crypt-table>
           </div>
         </div>
         <div v-else>
@@ -226,15 +167,12 @@
 <script>
 import Vue from "vue";
 import { isAddress } from "../util/addressUtil";
+import debounce from "lodash/debounce";
 import getCardTypes from "../util/getCardType";
 import SortDropdown from "@/components/SortDropdown.vue";
 import OwnedCardContent from "@/components/OwnedCardContent";
-import { getRarity, dynamicSort } from "../helpers";
-import {
-  showSuccessToast,
-  showPendingToast,
-  showRejectedToast,
-} from "../util/showToast";
+import CryptTable from "@/components/CryptTable";
+import { showSuccessToast } from "../util/showToast";
 import {
   BButton,
   BInputGroup,
@@ -245,6 +183,7 @@ import {
 } from "bootstrap-vue";
 import dAppStates from "@/dAppStates";
 import { MessageBus } from "@/messageBus";
+import { mapGetters } from "vuex";
 
 export default {
   name: "CardsContainer",
@@ -257,6 +196,7 @@ export default {
     BInputGroupAppend,
     BSpinner,
     BTable,
+    CryptTable,
   },
   props: {
     addressToLoad: {
@@ -269,21 +209,87 @@ export default {
     },
   },
   emits: ["cryptChanged"],
+  beforeDestroy() {
+    this.observer.disconnect();
+  },
+  created() {
+    this.observer = new IntersectionObserver(this.onElementObserved, {
+      root: this.$el,
+      threshold: 1.0,
+    });
+
+    this.loadMoreCards = debounce(
+      () => {
+        if (this.isCardSorted) {
+          const newCards = this.getPaginatedCryptCards(
+            this.pageSize,
+            this.sortedPageNext,
+            this.isCardSorted
+          );
+          this.sortedPaginatedCryptCards = [
+            ...this.sortedPaginatedCryptCards,
+            ...newCards.cards,
+          ];
+          this.sortedPageNext = newCards.next;
+        } else {
+          const newCards = this.getPaginatedCryptCards(
+            this.pageSize,
+            this.pageNext,
+            this.isCardSorted
+          );
+          this.paginatedCryptCards = [
+            ...this.paginatedCryptCards,
+            ...newCards.cards,
+          ];
+          this.pageNext = newCards.next;
+        }
+      },
+      500,
+      { leading: true }
+    );
+  },
+  mounted() {
+    if (this.CryptozInstance && this.addressToLoad) {
+      this.fetchCryptCards();
+    }
+
+    MessageBus.$on("boosterOpened", this.boosterOpened);
+  },
   data() {
     return {
       cardsBeingGifted: {},
       cardsBeingSacrificed: {},
-      isLoading: false,
-      orderedCards: [],
-      ownsCards: false,
-      sortType: null,
-      isDescending: true,
       isTableView: false,
       addressToSearch: null,
       disableSearch: true,
+      isCardSorted: false,
+      pageSize: 15,
+      paginatedCryptCards: [],
+      sortedPaginatedCryptCards: [],
+      pageNext: 0,
+      sortedPageNext: 0,
+      observer: null,
     };
   },
   computed: {
+    ...mapGetters({
+      getPaginatedCryptCards: "crypt/getPaginatedCryptCards",
+      ownsCards: "crypt/getIfOwnsCards",
+      isLoading: "crypt/isLoadingCrypt",
+      isCryptLoaded: "crypt/isCryptLoaded",
+    }),
+    displayCards() {
+      return this.isCardSorted
+        ? this.sortedPaginatedCryptCards
+        : this.paginatedCryptCards;
+    },
+    canLoadMore() {
+      if (this.isCardSorted) {
+        return this.sortedPageNext !== null;
+      } else {
+        return this.pageNext !== null;
+      }
+    },
     coinbase() {
       return this.$store.state.web3.coinbase;
     },
@@ -322,9 +328,6 @@ export default {
         ];
       }
     },
-    currentEvent() {
-      return this.$store.state.lastChainEvent;
-    },
     getMyCryptLink() {
       const url =
         process.env.NODE_ENV == "development"
@@ -335,18 +338,13 @@ export default {
   },
   watch: {
     CryptozInstance(newVal) {
-      if (newVal && this.addressToLoad) {
-        this.getAllCards(this.addressToLoad);
-      }
-    },
-    currentEvent(newVal) {
-      if (newVal) {
-        this.getAllCards(this.addressToLoad);
+      if (newVal && this.addressToLoad && !this.isCryptLoaded) {
+        this.fetchCryptCards();
       }
     },
     isWalletConnected(val) {
-      if (val) {
-        this.getAllCards(this.addressToLoad);
+      if (val && !this.isCryptLoaded) {
+        this.fetchCryptCards();
       }
     },
     addressToSearch: function (newVal, oldVal) {
@@ -358,15 +356,10 @@ export default {
       }
     },
     addressToLoad: function (newVal, oldVal) {
-      if (newVal && newVal !== oldVal) {
-        this.getAllCards(newVal);
+      if (newVal && newVal !== oldVal && !this.isCryptLoaded) {
+        this.fetchCryptCards();
       }
     },
-  },
-  mounted() {
-    if (this.CryptozInstance) {
-      this.getAllCards(this.addressToLoad);
-    }
   },
   methods: {
     addHashToLocation(params) {
@@ -378,19 +371,23 @@ export default {
       history.pushState({}, null, newPath + `${params}`);
     },
     clearCards: function () {
-      this.orderedCards = [];
-      this.ownsCards = false;
+      this.$store.dispatch("crypt/clearCards");
     },
     toggleTableView: function () {
       const nextVal = !this.isTableView;
       this.isTableView = nextVal;
     },
+    boosterOpened: function (newCard) {
+      this.paginatedCryptCards.unshift(newCard);
+      if (this.sortedPaginatedCryptCards.length > 0) {
+        this.sortedPaginatedCryptCards.unshift(newCard);
+      }
+    },
     searchNewCrypt: function () {
       if (this.isOthersCrypt) {
-        this.isLoading = true;
         this.clearCards();
         this.addHashToLocation(`my-cryptoz-nfts/${this.addressToSearch}`);
-        this.getAllCards(this.addressToSearch);
+        this.fetchCryptCards();
         this.$emit("cryptChanged", this.addressToSearch);
       } else {
         this.navigateToNewCrypt();
@@ -442,18 +439,30 @@ export default {
     navigateToNewCrypt: function () {
       this.$router.push(`/my-cryptoz-nfts/${this.addressToSearch}`);
     },
-    getAllCards: async function (addressToLoad) {
+    fetchCryptCards: async function () {
       if (!this.isOthersCrypt && !this.isWalletConnected) {
         return;
       }
-      this.isLoading = true;
-      const tokensOfOwner = await this.CryptozInstance.methods
-        .tokensOfOwner(addressToLoad)
-        .call();
 
-      console.log({ tokensOfOwner });
-      this.handleGetAllCards(tokensOfOwner, this.CryptozInstance);
-      this.isLoading = false;
+      await this.$store.dispatch("crypt/loadCryptCards", {
+        addressToLoad: this.addressToLoad,
+        isOwnCrypt: !this.isOthersCrypt,
+      });
+
+      const pageStart = this.isCardSorted ? this.sortedPageNext : this.pageNext;
+      const newCards = this.getPaginatedCryptCards(
+        this.pageSize,
+        pageStart,
+        this.isCardSorted
+      );
+
+      if (this.isCardSorted) {
+        this.sortedPaginatedCryptCards = [...newCards.cards];
+        this.sortedPageNext = newCards.next;
+      } else {
+        this.paginatedCryptCards = [...newCards.cards];
+        this.pageNext = newCards.next;
+      }
     },
     sacrificeCard: async function (id) {
       this.$store.dispatch("setIsTransactionPending", true);
@@ -476,7 +485,13 @@ export default {
         });
 
       if (sacrificeRes) {
-        this.orderedCards = this.orderedCards.filter((card) => card.id !== id);
+        this.$store.dispatch("crypt/cardSacrificed", { id });
+        this.paginatedCryptCards = this.paginatedCryptCards.filter(
+          (card) => card.id !== id
+        );
+        this.sortedPaginatedCryptCards = this.sortedPaginatedCryptCards.filter(
+          (card) => card.id !== id
+        );
         showSuccessToast(this, "Card sacrificed.");
       }
     },
@@ -499,125 +514,47 @@ export default {
         });
 
       if (giftRes) {
-        this.orderedCards = this.orderedCards.filter((card) => card.id !== id);
+        this.$store.dispatch("crypt/cardGifted", {
+          id: id,
+        });
+
+        this.paginatedCryptCards = this.paginatedCryptCards.filter(
+          (card) => card.id !== id
+        );
+        this.sortedPaginatedCryptCards = this.sortedPaginatedCryptCards.filter(
+          (card) => card.id !== id
+        );
+
         showSuccessToast(this, "Card Gifted.");
       }
     },
-    handleGetAllCards: async function (tokensOfOwner, instance) {
-      if (tokensOfOwner.length > 0) {
-        this.ownsCards = true;
-
-        //Place to track our token array data
-        let tokenIdList = {};
-
-        const getCard = async (tokenId) => {
-          try {
-            const ownedCard = await instance.methods
-              .getOwnedCard(tokenId)
-              .call();
-
-            tokenIdList[tokenId] = ownedCard;
-            const cardData = await getCardTypes(parseInt(ownedCard[0]));
-
-            cardData.id = tokenId;
-            let newAttr = {};
-
-            cardData.attributes.forEach((attribute) => {
-              newAttr[attribute.trait_type] = attribute.value;
-            });
-
-            cardData.attributes = newAttr;
-            cardData.attributes.edition_current = parseInt(
-              tokenIdList[tokenId][1]
-            );
-
-            if (cardData.attributes.edition_total == 0) {
-              //unlimited
-              cardData.attributes.edition_label =
-                "#" + cardData.attributes.edition_current;
-            } else {
-              cardData.attributes.edition_label =
-                "#" +
-                cardData.attributes.edition_current +
-                " of " +
-                cardData.attributes.edition_total;
-            }
-
-            switch (cardData.attributes.rarity) {
-              case "Common":
-                cardData.attributes.rarity = "card-bg card-bg-6";
-                break;
-              case "Uncommon":
-                cardData.attributes.rarity = "card-bg card-bg-5";
-                break;
-              case "Rare":
-                cardData.attributes.rarity = "card-bg card-bg-4";
-                break;
-              case "Epic":
-                cardData.attributes.rarity = "card-bg card-bg-3";
-                break;
-              case "Diamond":
-                cardData.attributes.rarity = "card-bg card-bg-2";
-                break;
-              case "Platinum":
-                cardData.attributes.rarity = "card-bg card-bg-1";
-                break;
-            }
-
-            newAttr = { ...newAttr, ...cardData };
-            delete newAttr.attributes;
-
-            return newAttr;
-          } catch (error) {
-            throw error;
-          }
-        };
-
-        this.orderedCards = await Promise.all(
-          tokensOfOwner.map((token) => getCard(parseInt(token)))
-        ).catch((err) => {
-          console.error("Failed to fetch cards.", err);
-          this.clearCards();
-          return;
-        });
-
-        this.orderedCards.sort((a, b) => b.id - a.id);
-
-        if (this.sortType) {
-          this.sortByAttr(this.sortType, this.isDescending);
-        }
-      } else {
-        console.log("no cards returned from handleGetAllCards()");
-        this.ownsCards = false;
-      }
-    },
-    sortByAttr: function (param, isDescending) {
+    sortByAttr: async function (param, isDescending) {
       if (!param) {
-        // clear sort
-        this.orderedCards.sort((a, b) => b.id - a.id);
-        this.sortType = null;
-        this.isDescending = true;
+        // We cleared sort.
+        // Clear all data so we start with a new page of sort
+        this.isCardSorted = false;
+        this.sortedPaginatedCryptCards = [];
+        this.sortedPageNext = 0;
         return;
       }
 
-      this.sortType = param;
-      this.isDescending = isDescending;
+      this.sortedPaginatedCryptCards = [];
+      this.sortedPageNext = 0;
+      this.isCardSorted = true;
 
-      switch (param) {
-        case "edition_number":
-          this.orderedCards.sort(
-            dynamicSort("edition_current", isDescending, false)
-          );
-          break;
-        case "rarity":
-          this.orderedCards.sort(
-            dynamicSort(param, isDescending, true, getRarity)
-          );
-          break;
-        default:
-          this.orderedCards.sort(dynamicSort(param, isDescending));
-          break;
-      }
+      await this.$store.dispatch("crypt/sortCryptCards", {
+        param,
+        isDescending,
+      });
+
+      const newCards = this.getPaginatedCryptCards(
+        this.pageSize,
+        this.sortedPageNext,
+        this.isCardSorted
+      );
+
+      this.sortedPaginatedCryptCards = [...newCards.cards];
+      this.sortedPageNext = newCards.next;
     },
     goBackToMyCrypt: function () {
       this.$router.push("/my-cryptoz-nfts");
@@ -635,6 +572,23 @@ export default {
     },
     onConnect: function () {
       MessageBus.$emit("connect");
+    },
+    onElementObserved(entries) {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting) {
+          return;
+        }
+
+        this.observer.unobserve(target);
+
+        const index = parseInt(target.getAttribute("data-index"));
+        // if the 10th last card scrolls into view, load more
+        if (index === this.displayCards.length - 10) {
+          if (this.canLoadMore) {
+            this.loadMoreCards();
+          }
+        }
+      });
     },
   },
 };

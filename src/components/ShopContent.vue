@@ -202,6 +202,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import debounce from "lodash/debounce";
 import { BRow, BCol, BButton, BSpinner } from "bootstrap-vue";
 
 import OwnedCardContent from "@/components/OwnedCardContent.vue";
@@ -253,7 +254,7 @@ export default {
       root: this.$el,
       threshold: 1.0,
     });
-    this.loadMoreCards = _.debounce(
+    this.loadMoreCards = debounce(
       () => {
         if (this.isCardSorted) {
           const newCards = this.$store.getters.getPaginatedShopCards(
@@ -304,32 +305,7 @@ export default {
     coinbase() {
       return this.$store.state.web3.coinbase;
     },
-    currentEvent() {
-      return this.$store.state.lastChainEvent;
-    },
     displayCards() {
-      // if (this.isLoadingShopCards || !this.isShopLoadingFinished) {
-      //   return [];
-      // }
-      // const pageStart = this.isCardSorted ? this.sortedPageNext : this.pageNext;
-      // const newCards = this.$store.getters.getPaginatedShopCards(
-      //   this.pageSize,
-      //   pageStart,
-      //   this.isCardSorted
-      // );
-
-      // if (this.isCardSorted) {
-      //   this.sortedPaginatedCards = [
-      //     ...this.sortedPaginatedCards,
-      //     ...newCards.cards,
-      //   ];
-      //   this.sortedPageNext = newCards.next;
-      //   return this.sortedPaginatedCards;
-      // } else {
-      //   this.paginatedCards = [...this.paginatedCards, ...newCards.cards];
-      //   this.pageNext = newCards.next;
-      //   return this.paginatedCards;
-      // }
       return this.isCardSorted
         ? this.sortedPaginatedCards
         : this.paginatedCards;
