@@ -377,6 +377,10 @@ export default {
     },
     clearCards: function () {
       this.$store.dispatch("crypt/clearCards");
+      this.pageNext = 0;
+      this.sortedPageNext = 0;
+      this.paginatedCryptCards = [];
+      this.sortedPaginatedCryptCards = [];
     },
     toggleTableView: function () {
       const nextVal = !this.isTableView;
@@ -448,6 +452,8 @@ export default {
       if (!this.isOthersCrypt && !this.isWalletConnected) {
         return;
       }
+
+      this.clearCards();
 
       await this.$store.dispatch("crypt/loadCryptCards", {
         addressToLoad: this.addressToLoad,
