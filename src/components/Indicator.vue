@@ -20,7 +20,7 @@
               :text-align="'right'"
               :text-vertical-align="'bottom'"
               :colors="[ '#545161', '#2BA4FA', '#CA3C2C', '#5745E5' ]"
-              :values="dataTreeMap.values">
+              :values="allCards.values">
             </graph-treemap>
           </b-col>
         </b-row>
@@ -55,16 +55,18 @@ export default {
   },
   data() {
     return {
-      dataTreeMap: {
+      allCards: {
         values: [
             [ '0', 'Common', -1 ],
-            [ '0.0', 'Common', 5 ],
+            [ '0.0', 'Common', 79 ],
             [ '1', 'Uncommon', -1 ],
-            [ '1.0', 'Uncommon', 4 ],
+            [ '1.0', 'Uncommon', 59 ],
             [ '2', 'Rare', -1 ],
-            [ '2.0', 'Rare', 1 ],
-            [ '3', 'Epic', 2 ],
-            [ '3.0', 'Epic', 2 ],
+            [ '2.0', 'Rare', 34 ],
+            [ '3', 'Epic',  ],
+            [ '3.0', 'Epic', 20 ],
+            [ '4', 'Platinum',  ],
+            [ '4.0', 'Epic', 5 ],
         ]
       }
     }
