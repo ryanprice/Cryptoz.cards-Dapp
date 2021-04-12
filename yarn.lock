@@ -8690,6 +8690,18 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+juijs-chart@2.6.9:
+  version "2.6.9"
+  resolved "https://registry.yarnpkg.com/juijs-chart/-/juijs-chart-2.6.9.tgz#9f5e4759ee0c12101765c0b1af6870360e8116b5"
+  integrity sha512-l62qiuz/kPELx10zNC8gzV8DWSGdTkUhOCkmvDDlQzoW0a59vDP7sk8ahbzb0lUuCVGVjOL94YuKKriwcEcQtA==
+  dependencies:
+    juijs-graph "1.1.4"
+
+juijs-graph@1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/juijs-graph/-/juijs-graph-1.1.4.tgz#36931cc0f79c406a08e5db9f1ff81de7bc4f26eb"
+  integrity sha512-97LnBbwTrqbKBi2nS4nfvsHXKAArwcVxmGHkoXx9X7GT1uGXdRONmdLhjYc87UkWWQr5p91sSWlwA0qXvQg7/Q==
+
 keccak@^1.0.2:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/keccak/-/keccak-1.4.0.tgz#572f8a6dbee8e7b3aa421550f9e6408ca2186f80"
@@ -13369,6 +13381,14 @@ vue-functional-data-merge@^3.1.0:
   resolved "https://registry.yarnpkg.com/vue-functional-data-merge/-/vue-functional-data-merge-3.1.0.tgz#08a7797583b7f35680587f8a1d51d729aa1dc657"
   integrity sha512-leT4kdJVQyeZNY1kmnS1xiUlQ9z1B/kdBFCILIjYYQDqZgLqCLa0UhjSSeRX6c3mUe6U5qYeM8LrEqkHJ1B4LA==
 
+vue-graph@^0.8.7:
+  version "0.8.7"
+  resolved "https://registry.yarnpkg.com/vue-graph/-/vue-graph-0.8.7.tgz#686d1e7e50c537840493b5cd6d9dec34af6901b6"
+  integrity sha512-VLnYZ6AzVGGykIH4HothlJ9J39G2ute7crBeD4bvzvNCFq3+GhivUygrY/UUD3uN0e+BiYPCYq4v58vTIU7DiA==
+  dependencies:
+    juijs-chart "2.6.9"
+    vue "^2.6.7"
+
 vue-gtm@3.0.0-vue2:
   version "3.0.0-vue2"
   resolved "https://registry.yarnpkg.com/vue-gtm/-/vue-gtm-3.0.0-vue2.tgz#cbda283eb4f4d0e22e06b8fc686ce0e1965d17d7"
@@ -13427,7 +13447,7 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
-vue@^2.6.10, vue@^2.6.11:
+vue@^2.6.10, vue@^2.6.11, vue@^2.6.7:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
   integrity sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg==
