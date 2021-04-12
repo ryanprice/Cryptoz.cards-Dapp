@@ -9,7 +9,7 @@
       ref="cryptTable"
     >
       <template #cell(name)="row">
-        <div class="cell">
+        <div class="cell" :ref="'tableRow' + row.item.id" :data-id="row.item.id">
           <img :src="row.item.image" :class="`cell mr-4 ${row.item.rarity}`" />
           {{ row.item.name }}
         </div>
@@ -68,9 +68,6 @@
         </div>
       </template>
     </b-table>
-    <div v-if="canLoadMore" class="button-container">
-      <b-button variant="outline-success" @click="loadMore">Load more</b-button>
-    </div>
   </div>
 </template>
 
@@ -96,10 +93,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    canLoadMore: {
-      type: Boolean,
-      default: true,
-    },
     cardsBeingGifted: {
       type: Object,
       default: null,
@@ -108,6 +101,20 @@ export default {
       type: Object,
       default: null,
     },
+    observer: {
+      type: IntersectionObserver,
+      default: null
+    }
+  },
+  mounted() {
+    this.observeRefs()
+  },
+  watch: {
+    displayCards(val, oldVal) {
+      if (val.length !== oldVal.length) {
+        this.observeRefs()
+      }
+    }
   },
   methods: {
     sacrificeCard: async function (id) {
@@ -119,6 +126,16 @@ export default {
     loadMore: function () {
       this.$emit("loadMore");
     },
+    observeRefs: function() {
+      this.$nextTick(() => {
+        Object.keys(this.$refs).forEach(refId => {
+          const ref = this.$refs[refId]
+          if (refId.includes('tableRow') && this.observer && ref) {
+            this.observer.observe(ref)
+          }
+        })
+      })
+    }
   },
 };
 </script>

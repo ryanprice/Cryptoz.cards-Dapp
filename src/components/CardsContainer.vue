@@ -128,7 +128,6 @@
               :tableFields="tableFields"
               :isOthersCrypt="isOthersCrypt"
               :observer="observer"
-              :canLoadMore="canLoadMore"
               :cardsBeingSacrificed="cardsBeingSacrificed"
               :cardsBeingGifted="cardsBeingGifted"
               @giftCard="openGiftModal"
@@ -592,9 +591,14 @@ export default {
 
         this.observer.unobserve(target);
 
-        const index = parseInt(target.getAttribute("data-index"));
+        const dataIndex = target.getAttribute("data-index");
+        const dataId = target.getAttribute("data-id");
+        const index = dataIndex
+          ? parseInt(dataIndex)
+          : this.displayCards.findIndex(card => card.id === parseInt(dataId))
+
         // if the 10th last card scrolls into view, load more
-        if (index === this.displayCards.length - 10) {
+        if (index >= this.displayCards.length - 10) {
           if (this.canLoadMore) {
             this.loadMoreCards();
           }

@@ -196,7 +196,6 @@ export default {
         czxpArtifact.abi,
         czxpContractAddress
       );
-      console.log({ cryptozContract, czxpContract });
       return this.$store.dispatch("setContractInstance", {
         cryptoz: cryptozContract,
         czxp: czxpContract,

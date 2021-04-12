@@ -47,7 +47,6 @@
     },
     watch: {
       coinbase_czxp_balance(val, oldVal) {
-        console.log({val, oldVal})
         if (val.czxp_balance && oldVal.czxp_balance && val.czxp_balance !== oldVal.czxp_balance && val.coinbase === oldVal.coinbase) {
           this.animate(val.czxp_balance-oldVal.czxp_balance)
         }

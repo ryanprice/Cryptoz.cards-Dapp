@@ -211,11 +211,6 @@ export default {
   },
   methods: {
     loadCard: async function (token_id) {
-      console.log({
-        token_id,
-        inst: this.CryptozInstance,
-        dAppState: this.dAppState,
-      });
       const res = await this.CryptozInstance.methods
         .getOwnedCard(token_id)
         .call()
