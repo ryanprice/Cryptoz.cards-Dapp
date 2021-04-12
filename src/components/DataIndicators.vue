@@ -1,8 +1,11 @@
 <template>
   <div>
     <div class="jumbotron">
-      IS this working ?
-      <Indicator></Indicator>
+      <h2>The Heartbeat of the Universe</h2>
+      <Indicator v-for="item in items"
+        :id="item.id"
+      >
+      </Indicator>
     </div>
   </div>
 </template>
@@ -12,9 +15,12 @@ import Indicator from "@/components/Indicator.vue";
 
 export default {
   name: "DataIndicators",
+  components: {
+    Indicator,
+  },
   data() {
     return {
-
+      items: [1,2,3],
     }
   },
 };
