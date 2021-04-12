@@ -41,11 +41,11 @@ const router = new Router({
           {
             property: "og:title",
             content:
-              "Cryptoz Cards unique and fun collectibles on the Ethereum blockchain",
+              "Cryptoz NFT Cards unique and fun collectibles on the Binance Smart Chain",
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },
@@ -74,11 +74,11 @@ const router = new Router({
           {
             property: "og:title",
             content:
-              "Cryptoz Cards - Shop - Purchase Limited edition Cryptoz and claim some for FREE",
+              "The Cryptoz NFT Universe - Shop - Purchase Limited edition Cryptoz NFTs and claim some for FREE",
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },
@@ -111,7 +111,7 @@ const router = new Router({
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },
@@ -142,7 +142,7 @@ const router = new Router({
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },
@@ -175,7 +175,7 @@ const router = new Router({
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },
@@ -209,7 +209,7 @@ const router = new Router({
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },
@@ -238,11 +238,44 @@ const router = new Router({
           {
             property: "og:title",
             content:
-              "Cryptoz NFT - View NFT Card - Detailed information about a Cryptoz Card",
+              "The Cryptoz NFT Universe - View NFT - Detailed information about a Uniqiue Cryptoz NFT Card",
           },
           {
             property: "og:image",
-            content: "https://cryptoz.cards/assets/cryptokeeper_logo.svg",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
+          },
+        ],
+      },
+    },
+    {
+      path: "/data-indicators",
+      name: "DataIndicators",
+      component: lazyLoadComponents("DataIndicators"),
+      meta: {
+        title:
+          "The Cryptoz NFT Universe - Data Inidicators - The Heart of the Universe",
+        metaTags: [
+          {
+            name: "description",
+            content:
+              "All the data in the Universe, Rarity, Scarcity, trends and indicators",
+          },
+          {
+            property: "og:url",
+            content: "https://cryptoz.cards/data-indicators",
+          },
+          {
+            property: "og:type",
+            content: "website",
+          },
+          {
+            property: "og:title",
+            content:
+              "The Cryptoz NFT Universe - Data Inidicators - The Heart of the Universe",
+          },
+          {
+            property: "og:image",
+            content: "https://cryptoz.cards/assets/cryptokeeper_logo_binance.svg",
           },
         ],
       },

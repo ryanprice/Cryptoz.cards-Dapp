@@ -35,6 +35,9 @@
               Affiliate
             </b-link>
           </b-nav-item>
+          <b-nav-item>
+            <router-link :class="classObject" to="/data-indicators"><b-icon-bar-chart-line-fill /></router-link>
+          </b-nav-item>
 
           <li v-if="isWalletConnected" id="wallet-nav">
             <div
