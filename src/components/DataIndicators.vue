@@ -1,125 +1,124 @@
 <template>
   <div>
-  <div class="jumbotron">
-    <h2>The Heartbeat of the Universe</h2>
-
-    <b-card class="card-spacer"
-          header="All Types Rarity Distribution"
-          header-tag="header"
-        >
-        <b-row>
-          <b-col>
-            <b-card-text>
-              Common</br>
-              UnCommon</br>
-              Rare</br>
-              Epic</br>
-            </b-card-text>
-          </b-col>
-          <b-col>
-            <graph-treemap
-              :width="300"
-              :height="300"
-              :text-align="'right'"
-              :text-vertical-align="'bottom'"
-              :colors="[ '#545161', '#2BA4FA', '#CA3C2C', '#5745E5', '#d3d3d3' ]"
-              :values="treeMaprarity.allTypes">
-            </graph-treemap>
-          </b-col>
-        </b-row>
-    </b-card>
-
-    <b-card class="card-spacer"
-          header="Store Types Rarity Distribution"
-          header-tag="header"
-        >
-        <b-row>
-          <b-col>
-            <b-card-text>
-              Common</br>
-              UnCommon</br>
-              Rare</br>
-              Epic</br>
-            </b-card-text>
-          </b-col>
-          <b-col>
-            <graph-treemap
-              :width="300"
-              :height="300"
-              :text-align="'right'"
-              :text-vertical-align="'bottom'"
-              :colors="[ '#545161', '#2BA4FA', '#CA3C2C', '#5745E5', '#d3d3d3' ]"
-              :values="treeMaprarity.storeTypes">
-            </graph-treemap>
-          </b-col>
-        </b-row>
-    </b-card>
-
-
+    <div class="jumbotron">
+      <h2>The Heartbeat of the Universe</h2>
+      <b-card
+        class="card-container"
+        header="Rarity Distribution"
+        header-tag="header"
+      >
+        <b-tabs>
+          <b-tab title="All Types">
+            <div class="chart-container">
+              <doughnut-chart :chart-data="allTypesData" />
+            </div>
+          </b-tab>
+          <b-tab title="Store Types">
+            <div class="chart-container">
+              <doughnut-chart :chart-data="storeTypesData" />
+            </div>
+          </b-tab>
+        </b-tabs>
+      </b-card>
+      <b-card
+        class="card-container"
+        header="Total NFTs sacrificed over time"
+        header-tag="header"
+      >
+        <div class="chart-container">
+          <line-chart :chart-data="nftsMintedOverTime" />
+        </div>
+      </b-card>
     </div>
   </div>
 </template>
 
 <script>
-import GraphTreemap from 'vue-graph/src/components/treemap.js'
-import NoteWidget from 'vue-graph/src/widgets/note.js'
-import LegendWidget from 'vue-graph/src/widgets/legends.js'
-import ToolTip from 'vue-graph/src/widgets/tooltip.js'
 
 import {
   BCard,
   BCardText,
-  BCol,
-  BRow,
+  BTabs,
+  BTab
 } from "bootstrap-vue";
+
+import LineChart from './charts/LineChart'
+import DoughnutChart from './charts/DoughnutChart'
 
 export default {
   name: "DataIndicators",
   components: {
     BCard,
     BCardText,
-    BCol,
-    BRow,
-    NoteWidget,
-    LegendWidget,
-    ToolTip,
-    GraphTreemap,
+    BTabs,
+    BTab,
+    LineChart,
+    DoughnutChart,
   },
   data() {
     return {
-      treeMaprarity: {
-        allTypes: [ //SELECT count(rarity),rarity FROM cards GROUP BY rarity
-            [ '0', 'Common', -1 ],
-            [ '0.0', 'Common', 79 ],
-            [ '1', 'Uncommon', -1 ],
-            [ '1.0', 'Uncommon', 59 ],
-            [ '2', 'Rare', -1 ],
-            [ '2.0', 'Rare', 34 ],
-            [ '3', 'Epic', -1 ],
-            [ '3.0', 'Epic', 20 ],
-            [ '4', 'Platinum',  ],
-            [ '4.0', 'Platinum', 5 ],
+      allTypesData: {
+        labels: [
+          'Common',
+          'Uncommon',
+          'Rare',
+          'Epic',
+          'Platinum',
         ],
-        storeTypes: [ // SELECT count(rarity),rarity FROM cards WHERE in_store=0 GROUP BY rarity
-            [ '0', 'Common', -1 ],
-            [ '0.0', 'Common', 22 ],
-            [ '1', 'Uncommon', -1 ],
-            [ '1.0', 'Uncommon', 15 ],
-            [ '2', 'Rare', -1 ],
-            [ '2.0', 'Rare', 15 ],
-            [ '3', 'Epic', -1 ],
-            [ '3.0', 'Epic', 6 ],
-            [ '4', 'Platinum', -1 ],
-            [ '4.0', 'Platinum', 0 ],
-        ]
+        datasets:[{
+          label: 'yeet',
+          data: [79, 59, 34, 20, 5], //SELECT count(rarity),rarity FROM cards GROUP BY rarity
+          backgroundColor: [
+            '#545161',
+            '#2BA4FA',
+            '#CA3C2C',
+            '#5745E5',
+            '#D3D3D3',
+          ],
+          hoverOffset: 2,
+        }]
+      },
+      storeTypesData: {
+        labels: [
+          'Common',
+          'Uncommon',
+          'Rare',
+          'Epic',
+          'Platinum',
+        ],
+        datasets:[{
+          label: 'yeet',
+          data: [22, 15, 15, 6, 0], //SELECT count(rarity),rarity FROM cards GROUP BY rarity
+          backgroundColor: [
+            '#545161',
+            '#2BA4FA',
+            '#CA3C2C',
+            '#5745E5',
+            '#D3D3D3',
+          ],
+          hoverOffset: 2,
+        }]
+      },
+      nftsMintedOverTime: {
+
+      },
+      options: {
+        responsive: true,
       }
     }
   },
 }
 </script>
 
-<style scoped>
-.card-spacer{
+<style scoped lang="scss">
+.card-container{
   margin-bottom: 10px;
+}
+.card-body {
+
+  .chart-container {
+    width: 350px;
+    position: relative;
+  }
 }
 </style>
