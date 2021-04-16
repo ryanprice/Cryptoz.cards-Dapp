@@ -1,3 +1,10 @@
 .web3modal-modal-card {
   margin-top: 50px !important;
 }
+
+.centered-container {
+  height: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
