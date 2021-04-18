@@ -113,7 +113,24 @@
       size="lg"
       title="Sponsor Link"
       hide-footer
+      body-class="sponsor-modal"
     >
+      <div class="prev-next-buttons" v-if="queryHasSponsor">
+        <b-button
+          :style="{ visibility: showShareMyLink ? 'visible' : 'hidden' }"
+          size="lg"
+          variant="link"
+          @click="previousSponsorModalAction"
+          >Previous</b-button
+        >
+        <b-button
+          @click="nextSponsorModalAction"
+          :style="{ visibility: showShareMyLink ? 'hidden' : 'visible' }"
+          size="lg"
+          variant="link"
+          >Next</b-button
+        >
+      </div>
       <b-jumbotron class="jumbo" :lead="sponsorTitle">
         <p>
           By linking your sponsor's wallet address, you will mint a
@@ -153,10 +170,20 @@
         </b-alert>
       </b-jumbotron>
 
+      <div class="platinum-card" v-if="queryHasSponsor && !showShareMyLink">
+        <b-jumbotron>
+          <div class="platinum-card-wrapper">
+            <img src="../assets/cryptoz_card_platinum.svg" />
+            <span class="question-mark">?</span>
+          </div>
+        </b-jumbotron>
+      </div>
+
       <b-jumbotron
         id="sponsor-link-wrapper"
         class="jumbo"
         lead="Your Affiliate Link"
+        v-else
       >
         <p>
           Automatically earn CZXP
@@ -178,18 +205,20 @@
           hidden
           :value="getSponsorRoute"
         />
-
-        <a class="twitter-share-button" :href="getTweet" data-size="large">
-          <b-button variant="primary" style="width: 26%"
-            ><img
-              style="width: 30px"
-              src="https://utilitypeopleuk.com/wp-content/uploads/2017/06/twitter-icon-circle-blue-logo-preview.png"
-            />
-            Tweet your link</b-button
-          >
-        </a>
-        &nbsp;
-        <b-button @click="copySponsorLink"> Copy Link To Clipboard </b-button>
+        <div class="button-wrapper">
+          <a :href="getTweet" data-size="large">
+            <b-button variant="primary" class="affiliate-button"
+              ><img
+                style="width: 30px"
+                src="https://utilitypeopleuk.com/wp-content/uploads/2017/06/twitter-icon-circle-blue-logo-preview.png"
+              />
+              Tweet your link</b-button
+            >
+          </a>
+          <b-button class="affiliate-button" @click="copySponsorLink">
+            Copy Link To Clipboard
+          </b-button>
+        </div>
       </b-jumbotron>
     </b-modal>
     <p />
@@ -250,6 +279,8 @@ export default {
       sponsorAddress: "",
       shouldShowSponsor: true,
       mySponsor: null,
+      queryHasSponsor: false,
+      showShareMyLink: false,
     };
   },
   computed: {
@@ -338,11 +369,23 @@ export default {
         this.checkSponsor(value);
       }
     },
+    $route(to) {
+      if (!to.query.sponsor) {
+        this.queryHasSponsor = false;
+        this.sponsorAddress = null;
+      }
+    },
   },
   mounted() {
     this.getDailyBonusTime();
   },
   methods: {
+    nextSponsorModalAction: function () {
+      this.showShareMyLink = true;
+    },
+    previousSponsorModalAction: function () {
+      this.showShareMyLink = false;
+    },
     checkSponsor: async function (address) {
       if (this.CryptozInstance && address) {
         const sponsor = await this.CryptozInstance.methods
@@ -354,6 +397,7 @@ export default {
         } else {
           if (this.$route.query.sponsor) {
             this.sponsorAddress = this.$route.query.sponsor;
+            this.queryHasSponsor = true;
             this.$bvModal.show("sponsor-modal");
           }
         }
@@ -375,6 +419,9 @@ export default {
 
       if (result) {
         showSuccessToast(this, "Sponsor linked!");
+        this.shouldShowSponsor = false;
+        this.mySponsor = this.sponsorAddress;
+        this.nextSponsorModalAction();
       }
     },
     copySponsorLink: function () {
@@ -440,9 +487,72 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
 .navbar {
   max-width: 100vw;
+}
+
+.button-wrapper {
+  display: flex;
+
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
+
+  .affiliate-button {
+    height: 40px;
+    margin-right: 16px;
+
+    @media (max-width: 400px) {
+      width: 100%;
+      margin-top: 16px;
+    }
+  }
+
+  a {
+    padding: 0;
+  }
+}
+
+.prev-next-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 18px;
+
+  button {
+    color: #f0b90b;
+  }
+}
+
+.sponsor-modal {
+  padding: 0 !important;
+}
+
+.modal-body {
+  padding: 0 !important;
+}
+
+.platinum-card {
+  margin-top: 0px;
+  display: flex;
+  justify-content: center;
+}
+
+.platinum-card-wrapper {
+  position: relative;
+  img {
+    width: 300px;
+  }
+
+  .question-mark {
+    font-size: 7rem;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    top: 17%;
+    left: 43%;
+  }
 }
 
 #cryptoz-nav {
