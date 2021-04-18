@@ -115,7 +115,6 @@
       size="lg"
       title="Sponsor Link"
       hide-footer
-      body-class="sponsor-modal"
     >
       <div class="prev-next-buttons" v-if="queryHasSponsor">
         <b-button
@@ -525,14 +524,6 @@ export default {
   button {
     color: #f0b90b;
   }
-}
-
-.sponsor-modal {
-  padding: 0 !important;
-}
-
-.modal-body {
-  padding: 0 !important;
 }
 
 .platinum-card {
