@@ -373,7 +373,7 @@ export default {
     $route(to) {
       if (!to.query.sponsor) {
         this.queryHasSponsor = false;
-        this.sponsorAddress = null;
+        this.sponsorAddress = "";
       }
     },
   },
