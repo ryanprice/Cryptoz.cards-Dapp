@@ -116,22 +116,6 @@
       title="Sponsor Link"
       hide-footer
     >
-      <div class="prev-next-buttons" v-if="queryHasSponsor">
-        <b-button
-          :style="{ visibility: showShareMyLink ? 'visible' : 'hidden' }"
-          size="lg"
-          variant="link"
-          @click="previousSponsorModalAction"
-          >Previous</b-button
-        >
-        <b-button
-          @click="nextSponsorModalAction"
-          :style="{ visibility: showShareMyLink ? 'hidden' : 'visible' }"
-          size="lg"
-          variant="link"
-          >Next</b-button
-        >
-      </div>
       <b-jumbotron class="jumbo" :lead="sponsorTitle">
         <p>
           By linking your sponsor's wallet address, you will mint a
@@ -172,7 +156,7 @@
       </b-jumbotron>
 
       <div class="platinum-card" v-if="queryHasSponsor && !showShareMyLink">
-        <b-jumbotron>
+        <b-jumbotron class="platinum-jumbotron">
           <div class="platinum-card-wrapper">
             <img src="../assets/cryptoz_card_platinum.svg" />
             <span class="question-mark">?</span>
@@ -221,6 +205,23 @@
           </b-button>
         </div>
       </b-jumbotron>
+
+      <div class="prev-next-buttons" v-if="queryHasSponsor">
+        <b-button
+          :style="{ visibility: showShareMyLink ? 'visible' : 'hidden' }"
+          size="lg"
+          variant="link"
+          @click="previousSponsorModalAction"
+          >Previous</b-button
+        >
+        <b-button
+          @click="nextSponsorModalAction"
+          :style="{ visibility: showShareMyLink ? 'hidden' : 'visible' }"
+          size="lg"
+          variant="link"
+          >Skip</b-button
+        >
+      </div>
     </b-modal>
     <p />
   </div>
@@ -496,7 +497,7 @@ export default {
 .button-wrapper {
   display: flex;
 
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     flex-direction: column;
   }
 
@@ -504,7 +505,7 @@ export default {
     height: 40px;
     margin-right: 16px;
 
-    @media (max-width: 400px) {
+    @media (max-width: 500px) {
       width: 100%;
       margin-top: 16px;
     }
@@ -536,6 +537,10 @@ export default {
   position: relative;
   img {
     width: 300px;
+
+    @media screen and (max-width: 400px) {
+      width: 200px;
+    }
   }
 
   .question-mark {
@@ -545,6 +550,11 @@ export default {
     position: absolute;
     top: 17%;
     left: 43%;
+
+    @media screen and (max-width: 400px) {
+      top: 10%;
+      left: 40%;
+    }
   }
 }
 
@@ -592,6 +602,10 @@ export default {
 #wallet-balance {
   display: flex;
   color: #90ee90;
+}
+
+.platinum-jumbotron {
+  margin-top: 0 !important;
 }
 
 .bonusClass {
