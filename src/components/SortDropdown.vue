@@ -4,7 +4,7 @@
       <b-dropdown
         id="dropdown"
         :disabled="disabled"
-        :text="'Sort by ' + (sortType ? types[sortType] : '')"
+        :text="'Sort By ' + (sortType ? types[sortType] : '')"
       >
         <b-dropdown-item
           v-for="(name, type) in types"

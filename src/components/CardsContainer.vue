@@ -2,16 +2,44 @@
   <div>
     <div class="wrapper">
       <div id="button-container">
-        <div class="primary-actions">
-          <SortDropdown :disabled="!ownsCards" @sort-by-attr="sortByAttr" />
-          <b-button
-            id="view-change-button"
-            variant="info"
-            :disabled="!ownsCards"
-            @click="() => toggleTableView()"
-          >
-            {{ "View " + (isTableView ? "Gallery" : "Table") }}
-          </b-button>
+        <div class="modifier-wrapper">
+          <div class="primary-actions">
+            <SortDropdown :disabled="!ownsCards" @sort-by-attr="sortByAttr" />
+            <b-button
+              id="view-change-button"
+              variant="info"
+              :disabled="!ownsCards"
+              @click="() => toggleTableView()"
+            >
+              {{ "View " + (isTableView ? "Gallery" : "Table") }}
+            </b-button>
+          </div>
+          <div class="filter-by-wrapper">
+            <b-dropdown
+              class="filter-by"
+              text="Filter By"
+              variant="outline-secondary"
+            >
+              <b-dropdown-item
+                @click="setFilterBy(null)"
+                :active="isActive(null)"
+              >
+                All Cards
+              </b-dropdown-item>
+              <b-dropdown-item
+                @click="setFilterBy('STORE')"
+                :active="isActive('STORE')"
+              >
+                Store Cards
+              </b-dropdown-item>
+              <b-dropdown-item
+                @click="setFilterBy('BOOSTER')"
+                :active="isActive('BOOSTER')"
+              >
+                Booster cards
+              </b-dropdown-item>
+            </b-dropdown>
+          </div>
         </div>
         <div class="crypt-actions">
           <input
@@ -184,6 +212,8 @@ import {
   BInputGroupAppend,
   BSpinner,
   BTable,
+  BDropdown,
+  BDropdownItem,
 } from "bootstrap-vue";
 import dAppStates from "@/dAppStates";
 import { MessageBus } from "@/messageBus";
@@ -201,6 +231,8 @@ export default {
     BSpinner,
     BTable,
     CryptTable,
+    BDropdown,
+    BDropdownItem,
   },
   props: {
     addressToLoad: {
@@ -224,23 +256,23 @@ export default {
 
     this.loadMoreCards = debounce(
       () => {
-        if (this.isCardSorted) {
-          const newCards = this.getPaginatedCryptCards(
-            this.pageSize,
-            this.sortedPageNext,
-            this.isCardSorted
-          );
-          this.sortedPaginatedCryptCards = [
-            ...this.sortedPaginatedCryptCards,
+        const pageNext = this.isCardModified
+          ? this.modifiedPageNext
+          : this.pageNext;
+
+        const newCards = this.getPaginatedCryptCards(
+          this.pageSize,
+          pageNext,
+          this.isCardModified
+        );
+
+        if (this.isCardModified) {
+          this.modifiedPaginatedCryptCards = [
+            ...this.modifiedPaginatedCryptCards,
             ...newCards.cards,
           ];
-          this.sortedPageNext = newCards.next;
+          this.modifiedPageNext = newCards.next;
         } else {
-          const newCards = this.getPaginatedCryptCards(
-            this.pageSize,
-            this.pageNext,
-            this.isCardSorted
-          );
           this.paginatedCryptCards = [
             ...this.paginatedCryptCards,
             ...newCards.cards,
@@ -266,13 +298,15 @@ export default {
       isTableView: false,
       addressToSearch: null,
       disableSearch: true,
-      isCardSorted: false,
+      isCardModified: false,
       pageSize: 15,
       paginatedCryptCards: [],
-      sortedPaginatedCryptCards: [],
+      modifiedPaginatedCryptCards: [],
       pageNext: 0,
-      sortedPageNext: 0,
+      modifiedPageNext: 0,
       observer: null,
+      filterBy: null,
+      sortParam: null,
     };
   },
   computed: {
@@ -283,13 +317,13 @@ export default {
       isCryptLoaded: "crypt/isCryptLoaded",
     }),
     displayCards() {
-      return this.isCardSorted
-        ? this.sortedPaginatedCryptCards
+      return this.isCardModified
+        ? this.modifiedPaginatedCryptCards
         : this.paginatedCryptCards;
     },
     canLoadMore() {
-      if (this.isCardSorted) {
-        return this.sortedPageNext !== null;
+      if (this.isCardModified) {
+        return this.modifiedPageNext !== null;
       } else {
         return this.pageNext !== null;
       }
@@ -332,12 +366,19 @@ export default {
         ];
       }
     },
+
     getMyCryptLink() {
       const url =
         process.env.NODE_ENV == "development"
           ? "localhost:8080"
           : "https://bsc.cryptoz.cards";
       return `${url}/my-cryptoz-nfts/${this.coinbase}`;
+    },
+    isModified() {
+      return {
+        sortParam: this.sortParam,
+        filterBy: this.filterBy,
+      };
     },
   },
   watch: {
@@ -359,6 +400,14 @@ export default {
         this.disableSearch = true;
       }
     },
+    isModified(val) {
+      const { filterBy, sortParam } = val;
+      if (filterBy === null && sortParam === null) {
+        this.isCardModified = false;
+      } else {
+        this.isCardModified = true;
+      }
+    },
     addressToLoad: function (newVal, oldVal) {
       if (newVal && newVal !== oldVal && !this.isCryptLoaded) {
         this.fetchCryptCards();
@@ -371,6 +420,28 @@ export default {
     },
   },
   methods: {
+    isActive(criteria) {
+      return criteria === this.filterBy;
+    },
+    setFilterBy: async function (criteria) {
+      this.filterBy = criteria;
+
+      await this.$store.dispatch("crypt/filterCryptCards", {
+        sortParam: this.sortParam,
+        filterBy: this.filterBy,
+      });
+
+      this.modifiedPageNext = 0;
+
+      const newCards = this.getPaginatedCryptCards(
+        this.pageSize,
+        this.modifiedPageNext,
+        this.isCardModified
+      );
+
+      this.modifiedPaginatedCryptCards = [...newCards.cards];
+      this.modifiedPageNext = newCards.next;
+    },
     addHashToLocation(params) {
       const currentPath = this.$route.path;
       const newPath = currentPath.substring(
@@ -382,9 +453,9 @@ export default {
     clearCards: function () {
       this.$store.dispatch("crypt/clearCards");
       this.pageNext = 0;
-      this.sortedPageNext = 0;
+      this.modifiedPageNext = 0;
       this.paginatedCryptCards = [];
-      this.sortedPaginatedCryptCards = [];
+      this.modifiedPaginatedCryptCards = [];
     },
     toggleTableView: function () {
       const nextVal = !this.isTableView;
@@ -392,8 +463,8 @@ export default {
     },
     boosterOpened: function (newCard) {
       this.paginatedCryptCards.unshift(newCard);
-      if (this.sortedPaginatedCryptCards.length > 0) {
-        this.sortedPaginatedCryptCards.unshift(newCard);
+      if (this.modifiedPaginatedCryptCards.length > 0) {
+        this.modifiedPaginatedCryptCards.unshift(newCard);
       }
     },
     searchNewCrypt: function () {
@@ -465,18 +536,18 @@ export default {
       });
 
       if (this.ownsCards) {
-        const pageStart = this.isCardSorted
-          ? this.sortedPageNext
+        const pageStart = this.isCardModified
+          ? this.modifiedPageNext
           : this.pageNext;
         const newCards = this.getPaginatedCryptCards(
           this.pageSize,
           pageStart,
-          this.isCardSorted
+          this.isCardModified
         );
 
-        if (this.isCardSorted) {
-          this.sortedPaginatedCryptCards = [...newCards.cards];
-          this.sortedPageNext = newCards.next;
+        if (this.isCardModified) {
+          this.modifiedPaginatedCryptCards = [...newCards.cards];
+          this.modifiedPageNext = newCards.next;
         } else {
           this.paginatedCryptCards = [...newCards.cards];
           this.pageNext = newCards.next;
@@ -508,7 +579,7 @@ export default {
         this.paginatedCryptCards = this.paginatedCryptCards.filter(
           (card) => card.id !== id
         );
-        this.sortedPaginatedCryptCards = this.sortedPaginatedCryptCards.filter(
+        this.modifiedPaginatedCryptCards = this.modifiedPaginatedCryptCards.filter(
           (card) => card.id !== id
         );
         showSuccessToast(this, "Card sacrificed.");
@@ -540,7 +611,7 @@ export default {
         this.paginatedCryptCards = this.paginatedCryptCards.filter(
           (card) => card.id !== id
         );
-        this.sortedPaginatedCryptCards = this.sortedPaginatedCryptCards.filter(
+        this.modifiedPaginatedCryptCards = this.modifiedPaginatedCryptCards.filter(
           (card) => card.id !== id
         );
 
@@ -550,30 +621,29 @@ export default {
     sortByAttr: async function (param, isDescending) {
       if (!param) {
         // We cleared sort.
-        // Clear all data so we start with a new page of sort
-        this.isCardSorted = false;
-        this.sortedPaginatedCryptCards = [];
-        this.sortedPageNext = 0;
-        return;
+        this.sortParam = null;
+      } else {
+        this.sortParam = {
+          param,
+          isDescending,
+        };
       }
 
-      this.sortedPaginatedCryptCards = [];
-      this.sortedPageNext = 0;
-      this.isCardSorted = true;
+      this.modifiedPageNext = 0;
 
       await this.$store.dispatch("crypt/sortCryptCards", {
-        param,
-        isDescending,
+        sortParam: this.sortParam,
+        filterBy: this.filterBy,
       });
 
       const newCards = this.getPaginatedCryptCards(
         this.pageSize,
-        this.sortedPageNext,
-        this.isCardSorted
+        this.modifiedPageNext,
+        this.isCardModified
       );
 
-      this.sortedPaginatedCryptCards = [...newCards.cards];
-      this.sortedPageNext = newCards.next;
+      this.modifiedPaginatedCryptCards = [...newCards.cards];
+      this.modifiedPageNext = newCards.next;
     },
     goBackToMyCrypt: function () {
       this.$router.push("/my-cryptoz-nfts");
@@ -649,10 +719,16 @@ export default {
   align-items: center;
 }
 
+.filter-by-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
 .primary-actions {
   display: flex;
   justify-content: center;
-  margin-bottom: 16px;
 }
 
 .my-crypt-button {
@@ -714,11 +790,27 @@ table {
   place-items: center;
 }
 
+.modifier-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Desktop CSS */
-@media only screen and (min-width: 1000px) {
+@media only screen and (min-width: 1300px) {
   #button-container {
     flex-direction: row;
     justify-content: space-between;
+  }
+
+  .modifier-wrapper {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .filter-by-wrapper {
+    margin: 0;
+    width: fit-content;
+    margin-left: 8px;
   }
 
   .crypt-actions {
@@ -732,7 +824,8 @@ table {
     margin-bottom: 0;
     margin-right: 16px;
   }
-
+}
+@media only screen and (min-width: 1000px) {
   .cards-wrapper {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   }

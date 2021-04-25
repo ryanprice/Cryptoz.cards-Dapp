@@ -2,23 +2,58 @@ import getCardType from "../util/getCardType";
 import { dynamicSort, getRarity } from "../helpers";
 import { RARITY_CLASSES } from "./cardStore";
 
+export const FILTER_CRITERIA = {
+  STORE: "STORE",
+  BOOSTER: "BOOSTER",
+};
+
+
+
+export const CRYPT_MUTATIONS = {
+  SET_CRYPT_CARDS: "SET_CRYPT_CARDS",
+  SET_MODIFIED_CRYPT_CARDS: "SET_MODIFIED_CRYPT_CARDS",
+  LOADING_CRYPT_CARDS: "LOADING_CRYPT_CARDS",
+  LOADING_CRYPT_CARDS_FAILED: "LOADING_CRYPT_CARDS_FAILED",
+  CLEAR_CRYPT_CARDS: "CLEAR_CRYPT_CARDS",
+  GIFT_CRYPT_CARD: "GIFT_CRYPT_CARD",
+  SACRIFICE_CRYPT_CARD: "SACRIFICE_CRYPT_CARD",
+  ADD_BOOSTER_CARD: "ADD_BOOSTER_CARD",
+};
+
 const DEFAULT_CRYPT_STATE = {
   allCryptCards: [],
-  sortedCryptCards: [],
+  modifiedCryptCards: [],
   isLoadingCrypt: false,
   failedToLoadCrypt: false,
   cryptLoaded: false,
 };
 
-export const CRYPT_MUTATIONS = {
-  SET_CRYPT_CARDS: "SET_CRYPT_CARDS",
-  SET_SORTED_CRYPT_CARDS: "SET_SORTED_CRYPT_CARDS",
-  LOADING_CRYPT_CARDS: "LOADING_CRYPT_CARDS",
-  LOADING_CRYPT_CARDS_FAILED: "LOADING_CRYPT_CARDS_FAILED",
-  CLEAR_CRYPT_CARDS: 'CLEAR_CRYPT_CARDS',
-  GIFT_CRYPT_CARD: 'GIFT_CRYPT_CARD',
-  SACRIFICE_CRYPT_CARD: 'SACRIFICE_CRYPT_CARD',
-  ADD_BOOSTER_CARD: 'ADD_BOOSTER_CARD'
+
+
+const sortCards = (sortParam, cards) => {
+  switch (sortParam.param) {
+    case "edition_number":
+      return cards.sort(
+        dynamicSort("edition_current", sortParam.isDescending, false)
+      );
+    case "rarity":
+      return cards.sort(
+        dynamicSort(sortParam.param, sortParam.isDescending, true, getRarity)
+      );
+    default:
+      return cards.sort(dynamicSort(sortParam.param, sortParam.isDescending));
+  }
+};
+
+const filterCards = (filterBy, cards) => {
+  switch (filterBy) {
+    case FILTER_CRITERIA.STORE:
+      return cards.filter((card) => card.in_store === "Store");
+    case FILTER_CRITERIA.BOOSTER:
+      return cards.filter((card) => card.in_store === "Booster");
+    default:
+      return cards;
+  }
 };
 
 const getCryptCard = async (tokenId, instance) => {
@@ -59,7 +94,7 @@ const cryptStore = {
   state: DEFAULT_CRYPT_STATE,
   mutations: {
     [CRYPT_MUTATIONS.CLEAR_CRYPT_CARDS](state) {
-      state = DEFAULT_CRYPT_STATE
+      state = DEFAULT_CRYPT_STATE;
     },
     [CRYPT_MUTATIONS.SET_CRYPT_CARDS](state, payload) {
       state.allCryptCards = [...payload];
@@ -67,32 +102,20 @@ const cryptStore = {
       state.isLoadingCrypt = false;
       state.failedToLoadCrypt = false;
     },
-    [CRYPT_MUTATIONS.SET_SORTED_CRYPT_CARDS](state, payload) {
-      const { sortParam } = payload;
+    [CRYPT_MUTATIONS.SET_MODIFIED_CRYPT_CARDS](state, payload) {
+      const { sortParam, filterBy } = payload;
       const cryptCards = [...state.allCryptCards];
-
-      switch (sortParam.param) {
-        case "edition_number":
-          cryptCards.sort(
-            dynamicSort("edition_current", sortParam.isDescending, false)
-          );
-          break;
-        case "rarity":
-          cryptCards.sort(
-            dynamicSort(
-              sortParam.param,
-              sortParam.isDescending,
-              true,
-              getRarity
-            )
-          );
-          break;
-        default:
-          cryptCards.sort(dynamicSort(sortParam.param, sortParam.isDescending));
-          break;
+      
+      let modifiedCards = cryptCards;
+      if (sortParam) {
+        modifiedCards = sortCards(sortParam, cryptCards);
       }
 
-      state.sortedCryptCards = cryptCards;
+      if (filterBy) {
+        modifiedCards = filterCards(filterBy, cryptCards);
+      }
+
+      state.modifiedCryptCards = [...modifiedCards]
     },
     [CRYPT_MUTATIONS.LOADING_CRYPT_CARDS](state) {
       state.isLoadingCrypt = true;
@@ -100,37 +123,47 @@ const cryptStore = {
     },
     [CRYPT_MUTATIONS.LOADING_CRYPT_CARDS_FAILED](state) {
       state.failedToLoadCrypt = true;
+      state.isLoadingCrypt = false;
       state.cryptLoaded = false;
     },
     [CRYPT_MUTATIONS.GIFT_CRYPT_CARD](state, payload) {
       state.allCryptCards = state.allCryptCards.filter(card => card.id !== payload.id);
-      state.sortedCryptCards = state.sortedCryptCards.filter(card => card.id !== payload.id)
+      state.modifiedCryptCards = state.modifiedCryptCards.filter(card => card.id !== payload.id)
     },
     [CRYPT_MUTATIONS.SACRIFICE_CRYPT_CARD](state, payload) {
       state.allCryptCards = state.allCryptCards.filter(card => card.id !== payload.id);
-      state.sortedCryptCards = state.sortedCryptCards.filter(card => card.id !== payload.id)
+      state.modifiedCryptCards = state.modifiedCryptCards.filter(card => card.id !== payload.id)
     },
     [CRYPT_MUTATIONS.ADD_BOOSTER_CARD](state, payload) {
       state.allCryptCards.unshift(payload);
-      if (state.sortedCryptCards.length > 0) {
-        state.sortedCryptCards.unshift(payload);
+      if (state.modifiedCryptCards.length > 0) {
+        state.modifiedCryptCards.unshift(payload);
       }
     }
   },
   actions: {
+    // 2 actions here have the same mutation with different names.
+    // For view to have a better idea of what "modified" means.
     sortCryptCards({ commit }, payload) {
-      commit(CRYPT_MUTATIONS.SET_SORTED_CRYPT_CARDS, {
-        sortParam: payload,
+      commit(CRYPT_MUTATIONS.SET_MODIFIED_CRYPT_CARDS, {
+        sortParam: payload.sortParam,
+        filterBy: payload.filterBy,
       });
     },
-    clearCards({commit}) {
-      commit(CRYPT_MUTATIONS.CLEAR_CRYPT_CARDS)
+    filterCryptCards({ commit }, payload) {
+      commit(CRYPT_MUTATIONS.SET_MODIFIED_CRYPT_CARDS, {
+        sortParam: payload.sortParam,
+        filterBy: payload.filterBy,
+      });
     },
-    cardGifted({commit}, payload) {
+    clearCards({ commit }) {
+      commit(CRYPT_MUTATIONS.CLEAR_CRYPT_CARDS);
+    },
+    cardGifted({ commit }, payload) {
       commit(CRYPT_MUTATIONS.GIFT_CRYPT_CARD, payload);
     },
-    cardSacrificed({commit}, payload) {
-      commit(CRYPT_MUTATIONS.SACRIFICE_CRYPT_CARD, payload)
+    cardSacrificed({ commit }, payload) {
+      commit(CRYPT_MUTATIONS.SACRIFICE_CRYPT_CARD, payload);
     },
     async loadCryptCards({ commit, dispatch, rootState }, payload) {
       const { addressToLoad, isOwnCrypt } = payload;
@@ -190,10 +223,11 @@ const cryptStore = {
     getIfOwnsCards: (state) => {
       return state.allCryptCards.length > 0;
     },
-    getPaginatedCryptCards: (state) => (pageSize, pageStart, isSorted) => {
-      const cardsToReturn = isSorted
-        ? state.sortedCryptCards
+    getPaginatedCryptCards: (state) => (pageSize, pageStart, isSortedOrFiltered) => {
+      const cardsToReturn = isSortedOrFiltered
+        ? state.modifiedCryptCards
         : state.allCryptCards;
+
       if (cardsToReturn.length === 0) {
         return [];
       }
@@ -230,7 +264,7 @@ const cryptStore = {
       }
     },
     isLoadingCrypt: (state) => state.isLoadingCrypt,
-    isCryptLoaded: (state) => state.cryptLoaded
+    isCryptLoaded: (state) => state.cryptLoaded,
   },
 };
 
