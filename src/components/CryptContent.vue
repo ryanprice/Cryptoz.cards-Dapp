@@ -118,7 +118,7 @@
           <div>
             <b-button
               v-b-tooltip.hover="'Mint 1 random booster NFT'"
-              class="btn btn-danger"
+              class="mint-booster-btn btn btn-danger"
               :disabled="boostersOwned < 1"
               @click="openBooster"
               >Mint <b-icon-lightning-fill /> Booster NFT
@@ -127,7 +127,7 @@
           <div>
             <b-button
               v-b-tooltip.hover="'View probability of mint by rarity'"
-              class="btn" variant="info" 
+              class="btn" variant="info"
               v-b-modal="'open-probability-modal'"
             >
               <b-icon-pie-chart-fill />
@@ -434,5 +434,9 @@ export default {
     text-align: center;
     margin-bottom: 16px;
   }
+}
+
+.mint-booster-btn {
+  min-height:62px;
 }
 </style>

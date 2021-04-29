@@ -39,6 +39,20 @@
                 Booster cards
               </b-dropdown-item>
             </b-dropdown>
+            <div class="filter-rarity-wrapper">
+              <b-form-checkbox name="e-check-button" button button-variant="epic">
+                    <b>E</b>
+              </b-form-checkbox>
+              <b-form-checkbox name="r-check-button" button button-variant="rare">
+                    <b>R</b>
+              </b-form-checkbox>
+              <b-form-checkbox name="u-check-button" button button-variant="uncommon">
+                    <b>U</b>
+              </b-form-checkbox>
+              <b-form-checkbox name="c-check-button" button button-variant="common">
+                    <b>C</b>
+              </b-form-checkbox>
+            </div>
           </div>
         </div>
         <div class="crypt-actions">
@@ -214,6 +228,7 @@ import {
   BTable,
   BDropdown,
   BDropdownItem,
+  BFormCheckbox,
 } from "bootstrap-vue";
 import dAppStates from "@/dAppStates";
 import { MessageBus } from "@/messageBus";
@@ -233,6 +248,7 @@ export default {
     CryptTable,
     BDropdown,
     BDropdownItem,
+    BFormCheckbox,
   },
   props: {
     addressToLoad: {
@@ -293,6 +309,13 @@ export default {
   },
   data() {
     return {
+      selected: [], // Must be an array reference!
+      options: [
+        { text: 'E', value: 'epic' },
+        { text: 'R', value: 'rare' },
+        { text: 'U', value: 'ucommon' },
+        { text: 'C', value: 'common' }
+      ],
       cardsBeingGifted: {},
       cardsBeingSacrificed: {},
       isTableView: false,
@@ -841,4 +864,9 @@ table {
   padding: 5px 10px;
   margin-right: 10px;
 }
+
+.filter-rarity-wrapper{
+    margin-left:10px;
+}
+
 </style>
