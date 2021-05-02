@@ -298,20 +298,20 @@ a {
 
 .btn-epic {
   color: #fff;
-  background-color: #5745E5;
-  border-color: #5745E5;
+  background-color: #5745e5;
+  border-color: #5745e5;
 }
 
 .btn-rare {
   color: #fff;
-  background-color: #CA3C2C;
-  border-color: #CA3C2C;
+  background-color: #ca3c2c;
+  border-color: #ca3c2c;
 }
 
 .btn-uncommon {
   color: #fff;
-  background-color: #2BA4FA;
-  border-color: #2BA4FA;
+  background-color: #2ba4fa;
+  border-color: #2ba4fa;
 }
 
 .btn-common {

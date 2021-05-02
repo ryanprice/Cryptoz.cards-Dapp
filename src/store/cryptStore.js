@@ -2,12 +2,15 @@ import getCardType from "../util/getCardType";
 import { dynamicSort, getRarity } from "../helpers";
 import { RARITY_CLASSES } from "./cardStore";
 
-export const FILTER_CRITERIA = {
+export const ORIGIN_CRITERIA = {
   STORE: "STORE",
   BOOSTER: "BOOSTER",
 };
 
-
+export const FILTER_TYPES = {
+  CARD_ORIGIN: "ORIGIN",
+  CARD_RARITY: "RARITY",
+};
 
 export const CRYPT_MUTATIONS = {
   SET_CRYPT_CARDS: "SET_CRYPT_CARDS",
@@ -28,8 +31,6 @@ const DEFAULT_CRYPT_STATE = {
   cryptLoaded: false,
 };
 
-
-
 const sortCards = (sortParam, cards) => {
   switch (sortParam.param) {
     case "edition_number":
@@ -45,15 +46,41 @@ const sortCards = (sortParam, cards) => {
   }
 };
 
-const filterCards = (filterBy, cards) => {
-  switch (filterBy) {
-    case FILTER_CRITERIA.STORE:
+const filterByRarity = (includeRarity, cards) => {
+  if (includeRarity.length === 0) {
+    return cards;
+  }
+  return cards.filter((card) => includeRarity.includes(card.rarityValue.toLowerCase()));
+};
+
+// origin is either null (all), STORE, or BOOSTER
+const filterByOrigin = (origin, cards) => {
+  switch (origin) {
+    case ORIGIN_CRITERIA.STORE:
       return cards.filter((card) => card.in_store === "Store");
-    case FILTER_CRITERIA.BOOSTER:
+    case ORIGIN_CRITERIA.BOOSTER:
       return cards.filter((card) => card.in_store === "Booster");
     default:
       return cards;
   }
+};
+
+const filterCards = (filterBy, cards) => {
+  let modifiedCards = [...cards];
+  Object.keys(filterBy).forEach(key => {
+    switch (key) {
+      case FILTER_TYPES.CARD_ORIGIN:
+        modifiedCards = filterByOrigin(filterBy[key], modifiedCards);
+        break;
+      case FILTER_TYPES.CARD_RARITY:
+        modifiedCards = filterByRarity(filterBy[key], modifiedCards);
+        break;
+      default:
+        return modifiedCards;
+    }
+  });
+
+  return modifiedCards
 };
 
 const getCryptCard = async (tokenId, instance) => {
@@ -81,6 +108,7 @@ const getCryptCard = async (tokenId, instance) => {
       cardData.attributes.edition_total;
   }
 
+  cardData.attributes.rarityValue = cardData.attributes.rarity;
   cardData.attributes.rarity = RARITY_CLASSES[cardData.attributes.rarity];
 
   newAttr = { ...newAttr, ...cardData };
@@ -105,7 +133,7 @@ const cryptStore = {
     [CRYPT_MUTATIONS.SET_MODIFIED_CRYPT_CARDS](state, payload) {
       const { sortParam, filterBy } = payload;
       const cryptCards = [...state.allCryptCards];
-      
+
       let modifiedCards = cryptCards;
       if (sortParam) {
         modifiedCards = sortCards(sortParam, cryptCards);
@@ -115,7 +143,7 @@ const cryptStore = {
         modifiedCards = filterCards(filterBy, cryptCards);
       }
 
-      state.modifiedCryptCards = [...modifiedCards]
+      state.modifiedCryptCards = [...modifiedCards];
     },
     [CRYPT_MUTATIONS.LOADING_CRYPT_CARDS](state) {
       state.isLoadingCrypt = true;
@@ -127,19 +155,27 @@ const cryptStore = {
       state.cryptLoaded = false;
     },
     [CRYPT_MUTATIONS.GIFT_CRYPT_CARD](state, payload) {
-      state.allCryptCards = state.allCryptCards.filter(card => card.id !== payload.id);
-      state.modifiedCryptCards = state.modifiedCryptCards.filter(card => card.id !== payload.id)
+      state.allCryptCards = state.allCryptCards.filter(
+        (card) => card.id !== payload.id
+      );
+      state.modifiedCryptCards = state.modifiedCryptCards.filter(
+        (card) => card.id !== payload.id
+      );
     },
     [CRYPT_MUTATIONS.SACRIFICE_CRYPT_CARD](state, payload) {
-      state.allCryptCards = state.allCryptCards.filter(card => card.id !== payload.id);
-      state.modifiedCryptCards = state.modifiedCryptCards.filter(card => card.id !== payload.id)
+      state.allCryptCards = state.allCryptCards.filter(
+        (card) => card.id !== payload.id
+      );
+      state.modifiedCryptCards = state.modifiedCryptCards.filter(
+        (card) => card.id !== payload.id
+      );
     },
     [CRYPT_MUTATIONS.ADD_BOOSTER_CARD](state, payload) {
       state.allCryptCards.unshift(payload);
       if (state.modifiedCryptCards.length > 0) {
         state.modifiedCryptCards.unshift(payload);
       }
-    }
+    },
   },
   actions: {
     // 2 actions here have the same mutation with different names.
@@ -175,12 +211,13 @@ const cryptStore = {
 
         const CryptozInstance = rootState.contractInstance.cryptoz;
 
-        const tokensOfOwner = await CryptozInstance.methods.tokensOfOwner(addressToLoad).call();
-
+        const tokensOfOwner = await CryptozInstance.methods
+          .tokensOfOwner(addressToLoad)
+          .call();
 
         if (tokensOfOwner.length === 0) {
           console.log("Current address doesn't have any cards.");
-          commit(CRYPT_MUTATIONS.SET_CRYPT_CARDS, [])
+          commit(CRYPT_MUTATIONS.SET_CRYPT_CARDS, []);
           return;
         }
 
@@ -202,7 +239,7 @@ const cryptStore = {
         commit(CRYPT_MUTATIONS.LOADING_CRYPT_CARDS_FAILED);
       }
     },
-    async addBoosterCard({commit, rootState}, payload) {
+    async addBoosterCard({ commit, rootState }, payload) {
       const { cardId } = payload;
 
       try {
@@ -210,26 +247,30 @@ const cryptStore = {
 
         const cardData = await getCryptCard(cardId, CryptozInstance);
 
-        commit(CRYPT_MUTATIONS.ADD_BOOSTER_CARD, cardData)
+        commit(CRYPT_MUTATIONS.ADD_BOOSTER_CARD, cardData);
 
         return cardData;
       } catch (err) {
-        console.error('Failed to get opened booster card. ', cardId);
+        console.error("Failed to get opened booster card. ", cardId);
         return null;
       }
-    }
+    },
   },
   getters: {
     getIfOwnsCards: (state) => {
       return state.allCryptCards.length > 0;
     },
-    getPaginatedCryptCards: (state) => (pageSize, pageStart, isSortedOrFiltered) => {
+    getPaginatedCryptCards: (state) => (
+      pageSize,
+      pageStart,
+      isSortedOrFiltered
+    ) => {
       const cardsToReturn = isSortedOrFiltered
         ? state.modifiedCryptCards
         : state.allCryptCards;
 
       if (cardsToReturn.length === 0) {
-        return [];
+        return null;
       }
 
       let pageNext, endIndex;

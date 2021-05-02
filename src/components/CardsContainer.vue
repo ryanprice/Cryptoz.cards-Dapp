@@ -21,37 +21,36 @@
               variant="outline-secondary"
             >
               <b-dropdown-item
-                @click="setFilterBy(null)"
-                :active="isActive(null)"
+                :active="isActive('ORIGIN', null)"
+                @click="setOriginFilter(null)"
               >
                 All Cards
               </b-dropdown-item>
               <b-dropdown-item
-                @click="setFilterBy('STORE')"
-                :active="isActive('STORE')"
+                :active="isActive('ORIGIN', 'STORE')"
+                @click="setOriginFilter('STORE')"
               >
                 Store Cards
               </b-dropdown-item>
               <b-dropdown-item
-                @click="setFilterBy('BOOSTER')"
-                :active="isActive('BOOSTER')"
+                :active="isActive('ORIGIN', 'BOOSTER')"
+                @click="setOriginFilter('BOOSTER')"
               >
                 Booster cards
               </b-dropdown-item>
             </b-dropdown>
             <div class="filter-rarity-wrapper">
-              <b-form-checkbox name="e-check-button" button button-variant="epic">
-                    <b>E</b>
-              </b-form-checkbox>
-              <b-form-checkbox name="r-check-button" button button-variant="rare">
-                    <b>R</b>
-              </b-form-checkbox>
-              <b-form-checkbox name="u-check-button" button button-variant="uncommon">
-                    <b>U</b>
-              </b-form-checkbox>
-              <b-form-checkbox name="c-check-button" button button-variant="common">
-                    <b>C</b>
-              </b-form-checkbox>
+              <b-button-group>
+                <b-button
+                  v-for="rarity in options"
+                  :key="rarity.value"
+                  :variant="rarity.value"
+                  :class="getRarityFilterActiveClass(rarity.value)"
+                  @click="() => setRarityFilter(rarity.value)"
+                >
+                  {{ rarity.text }}
+                </b-button>
+              </b-button-group>
             </div>
           </div>
         </div>
@@ -101,6 +100,11 @@
 
       <div v-if="isLoading" class="loading">
         <b-spinner style="width: 3rem; height: 3rem" type="grow" />
+      </div>
+      <div
+        v-else-if="isCardModified && modifiedPaginatedCryptCards.length === 0"
+      >
+        <h2>Your filter condition did not return any cards.</h2>
       </div>
       <div v-else>
         <div v-if="ownsCards">
@@ -169,12 +173,12 @@
             </div>
             <div v-else>
               <crypt-table
-                :displayCards="displayCards"
-                :tableFields="tableFields"
-                :isOthersCrypt="isOthersCrypt"
+                :display-cards="displayCards"
+                :table-fields="tableFields"
+                :is-others-crypt="isOthersCrypt"
                 :observer="observer"
-                :cardsBeingSacrificed="cardsBeingSacrificed"
-                :cardsBeingGifted="cardsBeingGifted"
+                :cards-being-sacrificed="cardsBeingSacrificed"
+                :cards-being-gifted="cardsBeingGifted"
                 @giftCard="openGiftModal"
                 @sacrificeCard="sacrificeCard"
                 @loadMore="loadMoreCards"
@@ -214,21 +218,20 @@
 import Vue from "vue";
 import { isAddress } from "../util/addressUtil";
 import debounce from "lodash/debounce";
-import getCardTypes from "../util/getCardType";
 import SortDropdown from "@/components/SortDropdown.vue";
 import OwnedCardContent from "@/components/OwnedCardContent";
 import CryptTable from "@/components/CryptTable";
 import { showSuccessToast } from "../util/showToast";
+import { FILTER_TYPES } from "../store/cryptStore";
 import {
   BButton,
   BInputGroup,
   BFormInput,
   BInputGroupAppend,
   BSpinner,
-  BTable,
   BDropdown,
   BDropdownItem,
-  BFormCheckbox,
+  BButtonGroup,
 } from "bootstrap-vue";
 import dAppStates from "@/dAppStates";
 import { MessageBus } from "@/messageBus";
@@ -244,11 +247,10 @@ export default {
     BFormInput,
     BInputGroupAppend,
     BSpinner,
-    BTable,
     CryptTable,
     BDropdown,
     BDropdownItem,
-    BFormCheckbox,
+    BButtonGroup,
   },
   props: {
     addressToLoad: {
@@ -261,6 +263,7 @@ export default {
     },
   },
   emits: ["cryptChanged"],
+
   beforeDestroy() {
     this.observer.disconnect();
   },
@@ -311,10 +314,10 @@ export default {
     return {
       selected: [], // Must be an array reference!
       options: [
-        { text: 'E', value: 'epic' },
-        { text: 'R', value: 'rare' },
-        { text: 'U', value: 'ucommon' },
-        { text: 'C', value: 'common' }
+        { text: "E", value: "epic" },
+        { text: "R", value: "rare" },
+        { text: "U", value: "uncommon" },
+        { text: "C", value: "common" },
       ],
       cardsBeingGifted: {},
       cardsBeingSacrificed: {},
@@ -328,7 +331,10 @@ export default {
       pageNext: 0,
       modifiedPageNext: 0,
       observer: null,
-      filterBy: null,
+      filterBy: {
+        [FILTER_TYPES.CARD_ORIGIN]: null,
+        [FILTER_TYPES.CARD_RARITY]: [],
+      },
       sortParam: null,
     };
   },
@@ -423,13 +429,20 @@ export default {
         this.disableSearch = true;
       }
     },
-    isModified(val) {
-      const { filterBy, sortParam } = val;
-      if (filterBy === null && sortParam === null) {
-        this.isCardModified = false;
-      } else {
-        this.isCardModified = true;
-      }
+    isModified: {
+      handler: function (val) {
+        const { filterBy, sortParam } = val;
+        if (
+          filterBy[FILTER_TYPES.CARD_ORIGIN] === null &&
+          filterBy[FILTER_TYPES.CARD_RARITY].length === 0 &&
+          sortParam === null
+        ) {
+          this.isCardModified = false;
+        } else {
+          this.isCardModified = true;
+        }
+      },
+      deep: true,
     },
     addressToLoad: function (newVal, oldVal) {
       if (newVal && newVal !== oldVal && !this.isCryptLoaded) {
@@ -443,11 +456,58 @@ export default {
     },
   },
   methods: {
-    isActive(criteria) {
-      return criteria === this.filterBy;
+    isActive(type, criteria) {
+      switch (type) {
+        case FILTER_TYPES.CARD_ORIGIN:
+          return this.filterBy[FILTER_TYPES.CARD_ORIGIN] === criteria;
+        case FILTER_TYPES.CARD_RARITY:
+          return this.filterBy[FILTER_TYPES.CARD_RARITY].includes(criteria);
+        default:
+          return false;
+      }
     },
-    setFilterBy: async function (criteria) {
-      this.filterBy = criteria;
+    getRarityFilterActiveClass(rarity) {
+      const isCurrentRarityFilterActive = this.isActive("RARITY", rarity);
+
+      return isCurrentRarityFilterActive ? "filter-button-active" : null;
+    },
+    setOriginFilter: async function (criteria) {
+      this.filterBy = {
+        [FILTER_TYPES.CARD_ORIGIN]: criteria,
+        [FILTER_TYPES.CARD_RARITY]: [
+          ...this.filterBy[FILTER_TYPES.CARD_RARITY],
+        ],
+      };
+
+      await this.$store.dispatch("crypt/filterCryptCards", {
+        sortParam: this.sortParam,
+        filterBy: this.filterBy,
+      });
+
+      this.modifiedPageNext = 0;
+      const newCards = this.getPaginatedCryptCards(
+        this.pageSize,
+        this.modifiedPageNext,
+        this.isCardModified
+      );
+
+      if (newCards) {
+        this.modifiedPaginatedCryptCards = [...newCards.cards];
+        this.modifiedPageNext = newCards.next;
+      } else {
+        this.modifiedPaginatedCryptCards = [];
+        this.modifiedPageNext = 0;
+      }
+    },
+    setRarityFilter: async function (criteria) {
+      if (this.filterBy[FILTER_TYPES.CARD_RARITY].includes(criteria)) {
+        // remove it from filter by
+        this.filterBy[FILTER_TYPES.CARD_RARITY] = this.filterBy[
+          FILTER_TYPES.CARD_RARITY
+        ].filter((rarity) => rarity !== criteria);
+      } else {
+        this.filterBy[FILTER_TYPES.CARD_RARITY].push(criteria);
+      }
 
       await this.$store.dispatch("crypt/filterCryptCards", {
         sortParam: this.sortParam,
@@ -462,8 +522,13 @@ export default {
         this.isCardModified
       );
 
-      this.modifiedPaginatedCryptCards = [...newCards.cards];
-      this.modifiedPageNext = newCards.next;
+      if (newCards) {
+        this.modifiedPaginatedCryptCards = [...newCards.cards];
+        this.modifiedPageNext = newCards.next;
+      } else {
+        this.modifiedPaginatedCryptCards = [];
+        this.modifiedPageNext = 0;
+      }
     },
     addHashToLocation(params) {
       const currentPath = this.$route.path;
@@ -818,6 +883,15 @@ table {
   flex-direction: column;
 }
 
+.filter-button-active {
+  font-weight: 800px;
+  transform: translateY(1px);
+  outline: none;
+  -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+  -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+  box-shadow: inset 0px 0px 5px #c1c1c1;
+}
+
 /* Desktop CSS */
 @media only screen and (min-width: 1300px) {
   #button-container {
@@ -865,8 +939,7 @@ table {
   margin-right: 10px;
 }
 
-.filter-rarity-wrapper{
-    margin-left:10px;
+.filter-rarity-wrapper {
+  margin-left: 10px;
 }
-
 </style>
