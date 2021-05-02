@@ -97,7 +97,7 @@ export default {
     color:#000;
     background-color:#ccc;
     padding:5px;
-    height:130px;
+    height:auto;
     text-decoration:none;
     border:1px solid black;
   }
